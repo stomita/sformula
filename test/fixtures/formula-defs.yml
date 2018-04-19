@@ -1,0 +1,97 @@
+-
+  type: Number
+  formula: 1 + 1
+  precision: 18
+  scale: 0
+  tests:
+    - {}
+-
+  type: Checkbox
+  formula: Number01__c + 2 < 0.5 * Number02__c
+  tests:
+    - 
+      Number01__c: 0 
+      Number02__c: 4
+-
+  type: Text
+  formula: Text01__c & "\"" & Text01__c
+  tests:
+    -
+      Text01__c: abc
+-
+  type: Text
+  formula: Text01__c + "_" + Text02__c
+  tests:
+    -
+      Text01__c: abc
+      Text02__c: def
+    -
+      Text01__c: abc
+    -
+      Text02__c: def
+-
+  type: Date
+  formula: Date01__c + 0.5
+  tests:
+    -
+      Date01__c: '2017-12-29'
+-
+  type: Date
+  formula: Datetime01__c - 0.5
+  tests:
+    -
+      Datetime01__c: '2018-01-01T14:00:00Z'
+    -
+      Datetime01__c: '2018-01-01T14:00:00+09:00'
+-
+  type: Number
+  formula: Datetime01__c - Datetime02__c
+  precision: 14
+  scale: 4
+  tests:
+    -
+      Datetime01__c: '2018-01-02T00:00:00Z'
+      Datetime02__c: '2017-12-29T12:00:00Z'
+    -
+      Datetime01__c: '2018-01-02T00:00:00Z'
+      Datetime02__c: '2017-12-30T00:00:00Z'
+-
+  type: Number
+  formula: Date01__c - Date02__c
+  precision: 14
+  scale: 4
+  tests:
+    -
+      Date01__c: '2018-01-02'
+      Date02__c: '2017-12-31'
+-
+  type: Number
+  formula: (Date01__c + 0.5 + 0.5) - (Date01__c + 0.1 + 0.9)
+  precision: 14
+  scale: 4
+  tests:
+    -
+      Date01__c: '2018-01-02'
+-
+  type: Checkbox
+  formula: '!Checkbox01__c && Checkbox02__c'
+  tests:
+    -
+      Checkbox01__c: false
+      Checkbox02__c: true
+-
+  type: Checkbox
+  formula: Checkbox01__c && 1 < 2
+  tests:
+    - {}
+-
+  type: Checkbox
+  formula: Date01__c > Date02__c || true
+  tests:
+    - {}
+    - 
+      Date01__c: '2018-01-01'
+    - 
+      Date01__c: '2018-01-01'
+      Date02__c: '2017-12-31'
+
