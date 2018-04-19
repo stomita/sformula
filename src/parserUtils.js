@@ -14,6 +14,20 @@ export function isReserved(id: string) {
   return /^(TRUE|FALSE|NULL)$/i.test(id);
 }
 
+export function concatinateLogicalExpressions(head: Expression, tail: Array<[BinaryOperator, Expression]>): Expression {
+  if (tail.length === 0) { return head; }
+  const [[op, tail1], ...rtail] = tail;
+  const expr = createLogicalExpression(op, head, tail1);
+  return concatinateLogicalExpressions(expr, rtail);
+}
+
+export function concatinateBinaryExpressions(head: Expression, tail: Array<[BinaryOperator, Expression]>): Expression {
+  if (tail.length === 0) { return head; }
+  const [[op, tail1], ...rtail] = tail;
+  const expr = createBinaryExpression(op, head, tail1);
+  return concatinateBinaryExpressions(expr, rtail);
+}
+
 export function createUnaryExpression(operator: UnaryOperator, argument: Expression): UnaryExpression {
   return {
     type: 'UnaryExpression',

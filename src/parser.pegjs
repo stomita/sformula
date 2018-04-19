@@ -1,8 +1,10 @@
 {
   const {
-    createUnaryExpression,
-    createBinaryExpression,
+    concatinateLogicalExpressions,
+    concatinateBinaryExpressions,
     createLogicalExpression,
+    createBinaryExpression,
+    createUnaryExpression,
     createCallExpression,
     createFieldPathExpression,
     createIdentifier,
@@ -20,23 +22,31 @@
 Expression = LogicalExpression
 
 /**
- * Logical Exprssion (AND | OR)
+ * Logical Exprssion (&&, ||)
  */
 LogicalExpression = OrExpression
 
 OrExpression =
-  left:AndExpression _ op:OrOperator _ right:OrExpression {
-    return createLogicalExpression(op, left, right);
+  head:AndExpression tail:OrExpressionTail* {
+    return concatinateLogicalExpressions(head, tail);
   }
-/ AndExpression
+
+OrExpressionTail =
+  _ op:OrOperator _ expression:AndExpression {
+    return [op, expression];
+  }
 
 OrOperator = '||' { return text(); }
 
 AndExpression =
-  left:BinaryExpression _ op:AndOperator _ right:AndExpression {
-    return createLogicalExpression(op, left, right);
+  head:BinaryExpression tail:AndExpressionTail* {
+    return concatinateLogicalExpressions(head, tail);
   }
-/ BinaryExpression
+
+AndExpressionTail =
+  _ op:AndOperator _ expression:BinaryExpression {
+    return [op, expression];
+  }
 
 AndOperator = '&&' { return text(); }
 
@@ -46,10 +56,14 @@ AndOperator = '&&' { return text(); }
 BinaryExpression = ComparisonExpression
 
 ComparisonExpression = 
-  left:AdditiveExpression _ op:ComparisonOperator _ right:ComparisonExpression {
-    return createBinaryExpression(op, left, right);
+  head:AdditiveExpression tail:ComparisonExpressionTail* {
+    return concatinateBinaryExpressions(head, tail);
   }
-/ AdditiveExpression
+
+ComparisonExpressionTail =
+  _ op:ComparisonOperator _ expression:AdditiveExpression {
+    return [op, expression];
+  }
 
 ComparisonOperator =
   '==' { return '==='; }
@@ -61,44 +75,56 @@ ComparisonOperator =
 / '<'  { return text(); }
 / '>'  { return text(); }
 
+AdditiveExpression = 
+  head:MultiplicativeExpression tail:AdditiveExpressionTail* {
+    return concatinateBinaryExpressions(head, tail);
+  }
+
+AdditiveExpressionTail =
+  _ op:AdditiveOperator _ expression:MultiplicativeExpression {
+    return [op, expression];
+  }
+
 AdditiveOperator =
   '+' / '-'
 / '&' { return '+'; }
 
-AdditiveExpression = 
-  left:MultiplicativeExpression _ op:AdditiveOperator _ right:AdditiveExpression {
-    return createBinaryExpression(op, left, right);
-  }
-/ MultiplicativeExpression
-
 MultiplicativeExpression = 
-  left:ExponentialExpression _ op:MultiplicativeOperator _ right:MultiplicativeExpression {
-    return createBinaryExpression(op, left, right);
+  head:ExponentialExpression tail:MultiplicativeExpressionTail* {
+    return concatinateBinaryExpressions(head, tail);
+  } 
+
+MultiplicativeExpressionTail =  
+  _ op:MultiplicativeOperator _ expression:ExponentialExpression {
+    return [op, expression];
   }
-/ ExponentialExpression
 
 MultiplicativeOperator =
   '*' / '/'
 
 ExponentialExpression =
-  left:UnaryExpression _ op:ExponentialOperator _ right:ExponentialExpression {
-    return createBinaryExpression(op, left, right);
+  head:UnaryExpression tail:ExponentialExpressionTail* {
+    return concatinateBinaryExpressions(head, tail);
   }
-/ UnaryExpression
+
+ExponentialExpressionTail =
+  _ op:ExponentialOperator _ expression:UnaryExpression {
+    return [op, expression];
+  }
 
 ExponentialOperator = '^' { return '**'; }
 
 /**
  * Unary Expression (!, -, +)
  */
-UnaryOperator =
-  '-' / '+' / '!' { return text(); }
-
 UnaryExpression =
   op:UnaryOperator _ expr:UnaryExpression {
     return createUnaryExpression(op, expr);
   }
 / CallExpression
+
+UnaryOperator =
+  '-' / '+' / '!' { return text(); }
 
 /**
  * Call Expression (e.g. foo(a, b))
