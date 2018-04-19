@@ -6,6 +6,23 @@
   tests:
     - {}
 -
+  type: Number
+  formula: Number01__c + 2
+  precision: 18
+  scale: 0
+  tests:
+    - {}
+    -
+      Number01__c: 1
+-
+  type: Number
+  formula: Number01__c + 2
+  blankAsZero: true,
+  precision: 18
+  scale: 0
+  tests:
+    - {}
+-
   type: Checkbox
   formula: Number01__c + 2 < 0.5 * Number02__c
   tests:
@@ -21,6 +38,18 @@
 -
   type: Text
   formula: Text01__c + "_" + Text02__c
+  tests:
+    -
+      Text01__c: abc
+      Text02__c: def
+    -
+      Text01__c: abc
+    -
+      Text02__c: def
+-
+  type: Text
+  formula: Text01__c + "_" + Text02__c
+  blankAsZero: true
   tests:
     -
       Text01__c: abc

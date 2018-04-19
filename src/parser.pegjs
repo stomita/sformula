@@ -25,7 +25,7 @@ Expression = LogicalExpression
 LogicalExpression = OrExpression
 
 OrExpression =
-  left:AndExpression _ op:OrOperator _ right:Expression {
+  left:AndExpression _ op:OrOperator _ right:OrExpression {
     return createLogicalExpression(op, left, right);
   }
 / AndExpression
@@ -33,7 +33,7 @@ OrExpression =
 OrOperator = '||' { return text(); }
 
 AndExpression =
-  left:BinaryExpression _ op:AndOperator _ right:Expression {
+  left:BinaryExpression _ op:AndOperator _ right:AndExpression {
     return createLogicalExpression(op, left, right);
   }
 / BinaryExpression
@@ -46,33 +46,33 @@ AndOperator = '&&' { return text(); }
 BinaryExpression = ComparisonExpression
 
 ComparisonExpression = 
-  left:AdditiveExpression _ op:ComparisonOperator _ right:Expression {
+  left:AdditiveExpression _ op:ComparisonOperator _ right:ComparisonExpression {
     return createBinaryExpression(op, left, right);
   }
 / AdditiveExpression
 
 ComparisonOperator =
-  '='  { return '==='; }
-/ '==' { return '==='; }
+  '==' { return '==='; }
+/ '='  { return '==='; }
 / '<>' { return '!=='; }
 / '!=' { return text(); }
-/ '<'  { return text(); }
-/ '>'  { return text(); }
 / '<=' { return text(); }
 / '>=' { return text(); }
+/ '<'  { return text(); }
+/ '>'  { return text(); }
 
 AdditiveOperator =
   '+' / '-'
 / '&' { return '+'; }
 
 AdditiveExpression = 
-  left:MultiplicativeExpression _ op:AdditiveOperator _ right:Expression {
+  left:MultiplicativeExpression _ op:AdditiveOperator _ right:AdditiveExpression {
     return createBinaryExpression(op, left, right);
   }
 / MultiplicativeExpression
 
 MultiplicativeExpression = 
-  left:ExponentialExpression _ op:MultiplicativeOperator _ right:Expression {
+  left:ExponentialExpression _ op:MultiplicativeOperator _ right:MultiplicativeExpression {
     return createBinaryExpression(op, left, right);
   }
 / ExponentialExpression
@@ -81,7 +81,7 @@ MultiplicativeOperator =
   '*' / '/'
 
 ExponentialExpression =
-  left:UnaryExpression _ op:ExponentialOperator _ right:Expression {
+  left:UnaryExpression _ op:ExponentialOperator _ right:ExponentialExpression {
     return createBinaryExpression(op, left, right);
   }
 / UnaryExpression
@@ -95,7 +95,7 @@ UnaryOperator =
   '-' / '+' / '!' { return text(); }
 
 UnaryExpression =
-  op:UnaryOperator _ expr:Expression {
+  op:UnaryOperator _ expr:UnaryExpression {
     return createUnaryExpression(op, expr);
   }
 / CallExpression
@@ -104,8 +104,8 @@ UnaryExpression =
  * Call Expression (e.g. foo(a, b))
  */
 CallExpression =
-  callee:Identifier _ LPAREN _ args:CallArgumentList _ RPAREN {
-    return createCallExpression(callee, args);
+  callee:Identifier _ LPAREN _ args:CallArgumentList? _ RPAREN {
+    return createCallExpression(callee, args || []);
   }
 / FieldPathExpression
 

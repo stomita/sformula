@@ -7,8 +7,8 @@ export type ExpressionType = {
   type: 'string',
 } | {
   type: 'number',
-  precision: number,
-  scale: number,
+  precision?: number,
+  scale?: number,
 } | {
   type: 'boolean',
 } | {
@@ -17,8 +17,8 @@ export type ExpressionType = {
   type: 'datetime',
 } | {
   type: 'currency',
-  precision: number,
-  scale: number,
+  precision?: number,
+  scale?: number,
 } | {
   type: 'object',
   sobject: string,

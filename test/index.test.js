@@ -1,11 +1,19 @@
 /* @flow */
 import test from 'ava';
-import { parse } from '..'; 
+import { parse, type ReturnType } from '..'; 
 import { loadFormulaDefs } from './utils/formulaDef';
 import { describe, createFormulaSchema, resetFormulaSchema, createAndFetchRecord } from './utils/schema';
 
 
 const FORMULA_TEST_OBJECT = 'FormulaTest__c';
+
+function toReturnType(type: string): ReturnType {
+  return ((
+    type === 'Checkbox' ? 'boolean' :
+    type === 'Text' ? 'string' :
+    type.toLowerCase()
+  ): any);
+}
 
 /**
  * 
@@ -18,15 +26,16 @@ test('formula definition test', async (t) => {
   }
   const describer = { sobject: FORMULA_TEST_OBJECT, describe };
   for (const [i, formulaDef] of formulaDefs.entries()) {
-    const { name, formula, tests } = formulaDef;
+    const { name, formula, blankAsZero, tests } = formulaDef;
     console.log('===============================');
-    console.log('formula:    ', formula);
+    console.log('formula:    ', formula, blankAsZero ? '(blank as zero)' : '');
     let fml;
     try {
-      fml = await parse(formula, describer);
+      const returnType = toReturnType(formulaDef.type);
+      fml = await parse(formula, { ...describer, returnType });
       console.log('returnType: ', fml.returnType);
     } catch (err) {
-      console.error(err.message, err.location);
+      console.error(err.message);
     }
     for (const testRec of tests) {
       console.log('--------------------');
@@ -34,11 +43,11 @@ test('formula definition test', async (t) => {
       const record = await createAndFetchRecord(testRec);
       const expected = record[name];
       console.log('expected:   ', expected);
-      /*
       if (fml) {
-        t.true(fml.evaluate(testRec) === expected);
+        const actual = fml.evaluate(testRec);
+        console.log('actual:     ', actual);
+        // t.true(actual === expected);
       }
-      */
     }
   }
   t.pass();

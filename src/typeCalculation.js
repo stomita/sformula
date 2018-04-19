@@ -11,7 +11,7 @@ export type TypeCalculatedResult = {
   returnType: ExpressionType,
 };
 
-function validationError(expression: Expression, name: string, message: string) {
+export function validationError(expression: Expression, name: string, message: string) {
   const err = new Error(message);
   err.name = name;
   if (expression.loc) {
@@ -21,7 +21,7 @@ function validationError(expression: Expression, name: string, message: string) 
   return err;
 }
 
-function invalidArgLengthError(expression: Expression, argLen: number, argRange: [number, number]) {
+export function invalidArgLengthError(expression: Expression, argLen: number, argRange: [number, number]) {
   const message =
     `arguments num for the call is too small (expected ${
       argRange[0] === argRange[1] ? argRange[0] : `${argRange[0]}-${argRange[1]}`
@@ -29,17 +29,17 @@ function invalidArgLengthError(expression: Expression, argLen: number, argRange:
   return validationError(expression, 'INVALID_ARGUMENT_LENGTH', message);
 }
 
-function invalidTypeError(expression: Expression, type: string, expected: string[]) {
+export function invalidTypeError(expression: Expression, type: string, expected: string[]) {
   const message = `expected a ${expected.map(e => `'${e}'`).join(' or ')} type value, but '${type}' type found`
   return validationError(expression, 'INVALID_TYPE', message);
 }
 
-function invalidOperatorError(expression: Expression, type: string, operator: string) {
+export function invalidOperatorError(expression: Expression, type: string, operator: string) {
   const message = `operator ${operator} cannot be applied to '${type}' type value`;
-  return validationError(expression, 'INVALID_TYPE', message);
+  return validationError(expression, 'INVALID_OPERATOR', message);
 }
 
-function unexpectedError(expression: Expression, message: string) {
+export function unexpectedError(expression: Expression, message: string) {
   return validationError(expression, 'UNEXPECTED_ERROR', message);
 }
 
@@ -90,10 +90,21 @@ function calculateBinaryExpressionReturnType(
       if (rightType.type !== 'string' && rightType.type !== 'any') {
         throw invalidTypeError(expression.right, rightType.type, ['string']);
       }
+      if (operator === '+') {
+        returnType = { type: 'string' };
+      } else if (operator === '==' || operator === '!=' || operator === '===' || operator === '!==') {
+        returnType = { type: 'boolean' };
+      } else {
+        throw invalidOperatorError(expression.left, leftType.type, operator);
+      }
       break;
     case 'number':
       if (rightType.type !== 'number' && rightType.type !== 'currency' && rightType.type !== 'any') {
         throw invalidTypeError(expression.right, rightType.type, ['number', 'currency']);
+      }
+      if (operator === '==' || operator === '!=' || operator === '===' || operator === '!==' ||
+          operator === '<' || operator === '>' || operator === '<=' || operator === '>=') {
+        returnType = { type: 'boolean' };
       }
       break;
     case 'date':
@@ -114,14 +125,18 @@ function calculateBinaryExpressionReturnType(
         } else if (rightType.type === 'date') {
           return {
             expression: createCallExpression('$$DIFF_DATE$$', [expression.left, expression.right]),
-            returnType: { type: 'number', precision: -1, scale: -1 },
+            returnType: { type: 'number' },
           };
         } else {
           throw invalidTypeError(expression.right, rightType.type, ['number', 'date']);
         }
+      } else if (operator === '<' || operator === '>' || operator === '>=' || operator === '<=' ||
+                 operator === '===' || operator === '!==' || operator === '==' || operator == '!=') {
+        returnType = { type: 'boolean' };
       } else {
         throw invalidOperatorError(expression.left, leftType.type, operator);
       }
+      break;
     case 'datetime':
       if (operator === '+') {
         if (rightType.type !== 'number' && rightType.type !== 'any') {
@@ -140,20 +155,24 @@ function calculateBinaryExpressionReturnType(
         } else if (rightType.type === 'datetime') {
           return {
             expression: createCallExpression('$$DIFF_DATETIME$$', [expression.left, expression.right]),
-            returnType: { type: 'number', precision: -1, scale: -1 },
+            returnType: { type: 'number' },
           };
         } else {
           throw invalidTypeError(expression.right, rightType.type, ['number', 'datetime']);
         }
+      } else if (operator === '<' || operator === '>' || operator === '>=' || operator === '<=' ||
+                 operator === '===' || operator === '!==' || operator === '==' || operator == '!=') {
+        returnType = { type: 'boolean' };
       } else {
         throw invalidOperatorError(expression.left, leftType.type, operator);
       }
+      break;
     default:
       throw invalidTypeError(expression.left, leftType.type, ['string', 'number', 'date', 'datetime']);
   }
   return {
     expression: { type: 'BinaryExpression', operator, left, right, ...rexpression },
-    returnType: leftType,
+    returnType,
   };
 }
 
@@ -167,7 +186,7 @@ function calculateLogicalExpressionReturnType(
   switch (leftType.type) {
     case 'boolean':
       if (rightType.type !== 'boolean' && rightType.type !== 'any') {
-        throw invalidTypeError(expression.right, rightType.type, ['string']);
+        throw invalidTypeError(expression.right, rightType.type, ['boolean']);
       }
       break;
     default:
@@ -234,7 +253,7 @@ function calculateIdentifierReturnType(
 function calculateLiteralReturnType(expression: Literal) {
   const returnType =
     typeof expression.value === 'number' ?
-      { type: 'number', precision: -1, scale: -1 } :
+      { type: 'number' } :
     typeof expression.value === 'string' ?
       { type: 'string' } :
     typeof expression.value === 'boolean' ?
@@ -263,4 +282,17 @@ export function calculateReturnType(expression: Expression, typeDict: Expression
     default:
       throw new Error(`error on caluculating field type: ${expression.type} is not supported`);
   }
+}
+
+/**
+ * 
+ */
+export function isCompatibleType(srcType: string, dstType: string) {
+  if (srcType === dstType) {
+    return true;
+  }
+  if (srcType === 'datetime' && dstType === 'date') {
+    return true;
+  }
+  return false;
 }
