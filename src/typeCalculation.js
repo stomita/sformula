@@ -2,11 +2,11 @@
 import type {
   Expression, UnaryExpression, BinaryExpression, LogicalExpression,
   MemberExpression, CallExpression,
-  Identifier, Literal,
+  ObjectExpression, Identifier, Literal,
 } from 'esformula';
 import type { ExpressionType, ExpressionTypeDictionary } from './types';
 
-export type TypeCalculatedResult = {
+export type TraverseResult = {
   expression: Expression,
   returnType: ExpressionType,
 };
@@ -25,7 +25,7 @@ export function invalidArgLengthError(expression: Expression, argLen: number, ar
   const message =
     `arguments num for the call is too small (expected ${
       argRange[0] === argRange[1] ? argRange[0] : `${argRange[0]}-${argRange[1]}`
-    }, found ${argLen}`;
+    }, found ${argLen})`;
   return validationError(expression, 'INVALID_ARGUMENT_LENGTH', message);
 }
 
@@ -51,12 +51,46 @@ function createCallExpression(name: string, args: $PropertyType<CallExpression, 
   };
 }
 
-function calculateUnaryExpressionReturnType(
+function createLiteral(value: string | number | boolean | null): Literal {
+  return {
+    type: 'Literal',
+    value,
+    raw: String(value),
+  };
+}
+
+function nullValue(result: TraverseResult, blankAsZero: boolean) {
+  const { expression, returnType } = result;
+  let nullValue: Literal | ObjectExpression | null = null;
+  if (returnType.type === 'string') {
+    nullValue = createLiteral('');
+  } else if (returnType.type === 'boolean') {
+    nullValue = createLiteral(false);
+  } else if (returnType.type === 'number' || returnType.type === 'currency') {
+    nullValue = createLiteral(blankAsZero ? 0 : null);
+  } else if (returnType.type === 'object') {
+    nullValue = {
+      type: 'ObjectExpression',
+      properties: [],
+    };
+  }
+  if (nullValue !== null) {
+    return {
+      expression: createCallExpression('NULLVALUE', [ expression, nullValue ]),
+      returnType,
+    };
+  }
+  return result;
+}
+
+function traverseUnaryExpression(
   expression: UnaryExpression,
   typeDict: ExpressionTypeDictionary,
-): TypeCalculatedResult {
+  blankAsZero: boolean,
+): TraverseResult {
   const { type, operator, ...rexpression } = expression;
-  const { expression: argument, returnType: argumentType } = calculateReturnType(expression.argument, typeDict);
+  const { expression: argument, returnType: argumentType } =
+    traverseExpression(expression.argument, typeDict, blankAsZero);
   switch (argumentType.type) {
     case 'number':
       if (operator !== '-' && operator === '+') {
@@ -77,136 +111,282 @@ function calculateUnaryExpressionReturnType(
   };
 }
 
-function calculateBinaryExpressionReturnType(
+function traverseStringBinaryExpression(
   expression: BinaryExpression,
-  typeDict: ExpressionTypeDictionary,
-): TypeCalculatedResult {
+  left: TraverseResult,
+  right: TraverseResult,
+): TraverseResult {
   const { type, operator, ...rexpression } = expression;
-  const { expression: left, returnType: leftType } = calculateReturnType(expression.left, typeDict);
-  const { expression: right, returnType: rightType } = calculateReturnType(expression.right, typeDict);
-  let returnType = leftType;
-  switch (leftType.type) {
-    case 'string':
-      if (rightType.type !== 'string' && rightType.type !== 'any') {
-        throw invalidTypeError(expression.right, rightType.type, ['string']);
+  const rightType = right.returnType.type;
+  if (rightType !== 'string' && rightType !== 'any') {
+    throw invalidTypeError(expression.right, rightType, ['string']);
+  }
+  switch (operator) {
+    case '+':
+      return {
+        expression: createCallExpression('$$CONCAT_STRING$$', [left.expression, right.expression]),
+        returnType: { type: 'string' },
+      };
+    case '==':
+    case '!=':
+    case '===':
+    case '!==':
+      return {
+        expression: {
+          type: 'BinaryExpression',
+          operator,
+          ...rexpression,
+          left: left.expression,
+          right: right.expression,
+        },
+        returnType: { type: 'boolean' },
+      };
+    default:
+      throw invalidOperatorError(expression.left, left.returnType.type, operator);
+  }
+}
+
+const NUMBER_OPERATOR_FN = {
+  '+': '$$ADD_NUMBER$$',
+  '-': '$$SUBTRACT_NUMBER$$',
+  '*': '$$MULTIPLY_NUMBER$$',
+  '/': '$$DIVIDE_NUMBER$$',
+  '**': '$$POWER_NUMBER$$',
+  '<': '$$LT_NUMBER$$',
+  '>': '$$GT_NUMBER$$',
+  '<=': '$$LTE_NUMBER$$',
+  '>=': '$$GTE_NUMBER$$',
+  '==': '$$EQ_NUMBER$$',
+  '!=': '$$NEQ_NUMBER$$',
+  '===': '$$EQ_NUMBER$$',
+  '!==': '$$NEQ_NUMBER$$',
+};
+
+function traverseNumberBinaryExpression(
+  expression: BinaryExpression,
+  left: TraverseResult,
+  right: TraverseResult,
+): TraverseResult {
+  const { type, operator, ...rexpression } = expression;
+  const rightType = right.returnType.type;
+  if (rightType !== 'number' && rightType !== 'currency' && rightType !== 'any') {
+    throw invalidTypeError(expression.right, rightType, ['number', 'currency']);
+  }
+  switch (operator) {
+    case '+':
+    case '-':
+    case '*':
+    case '/':
+    case '**':
+      return {
+        expression: createCallExpression(NUMBER_OPERATOR_FN[operator], [left.expression, right.expression]),
+        returnType: left.returnType,
+      };
+    case '<':
+    case '>':
+    case '<=':
+    case '>=':
+    case '==':
+    case '!=':
+    case '===':
+    case '!==':
+      return {
+        expression: createCallExpression(NUMBER_OPERATOR_FN[operator], [left.expression, right.expression]),
+        returnType: { type: 'boolean' },
+      };
+    default:
+      throw invalidOperatorError(expression.left, left.returnType.type, operator);
+  }
+}
+
+const DATE_OPERATOR_FN = {
+  '<': '$$LT_DATE$$',
+  '<=': '$$LTE_DATE$$',
+  '>': '$$GT_DATE$$',
+  '>=': '$$GTE_DATE$$',
+  '==': '$$EQ_DATE$$',
+  '!=': '$$NEQ_DATE$$',
+  '===': '$$EQ_DATE$$',
+  '!==': '$$NEQ_DATE$$',
+};
+
+
+function traverseDateBinaryExpression(
+  expression: BinaryExpression,
+  left: TraverseResult,
+  right: TraverseResult,
+): TraverseResult {
+  const { type, operator, ...rexpression } = expression;
+  const rightType = right.returnType.type;
+  switch (operator) {
+    case '+':
+      if (rightType !== 'number' && rightType !== 'any') {
+        throw invalidTypeError(expression.right, rightType, ['number']);
       }
-      if (operator === '+') {
-        returnType = { type: 'string' };
-      } else if (operator === '==' || operator === '!=' || operator === '===' || operator === '!==') {
-        returnType = { type: 'boolean' };
-      } else {
-        throw invalidOperatorError(expression.left, leftType.type, operator);
-      }
-      break;
-    case 'number':
-      if (rightType.type !== 'number' && rightType.type !== 'currency' && rightType.type !== 'any') {
-        throw invalidTypeError(expression.right, rightType.type, ['number', 'currency']);
-      }
-      if (operator === '==' || operator === '!=' || operator === '===' || operator === '!==' ||
-          operator === '<' || operator === '>' || operator === '<=' || operator === '>=') {
-        returnType = { type: 'boolean' };
-      }
-      break;
-    case 'date':
-      if (operator === '+') {
-        if (rightType.type !== 'number' && rightType.type !== 'any') {
-          throw invalidTypeError(expression.right, rightType.type, ['number']);
-        }
+      return {
+        expression: createCallExpression('$$ADD_DATE$$', [left.expression, right.expression]),
+        returnType: { type: 'date' },
+      };
+    case '-':
+      if (rightType === 'number') {
         return {
-          expression: createCallExpression('$$ADD_DATE$$', [expression.left, expression.right]),
+          expression: createCallExpression('$$SUBTRACT_DATE$$', [left.expression, right.expression]),
           returnType: { type: 'date' },
         };
-      } else if (operator === '-') {
-        if (rightType.type === 'number') {
-          return {
-            expression: createCallExpression('$$SUBTRACT_DATE$$', [expression.left, expression.right]),
-            returnType: { type: 'date' },
-          };
-        } else if (rightType.type === 'date') {
-          return {
-            expression: createCallExpression('$$DIFF_DATE$$', [expression.left, expression.right]),
-            returnType: { type: 'number' },
-          };
-        } else {
-          throw invalidTypeError(expression.right, rightType.type, ['number', 'date']);
-        }
-      } else if (operator === '<' || operator === '>' || operator === '>=' || operator === '<=' ||
-                 operator === '===' || operator === '!==' || operator === '==' || operator == '!=') {
-        returnType = { type: 'boolean' };
-      } else {
-        throw invalidOperatorError(expression.left, leftType.type, operator);
-      }
-      break;
-    case 'datetime':
-      if (operator === '+') {
-        if (rightType.type !== 'number' && rightType.type !== 'any') {
-          throw invalidTypeError(expression.right, rightType.type, ['number']);
-        }
+      } else if (rightType === 'date') {
         return {
-          expression: createCallExpression('$$ADD_DATETIME$$', [expression.left, expression.right]),
+          expression: createCallExpression('$$DIFF_DATE$$', [left.expression, right.expression]),
+          returnType: { type: 'number' },
+        };
+      } else {
+        throw invalidTypeError(expression.right, rightType, ['number', 'date']);
+      }
+    case '<':
+    case '>':
+    case '>=':
+    case '<=':
+    case '==':
+    case '!=':
+    case '===':
+    case '!==':
+      if (rightType !== 'date') {
+        throw invalidTypeError(expression.right, rightType, ['date']);
+      }
+      const name = DATE_OPERATOR_FN[operator];
+      return {
+        expression: createCallExpression(name, [left.expression, right.expression]),
+        returnType: { type: 'boolean' },
+      };
+    default:
+      throw invalidOperatorError(expression.left, left.returnType.type, operator);
+  }
+}
+
+const DATETIME_OPERATOR_FN = {
+  '<': '$$LT_DATETIME$$',
+  '<=': '$$LTE_DATETIME$$',
+  '>': '$$GT_DATETIME$$',
+  '>=': '$$GTE_DATETIME$$',
+  '==': '$$EQ_DATETIME$$',
+  '!=': '$$NEQ_DATETIME$$',
+  '===': '$$EQ_DATETIME$$',
+  '!==': '$$NEQ_DATETIME$$',
+};
+
+function traverseDatetimeBinaryExpression(
+  expression: BinaryExpression,
+  left: TraverseResult,
+  right: TraverseResult,
+): TraverseResult {
+  const { type, operator, ...rexpression } = expression;
+  const rightType = right.returnType.type;
+  switch (operator) {
+    case '+':
+      if (rightType !== 'number' && rightType !== 'any') {
+        throw invalidTypeError(expression.right, rightType, ['number']);
+      }
+      return {
+        expression: createCallExpression('$$ADD_DATETIME$$', [left.expression, right.expression]),
+        returnType: { type: 'datetime' },
+      };
+    case '-':
+      if (rightType === 'number') {
+        return {
+          expression: createCallExpression('$$SUBTRACT_DATETIME$$', [left.expression, right.expression]),
           returnType: { type: 'datetime' },
         };
-      } else if (operator === '-') {
-        if (rightType.type === 'number') {
-          return {
-            expression: createCallExpression('$$SUBTRACT_DATETIME$$', [expression.left, expression.right]),
-            returnType: { type: 'datetime' },
-          };
-        } else if (rightType.type === 'datetime') {
-          return {
-            expression: createCallExpression('$$DIFF_DATETIME$$', [expression.left, expression.right]),
-            returnType: { type: 'number' },
-          };
-        } else {
-          throw invalidTypeError(expression.right, rightType.type, ['number', 'datetime']);
-        }
-      } else if (operator === '<' || operator === '>' || operator === '>=' || operator === '<=' ||
-                 operator === '===' || operator === '!==' || operator === '==' || operator == '!=') {
-        returnType = { type: 'boolean' };
+      } else if (rightType === 'datetime') {
+        return {
+          expression: createCallExpression('$$DIFF_DATETIME$$', [left.expression, right.expression]),
+          returnType: { type: 'number' },
+        };
       } else {
-        throw invalidOperatorError(expression.left, leftType.type, operator);
+        throw invalidTypeError(expression.right, rightType, ['number', 'datetime']);
       }
-      break;
+    case '<':
+    case '>':
+    case '>=':
+    case '<=':
+    case '===':
+    case '!==':
+      return {
+        expression: {
+          type: 'BinaryExpression',
+          operator,
+          ...rexpression,
+          left: left.expression,
+          right: right.expression,
+        },
+        returnType: { type: 'boolean' },
+      };
     default:
-      throw invalidTypeError(expression.left, leftType.type, ['string', 'number', 'date', 'datetime']);
+      throw invalidOperatorError(expression.left, left.returnType.type, operator);
   }
-  return {
-    expression: { type: 'BinaryExpression', operator, left, right, ...rexpression },
-    returnType,
-  };
 }
 
-function calculateLogicalExpressionReturnType(
+
+function traverseBinaryExpression(
+  expression: BinaryExpression,
+  typeDict: ExpressionTypeDictionary,
+  blankAsZero: boolean,
+): TraverseResult {
+  const left = traverseExpression(expression.left, typeDict, blankAsZero);
+  const right = traverseExpression(expression.right, typeDict, blankAsZero);
+  const leftType = left.returnType.type;
+  switch (leftType) {
+    case 'string':
+      return traverseStringBinaryExpression(expression, left, right);
+    case 'number':
+      return traverseNumberBinaryExpression(expression, left, right);
+    case 'date':
+      return traverseDateBinaryExpression(expression, left, right);
+    case 'datetime':
+      return traverseDatetimeBinaryExpression(expression, left, right);
+    default:
+      throw invalidTypeError(expression.left, leftType, ['string', 'number', 'date', 'datetime']);
+  }
+}
+
+function traverseLogicalExpression(
   expression: LogicalExpression,
   typeDict: ExpressionTypeDictionary,
-): TypeCalculatedResult {
+  blankAsZero: boolean,
+): TraverseResult {
   const { type, operator, ...rexpression } = expression;
-  const { expression: left, returnType: leftType } = calculateReturnType(expression.left, typeDict);
-  const { expression: right, returnType: rightType } = calculateReturnType(expression.right, typeDict);
-  switch (leftType.type) {
+  const left = traverseExpression(expression.left, typeDict, blankAsZero);
+  const right = traverseExpression(expression.right, typeDict, blankAsZero);
+  const leftType = left.returnType.type;
+  const rightType = right.returnType.type;
+  switch (leftType) {
     case 'boolean':
-      if (rightType.type !== 'boolean' && rightType.type !== 'any') {
-        throw invalidTypeError(expression.right, rightType.type, ['boolean']);
+      if (rightType !== 'boolean' && rightType !== 'any') {
+        throw invalidTypeError(expression.right, rightType, ['boolean']);
       }
-      break;
+      return {
+        expression: {
+          type: 'LogicalExpression',
+          operator,
+          ...rexpression,
+          left: left.expression,
+          right: right.expression,
+        },
+        returnType: left.returnType,
+      };
     default:
-      throw invalidTypeError(expression.left, leftType.type, ['boolean']);
+      throw invalidTypeError(expression.left, leftType, ['boolean']);
   }
-  return {
-    expression: { type: 'LogicalExpression', operator, left, right, ...rexpression },
-    returnType: leftType,
-  };
 }
 
-function calculateCallExpressionReturnType(
+function traverseCallExpression(
   expression: CallExpression,
   typeDict: ExpressionTypeDictionary,
-): TypeCalculatedResult {
+  blankAsZero: boolean,
+): TraverseResult {
   const { type, callee, arguments: args, ...rexpression } = expression;
   if (callee.type === 'Super') {
     throw unexpectedError(expression, 'callee cannot be a super type');
   }
-  const { expression: callee_, returnType: calleeType } = calculateReturnType(callee, typeDict);
+  const { expression: callee_, returnType: calleeType } = traverseExpression(callee, typeDict, blankAsZero);
   if (calleeType.type !== 'function') {
     throw invalidTypeError(callee, calleeType.type, ['function']);
   }
@@ -217,17 +397,33 @@ function calculateCallExpressionReturnType(
     throw invalidArgLengthError(callee, argLen, [minArgLen, maxArgLen]);
   }
   const args_ = [];
+  const templateTypes: { [name: string]: ?ExpressionType } = {};
   for (const [i, arg] of args.entries()) {
     if (arg.type === 'SpreadElement') {
       throw unexpectedError(expression, 'argument cannot be a spread element type');
     }
-    const { expression: arg_, returnType } = calculateReturnType(arg, typeDict);
-    const expectedArgType = calleeType.arguments[i].argument.type;
-    if (expectedArgType !== 'any' && returnType.type !== expectedArgType) {
-      throw invalidTypeError(arg, returnType.type, [expectedArgType]);
+    const argument = traverseExpression(arg, typeDict, blankAsZero);
+    const argumentType = argument.returnType;
+    const expectedType = calleeType.arguments[i].argument;
+    if (expectedType.type === 'template') {
+      let templateType = templateTypes[expectedType.ref];
+      if (templateType) {
+        if (templateType.type !== 'any' && argumentType.type !== templateType.type) {
+          throw invalidTypeError(arg, argumentType.type, [templateType.type]);
+        }
+      } else {
+        templateTypes[expectedType.ref] = argumentType;
+      }
+    } else if (expectedType.type !== 'any' && argumentType.type !== expectedType.type) {
+      throw invalidTypeError(arg, argumentType.type, [expectedType.type]);
     }
-    args_.push(arg_);
+    args_.push(argument.expression);
   }
+  const returnType = (
+    calleeType.returns.type === 'template' ?
+    templateTypes[calleeType.returns.ref] || { type: 'any' } :
+    calleeType.returns
+  );
   return {
     expression: {
       type: 'CallExpression',
@@ -235,22 +431,55 @@ function calculateCallExpressionReturnType(
       arguments: args_,
       ...rexpression,
     },
-    returnType: calleeType.returns,
+    returnType,
   };
 }
 
-function calculateIdentifierReturnType(
+function traverseMemberExpression(
+  expression: MemberExpression,
+  typeDict: ExpressionTypeDictionary,
+  blankAsZero: boolean,
+): TraverseResult {
+  const { type, object, property, ...rexpression } = expression;
+  if (object.type === 'Super') {
+    throw unexpectedError(expression, 'object cannot be a super type');
+  }
+  const objectResult = traverseExpression(object, typeDict, blankAsZero);
+  const objectType = objectResult.returnType;
+  if (objectType.type !== 'object') {
+    throw invalidTypeError(object, objectType.type, ['object']);
+  }
+  if (property.type !== 'Identifier') {
+    throw unexpectedError(property, 'property must be an identifier');
+  }
+  const returnType = objectType.properties[property.name];
+  if (!returnType) {
+    throw unexpectedError(property, `property ${property.name} is not found in object`);
+  }
+  return nullValue({
+    expression: {
+      type: 'MemberExpression',
+      object: objectResult.expression,
+      property,
+      ...rexpression,
+    },
+    returnType,
+  }, blankAsZero);
+}
+
+function traverseIdentifier(
   expression: Identifier,
   typeDict: ExpressionTypeDictionary,
+  blankAsZero: boolean,
 ) {
   const returnType = typeDict[expression.name];
   if (!returnType) {
     throw new Error(`identifier type information is not found: ${expression.name}`);
   }
-  return { expression, returnType };
+  return nullValue({ expression, returnType }, blankAsZero);
 }
 
-function calculateLiteralReturnType(expression: Literal) {
+function traverseLiteral(expression: Literal) {
   const returnType =
     typeof expression.value === 'number' ?
       { type: 'number' } :
@@ -265,22 +494,28 @@ function calculateLiteralReturnType(expression: Literal) {
 /**
  * 
  */
-export function calculateReturnType(expression: Expression, typeDict: ExpressionTypeDictionary): TypeCalculatedResult {
+export function traverseExpression(
+  expression: Expression,
+  typeDict: ExpressionTypeDictionary,
+  blankAsZero: boolean,
+): TraverseResult {
   switch (expression.type) {
     case 'UnaryExpression':
-      return calculateUnaryExpressionReturnType(expression, typeDict);
+      return traverseUnaryExpression(expression, typeDict, blankAsZero);
     case 'BinaryExpression':
-      return calculateBinaryExpressionReturnType(expression, typeDict);
+      return traverseBinaryExpression(expression, typeDict, blankAsZero);
     case 'LogicalExpression':
-      return calculateLogicalExpressionReturnType(expression, typeDict);
+      return traverseLogicalExpression(expression, typeDict, blankAsZero);
     case 'CallExpression':
-      return calculateCallExpressionReturnType(expression, typeDict);
+      return traverseCallExpression(expression, typeDict, blankAsZero);
+    case 'MemberExpression':
+      return traverseMemberExpression(expression, typeDict, blankAsZero);
     case 'Identifier':
-      return calculateIdentifierReturnType(expression, typeDict);
+      return traverseIdentifier(expression, typeDict, blankAsZero);
     case 'Literal':
-      return calculateLiteralReturnType(expression);
+      return traverseLiteral(expression);
     default:
-      throw new Error(`error on caluculating field type: ${expression.type} is not supported`);
+      throw unexpectedError(expression, `unexpected expression type found: ${expression.type}`);
   }
 }
 

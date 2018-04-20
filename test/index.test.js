@@ -2,10 +2,9 @@
 import test from 'ava';
 import { parse, type ReturnType } from '..'; 
 import { loadFormulaDefs } from './utils/formulaDef';
-import { describe, createFormulaSchema, resetFormulaSchema, createAndFetchRecord } from './utils/schema';
+import { describe, createFormulaSchema, resetFormulaSchema } from './utils/schema';
+import { loadTestRecords, truncateAllTestRecords, getExpectedRecords } from './utils/testRecords';
 
-
-const FORMULA_TEST_OBJECT = 'FormulaTest__c';
 
 function zeropad(n: number) {
   return (n < 10 ? '00' : n < 100 ? '0' : '') + String(n);
@@ -19,34 +18,43 @@ function toReturnType(type: string): ReturnType {
   ): any);
 }
 
+const FORMULA_TEST_OBJECT = 'FormulaTest__c';
+
 const formulaDefs = loadFormulaDefs();
 
 const describer = { sobject: FORMULA_TEST_OBJECT, describe };
+
+let testRecords;
+let expectedRecords;
 
 /**
  * 
  */
 test.before(async () => {
-  if (!process.env.SKIP_REBUILD_FORMULA_SCHEMA) {
+  if (process.env.SKIP_REBUILD_FORMULA_SCHEMA) {
+    await truncateAllTestRecords(FORMULA_TEST_OBJECT);
+  } else {
     await resetFormulaSchema(FORMULA_TEST_OBJECT);
     await createFormulaSchema(FORMULA_TEST_OBJECT, formulaDefs);
   }
+  testRecords = loadTestRecords();
+  expectedRecords = await getExpectedRecords(FORMULA_TEST_OBJECT, testRecords); 
 });
 
 for (const [i, formulaDef] of formulaDefs.entries()) {
-  const { type, name, formula, blankAsZero, tests } = formulaDef;
+  const { type, name, formula, blankAsZero } = formulaDef;
   /**
    * 
    */
   test.serial(`formula#${zeropad(i + 1)}: ${formula}${ blankAsZero ? ' (blank as zero) ' : ''}`, async (t) => {
     const returnType = toReturnType(type);
     const fml = await parse(formula, { ...describer, returnType, blankAsZero });
-    const { expression } = fml.compiled;
-    for (const record of tests) {
-      const fetched = await createAndFetchRecord(record);
-      const expected = fetched[name];
-      const actual = fml.evaluate(record);
-      t.truthy(actual === expected && { formula, expression, returnType, record });
+    for (const [i, record] of testRecords.entries()) {
+      const expected = expectedRecords[i][name];
+      t.true(
+        expected === fml.evaluate(record),
+        'evaluated value is not equals to the expected'
+      );
     }
     t.pass();
   });

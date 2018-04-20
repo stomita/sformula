@@ -3,7 +3,7 @@ export type Context = {
   [name: string]: any,
 };
 
-export type ExpressionType = {
+export type PrimitiveExpressionType = {
   type: 'string',
 } | {
   type: 'number',
@@ -20,6 +20,10 @@ export type ExpressionType = {
   precision?: number,
   scale?: number,
 } | {
+  type: 'any',
+};
+
+export type ExpressionType = PrimitiveExpressionType | {
   type: 'object',
   sobject: string,
   properties: ExpressionTypeDictionary,
@@ -31,7 +35,8 @@ export type ExpressionType = {
   }>,
   returns: ExpressionType,
 } | {
-  type: 'any',
+  type: 'template',
+  ref: string
 };
 
 export type ExpressionTypeDictionary = {

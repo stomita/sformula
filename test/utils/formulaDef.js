@@ -9,12 +9,12 @@ import { zeropad } from '.';
  */
 export type FormulaDef = {
   name: string,
+  description?: string,
   formula: string,
   type: string,
-  blankAsZero: boolean,
+  blankAsZero?: boolean,
   precision?: number,
   scale?: number,
-  tests: Array<{ [name: string]: any }>,
 };
 
 

@@ -1,59 +1,54 @@
 /* @flow */
 import { build as buildFormula } from 'esformula';
 import type { Expression } from 'esformula';
-import type { Context, ExpressionType, ExpressionTypeDictionary, DescribeSObjectResult } from './types'; 
+import type {
+  Context, PrimitiveExpressionType, ExpressionType, ExpressionTypeDictionary, DescribeSObjectResult,
+} from './types'; 
 import { parseFormula } from './formula';
 import { context as builtins, types as builtinTypeDict } from './builtin';
 import { extractFields } from './fieldExtraction';
 import { createFieldTypeDictionary } from './fieldType';
-import { calculateReturnType, isCompatibleType, invalidTypeError } from './typeCalculation';
+import { traverseExpression, isCompatibleType, validationError, invalidTypeError } from './typeCalculation';
 
-export type ReturnType = $PropertyType<ExpressionType, 'type'>;
+export type ReturnType = $PropertyType<PrimitiveExpressionType, 'type'>;
 
 export type Formula = {
-  _ast: Expression,
-  formula: string,
-  fields: string[],
-  returnType?: ReturnType,
+  compiled: CompiledFormula,
+  returnType: ReturnType,
   evaluate(context?: Context): any
 };
 
-type SyncParseOptions = {
-  fieldTypes?: ExpressionTypeDictionary,
-  returnType?: ReturnType,
+export type CompiledFormula = {
+  expression: Expression,
+  fields: string[],
+  returnType: ReturnType,
+  calculatedType: ReturnType,
 };
 
-type ParseOptions = {
+export type SyncParseOptions = {
+  fieldTypes?: ExpressionTypeDictionary,
+  returnType?: ReturnType,
+  blankAsZero?: boolean,
+};
+
+export type ParseOptions = {
   sobject: string,
   describe: (string) => Promise<DescribeSObjectResult>,
   returnType?: ReturnType,
+  blankAsZero?: boolean,
 };
 
 /**
  * 
  */
-function createFormulaInstance(params: {
-  expression: Expression,
-  formula: string,
-  fields: string[],
-  returnType?: ReturnType,
-  calculatedType: ReturnType,
-}): Formula {
-  const {
-    expression,
-    formula,
-    fields,
-    returnType,
-    calculatedType,
-  } = params;
-  const esformula = buildFormula(expression);
+export function create(compiled: CompiledFormula): Formula {
+  const esformula = buildFormula(compiled.expression);
+  const { returnType, calculatedType } = compiled;
   return {
-    _ast: expression,
-    formula,
-    fields,
+    compiled,
     returnType,
     evaluate(context?: Context = {}) {
-      const ret = esformula.evaluate({ ...context, ...builtins });
+      let ret = esformula.evaluate({ ...context, ...builtins });
       if (returnType === 'date' && calculatedType === 'datetime') {
         return ret && ret.substring(0, 10);
       }
@@ -62,26 +57,35 @@ function createFormulaInstance(params: {
   };
 }
 
+function traverseAndCreateFormula(expression, fieldTypes, fields, { returnType, blankAsZero }) {
+  const { expression: expression_, returnType: calculatedType } =
+    traverseExpression(expression, { ...fieldTypes, ...builtinTypeDict }, blankAsZero);
+  if (calculatedType.type === 'object' || calculatedType.type === 'function' || calculatedType.type === 'template') {
+    throw invalidTypeError(expression, calculatedType.type, ['string', 'number', 'currency', 'date', 'datetime', 'boolean']);
+  }
+  if (returnType && !isCompatibleType(calculatedType.type, returnType)) {
+    throw invalidTypeError(expression, calculatedType.type, [returnType]);
+  }
+  return create({
+    expression: expression_,
+    fields,
+    returnType: returnType && returnType !== 'any' ? returnType : calculatedType.type,
+    calculatedType: calculatedType.type,
+  });
+}
+
 /**
  *
  */
 export function parseSync(formula: string, options: SyncParseOptions = {}): Formula {
   const expression = parseFormula(formula);
   const fields = extractFields(expression);
-  const { returnType, fieldTypes = {} } = options;
+  const { returnType, fieldTypes = {}, blankAsZero = false } = options;
   try {
-    const { expression: expression_, returnType: calculatedType } = calculateReturnType(expression, { ...fieldTypes, ...builtinTypeDict });
-    if (returnType && !isCompatibleType(calculatedType.type, returnType)) {
-      throw invalidTypeError(expression, calculatedType.type, [returnType]);
-    }
-    return createFormulaInstance({
-      formula,
-      expression: expression_,
-      fields,
-      returnType: returnType && returnType !== 'any' ? returnType : calculatedType.type,
-      calculatedType: calculatedType.type,
-    });
+    return traverseAndCreateFormula(expression, fieldTypes, fields, { returnType, blankAsZero });
   } catch(e) {
+    console.log(e.stack);
+    console.log({ returnType });
     console.log(expression);
     throw e;
   }
@@ -91,24 +95,18 @@ export function parseSync(formula: string, options: SyncParseOptions = {}): Form
  *
  */
 export async function parse(formula: string, options: ParseOptions): Promise<Formula> {
-  const { returnType, ...describer } = options;
+  const { returnType, blankAsZero = false, ...describer } = options;
   const expression = parseFormula(formula);
   const fields = extractFields(expression);
   const fieldTypes = await createFieldTypeDictionary(fields, describer);
   try {
-    const { expression: expression_, returnType: calculatedType } = calculateReturnType(expression, { ...fieldTypes, ...builtinTypeDict });
-    if (returnType && !isCompatibleType(calculatedType.type, returnType)) {
-      throw invalidTypeError(expression, calculatedType.type, [returnType]);
-    }
-    return createFormulaInstance({
-      formula,
-      expression: expression_,
-      fields,
-      returnType: returnType && returnType !== 'any' ? returnType : calculatedType.type,
-      calculatedType: calculatedType.type,
-    });
+    return traverseAndCreateFormula(expression, fieldTypes, fields, { returnType, blankAsZero });
   } catch(e) {
+    console.log(e.stack);
+    console.log({ returnType });
     console.log(expression);
     throw e;
   }
 }
+
+export { builtins };

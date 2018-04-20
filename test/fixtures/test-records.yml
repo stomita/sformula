@@ -1,0 +1,86 @@
+- {}
+-
+  Number01__c: 1
+- 
+  Number02__c: 2
+-
+  Number01__c: 1
+  Number02__c: 2
+-
+  Number01__c: 1
+  Number02__c: 0
+-
+  Number01__c: 0
+  Number02__c: 4
+-
+  Text01__c: abc
+-
+  Text01__c: abc
+  Text02__c: def
+-
+  Text02__c: def
+-
+  Date01__c: '2017-12-29'
+-
+  Datetime01__c: '2018-01-01T14:00:00Z'
+-
+  Datetime01__c: '2018-01-01T14:00:00+09:00'
+-
+  Datetime01__c: '2018-01-02T00:00:00Z'
+  Datetime02__c: '2017-12-29T12:00:00Z'
+-
+  Datetime01__c: '2018-01-02T00:00:00Z'
+  Datetime02__c: '2017-12-30T00:00:00Z'
+-
+  Date01__c: '2018-01-02'
+  Date02__c: '2017-12-31'
+-
+  Date01__c: '2018-01-02'
+-
+  Number01__c: 0
+-
+  Number02__c: 1
+-
+  Number01__c: 0
+  Number02__c: 1
+-
+  Text01__c: ''
+-
+  Text02__c: null
+-
+  Text01__c: ''
+  Text02__c: null
+-
+  Text01__c: ''
+  Text02__c: ''
+-
+  Text01__c: null
+  Text02__c: null
+-
+  Checkbox01__c: false
+-
+  Checkbox01__c: false
+  Checkbox02__c: true
+-
+  Date01__c: '2018-01-01'
+-
+  Date01__c: '2018-01-01'
+  Date02__c: '2017-12-31'
+-
+  Date01__c: '2018-01-01'
+  Number01__c: 1
+-
+  Date01__c: '2018-01-01'
+  Date02__c: '2017-12-31'
+  Parent__r: {}
+-
+  Date01__c: '2018-01-01'
+  Parent__r:
+    Date01__c: '2018-01-01'
+    Date02__c: '2017-12-31'
+    Parent__r:
+      Date02__c: '2017-12-29'
+-
+  Text01__c: null
+-
+  Text02__c: ''

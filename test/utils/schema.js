@@ -1,35 +1,17 @@
 /* @flow */
-import jsforce from 'jsforce';
 import AdmZip from 'adm-zip';
 import metadata from 'salesforce-metadata-xml-builder';
+import { getConnection } from './connection';
 import type { FormulaDef } from './formulaDef';
 import { zeropad, escapeXml } from '.';
 
 /**
  * 
  */
-const _conn =
-  process.env.SF_CONNECTION_NAME ?
-  jsforce.registry.getConnection(process.env.SF_CONNECTION_NAME) :
-  new jsforce.Connection();
-
-_conn.metadata.pollInterval = 5000;
-_conn.metadata.pollTimeout = 60000;
-
-let _loggedIn
-if (process.env.SF_USERNAME && process.env.SF_PASSWORD) {
-  _loggedIn = _conn.login(process.env.SF_USERNAME, process.env.SF_PASSWORD);
-} else {
-  _loggedIn = _conn.identity();
-}
-
-/**
- * 
- */
 export async function describe(sobject: string) {
-  await _loggedIn;
+  const conn = await getConnection();
   return new Promise((resolve, reject) => {
-    _conn.describe$(sobject, (err, ret) => err ? reject(err) : resolve(ret));
+    conn.describe$(sobject, (err, ret) => err ? reject(err) : resolve(ret));
   });
 }
 
@@ -37,7 +19,7 @@ export async function describe(sobject: string) {
  * 
  */
 export async function resetFormulaSchema(sobject: string) {
-  await _loggedIn;
+  const conn = await getConnection();
   const packageXml = metadata.Package({
     version: '42.0',
   });
@@ -50,12 +32,12 @@ export async function resetFormulaSchema(sobject: string) {
   const zip = new AdmZip();
   zip.addFile('src/package.xml', new Buffer(packageXml));
   zip.addFile('src/destructiveChanges.xml', new Buffer(destructiveChangesXml));
-  const res = await _conn.metadata.deploy(zip.toBuffer(), { purgeOnDelete: true }).complete({ details: true });
+  const res = await conn.metadata.deploy(zip.toBuffer(), { purgeOnDelete: true }).complete({ details: true });
   console.log('Deleted existing formula test schema');
 }
 
 export async function createFormulaSchema(sobject: string, formulaDefs: FormulaDef[]) {
-  await _loggedIn;
+  const conn = await getConnection();
   const fields = [{
     type: 'Checkbox',
     fullName: 'Checkbox01__c',
@@ -212,14 +194,14 @@ export async function createFormulaSchema(sobject: string, formulaDefs: FormulaD
   const zip = new AdmZip();
   zip.addFile('src/package.xml', new Buffer(packageXml));
   zip.addFile(`src/objects/${sobject}.object`, new Buffer(objectXml));
-  const res = await _conn.metadata.deploy(zip.toBuffer()).complete({ details: true });
+  const res = await conn.metadata.deploy(zip.toBuffer()).complete({ details: true });
   if (res.status !== 'Succeeded') {
     console.error(res.details);
     throw new Error('Schema creation failed');
   }
   console.log('Created formula test schema');
-  const profile = await _conn.metadata.read('Profile', 'Admin');
-  await _conn.metadata.update('Profile', {
+  const profile = await conn.metadata.read('Profile', 'Admin');
+  await conn.metadata.update('Profile', {
     fullName: 'Admin',
     fieldPermissions: profile.fieldPermissions.map((fp) => (
       fp.field.indexOf(`${sobject}.`) === 0 ?
@@ -233,20 +215,3 @@ export async function createFormulaSchema(sobject: string, formulaDefs: FormulaD
   });
   console.log('Update field permissions');
 }
-
-
-export async function createAndFetchRecord(record: any) {
-  if (record.Parent__r) {
-    const pret = await _conn.sobject('FormulaTest__c').create(record.Parent__r);
-    record = { ...record };
-    delete record.Parent__r;
-    record.Parent__c = pret.id;
-  }
-  const ret = await _conn.sobject('FormulaTest__c').create(record);
-  if (!ret.success) {
-    throw new Error(ret.errors[0].message);
-  }
-  const rec = await _conn.sobject('FormulaTest__c').findOne({ Id: ret.id }, '*, Parent__r.*');
-  return rec;
-}
-
