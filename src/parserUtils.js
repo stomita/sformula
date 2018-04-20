@@ -63,7 +63,7 @@ export function createCallExpression(callee: Identifier, args: Expression[]): Ca
   };
 }
 
-export function createFieldPathExpression(fieldPaths: Identifier[]): Identifier | MemberExpression {
+export function createFieldExpression(fieldPaths: Identifier[]): Identifier | MemberExpression {
   if (fieldPaths.length < 2) {
     return fieldPaths[0];
   }

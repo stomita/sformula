@@ -6,7 +6,7 @@
     createBinaryExpression,
     createUnaryExpression,
     createCallExpression,
-    createFieldPathExpression,
+    createFieldExpression,
     createIdentifier,
     createNumberLiteral,
     createStringLiteral,
@@ -133,22 +133,20 @@ CallExpression =
   callee:Identifier _ LPAREN _ args:CallArgumentList? _ RPAREN {
     return createCallExpression(callee, args || []);
   }
-/ FieldPathExpression
+/ FieldExpression
 
 CallArgumentList =
-  arg:Expression _ COMMA _ rest:CallArgumentList {
-    return [arg].concat(rest);
+  arg:Expression _ COMMA _ args:CallArgumentList {
+    return [ arg, ...args ];
   }
-/ arg:Expression {
-    return [arg];
-  }
+/ arg:Expression { return [ arg ]; }
 
 /**
- * Field Path Expression (e.g. Account.Owner.Username)
+ * Field Expression (e.g. Account.Owner.Username)
  */
-FieldPathExpression =
+FieldExpression =
   fpath:FieldPath {
-    return createFieldPathExpression(fpath);
+    return createFieldExpression(fpath);
   }
 / ParenExpression
 
