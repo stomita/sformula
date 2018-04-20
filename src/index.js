@@ -8,7 +8,7 @@ import { parseFormula } from './formula';
 import { context as builtins, types as builtinTypeDict } from './builtin';
 import { extractFields } from './fieldExtraction';
 import { createFieldTypeDictionary } from './fieldType';
-import { traverseExpression, isCompatibleType, validationError, invalidTypeError } from './typeCalculation';
+import { traverseExpression, isCompatibleType, validationError, invalidTypeError } from './traverse';
 
 export type ReturnType = $PropertyType<PrimitiveExpressionType, 'type'>;
 
