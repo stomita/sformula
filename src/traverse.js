@@ -62,9 +62,7 @@ function createLiteral(value: string | number | boolean | null): Literal {
 function nullValue(result: TraverseResult, blankAsZero: boolean) {
   const { expression, returnType } = result;
   let nullValue: Literal | ObjectExpression;
-  if (returnType.type === 'string') {
-    nullValue = createLiteral('');
-  } else if (returnType.type === 'boolean') {
+  if (returnType.type === 'boolean') {
     nullValue = createLiteral(false);
   } else if (returnType.type === 'number' || returnType.type === 'currency') {
     nullValue = createLiteral(blankAsZero ? 0 : null);
@@ -127,20 +125,18 @@ function traverseStringBinaryExpression(
         returnType: { type: 'string' },
       };
     case '==':
-    case '!=':
     case '===':
-    case '!==':
       return {
-        expression: {
-          type: 'BinaryExpression',
-          operator,
-          ...rexpression,
-          left: left.expression,
-          right: right.expression,
-        },
+        expression: createCallExpression('$$EQ_STRING$$', [left.expression, right.expression]),
         returnType: { type: 'boolean' },
       };
-    default:
+    case '!=':
+    case '!==':
+      return {
+        expression: createCallExpression('$$NEQ_STRING$$', [left.expression, right.expression]),
+        returnType: { type: 'boolean' },
+      };
+   default:
       throw invalidOperatorError(expression.left, left.returnType.type, operator);
   }
 }
