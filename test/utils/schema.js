@@ -37,16 +37,21 @@ export async function describe(sobject: string) {
  * 
  */
 export async function resetFormulaSchema(sobject: string) {
-  try {
-    await _loggedIn;
-    const ret = await _conn.metadata.delete('CustomObject', sobject);
-    if (ret.success) {
-      console.log('Deleted existing formula test schema');
-    }
-  } catch (err) {
-    console.error(err);
-    throw err;
-  }
+  await _loggedIn;
+  const packageXml = metadata.Package({
+    version: '42.0',
+  });
+  const destructiveChangesXml = metadata.Package({
+    types: [{
+      name: 'CustomObject', members: [sobject]
+    }],
+    version: '42.0',
+  });
+  const zip = new AdmZip();
+  zip.addFile('src/package.xml', new Buffer(packageXml));
+  zip.addFile('src/destructiveChanges.xml', new Buffer(destructiveChangesXml));
+  const res = await _conn.metadata.deploy(zip.toBuffer(), { purgeOnDelete: true }).complete({ details: true });
+  console.log('Deleted existing formula test schema');
 }
 
 export async function createFormulaSchema(sobject: string, formulaDefs: FormulaDef[]) {
@@ -145,6 +150,16 @@ export async function createFormulaSchema(sobject: string, formulaDefs: FormulaD
     required: false,
     trackTrending: false,
     type: 'DateTime',
+  }, {
+    fullName: 'Parent__c',
+    externalId: false,
+    label: 'Parent',
+    referenceTo: sobject,
+    relationshipLabel: 'Children',
+    relationshipName: 'Children',
+    required: false,
+    trackTrending: false,
+    type: 'Lookup',
   }];
 
   const formulaFields = formulaDefs.map((fd, i) => ({
@@ -221,11 +236,17 @@ export async function createFormulaSchema(sobject: string, formulaDefs: FormulaD
 
 
 export async function createAndFetchRecord(record: any) {
+  if (record.Parent__r) {
+    const pret = await _conn.sobject('FormulaTest__c').create(record.Parent__r);
+    record = { ...record };
+    delete record.Parent__r;
+    record.Parent__c = pret.id;
+  }
   const ret = await _conn.sobject('FormulaTest__c').create(record);
   if (!ret.success) {
     throw new Error(ret.errors[0].message);
   }
-  const rec = await _conn.sobject('FormulaTest__c').findOne({ Id: ret.id });
+  const rec = await _conn.sobject('FormulaTest__c').findOne({ Id: ret.id }, '*, Parent__r.*');
   return rec;
 }
 
