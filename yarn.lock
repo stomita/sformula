@@ -1780,9 +1780,9 @@ escope@^3.6.0:
     esrecurse "^4.1.0"
     estraverse "^4.1.1"
 
-esformula@^1.0.6:
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/esformula/-/esformula-1.0.6.tgz#2559214b8819d14f78f873a30247d8cd0ceae2ce"
+esformula@^1.0.7:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/esformula/-/esformula-1.0.7.tgz#e23c7fe8b0c61e0d7653b9bb94ad34e912d24cc3"
   dependencies:
     acorn "^5.5.3"
 

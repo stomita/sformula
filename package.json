@@ -19,7 +19,7 @@
     "src"
   ],
   "dependencies": {
-    "esformula": "^1.0.6",
+    "esformula": "^1.0.7",
     "moment": "^2.22.1"
   },
   "devDependencies": {
