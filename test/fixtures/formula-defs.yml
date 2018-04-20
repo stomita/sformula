@@ -151,26 +151,36 @@
   formula: Number01__c != Number02__c
 -
   type: Checkbox
-  formula: 'Text01__c = Text02__c'
+  formula: Text01__c = Text02__c
 -
   type: Checkbox
-  formula: 'Text01__c != Text02__c'
+  formula: Text01__c != Text02__c
 -
   type: Text
-  formula: 'TEXT(Number01__c)'
+  formula: TEXT(Number01__c)
 -
   type: Text
   blankAsZero: true,
-  formula: 'TEXT(Number01__c)'
+  formula: TEXT(Number01__c)
 -
   type: Text
-  formula: 'TEXT(Date01__c)'
+  formula: TEXT(Date01__c)
 -
   type: Text
-  formula: 'TEXT(Datetime01__c)'
+  formula: TEXT(Datetime01__c)
 -
   type: Text
-  formula: 'TEXT(Picklist01__c)'
+  formula: TEXT(Picklist01__c)
+-
+  type: Date
+  formula: DATE(2018, Number01__c, Number02__c)
+-
+  type: Date
+  formula: DATE(10000, Number01__c, Number02__c)
+-
+  type: Date
+  formula: DATE(2000, 0, 0)
+
 
 
 

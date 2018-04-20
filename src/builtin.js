@@ -22,6 +22,29 @@ const builtins = {
       returns: { type: 'string' },
     },
   },
+  'DATE': {
+    value: (y: ?number, m: ?number, d: ?number) => {
+      if (y == null || m == null || d == null || y > 9999) {
+        return null;
+      }
+      const dd = moment([y, m-1, d]);
+      return dd.isValid() ? dd.format('YYYY-MM-DD') : null;
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'number' },
+        optional: false,
+      }, {
+        argument: { type: 'number' },
+        optional: false,
+      }, {
+        argument: { type: 'number' },
+        optional: false,
+      }],
+      returns: { type: 'date' },
+    },
+  },
   'TODAY': {
     value: () => {
       return moment().format('YYYY-MM-DD');
