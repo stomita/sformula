@@ -61,7 +61,7 @@ function createLiteral(value: string | number | boolean | null): Literal {
 
 function nullValue(result: TraverseResult, blankAsZero: boolean) {
   const { expression, returnType } = result;
-  let nullValue: Literal | ObjectExpression | null = null;
+  let nullValue: Literal | ObjectExpression;
   if (returnType.type === 'string') {
     nullValue = createLiteral('');
   } else if (returnType.type === 'boolean') {
@@ -73,14 +73,13 @@ function nullValue(result: TraverseResult, blankAsZero: boolean) {
       type: 'ObjectExpression',
       properties: [],
     };
+  } else {
+    nullValue = createLiteral(null);
   }
-  if (nullValue !== null) {
-    return {
-      expression: createCallExpression('NULLVALUE', [ expression, nullValue ]),
-      returnType,
-    };
-  }
-  return result;
+  return {
+    expression: createCallExpression('NULLVALUE', [ expression, nullValue ]),
+    returnType,
+  };
 }
 
 function traverseUnaryExpression(
@@ -517,6 +516,21 @@ export function traverseExpression(
     default:
       throw unexpectedError(expression, `unexpected expression type found: ${expression.type}`);
   }
+}
+
+export function traverse(
+  expression: Expression,
+  typeDict: ExpressionTypeDictionary,
+  blankAsZero: boolean,
+): TraverseResult {
+  const result = traverseExpression(expression, typeDict, blankAsZero);
+  if (result.expression.type === 'CallExpression') {
+    const { callee } = result.expression; 
+    if (callee.type === 'Identifier' && callee.name === 'NULLVALUE') {
+      return result;
+    }
+  }
+  return nullValue(result, false);
 }
 
 /**

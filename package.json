@@ -12,7 +12,8 @@
     "build:flow": "flow-copy-source src lib",
     "build:web": "webpack lib/index.js dist/sformula.js --output-library sformula",
     "test": "ava",
-    "test:skipRebuild": "SKIP_REBUILD_FORMULA_SCHEMA=true ava"
+    "test:skipRebuild": "SKIP_REBUILD_FORMULA_SCHEMA=true ava",
+    "test:skipPrepare": "SKIP_LOADING_TEST_RECORDS=true ava"
   },
   "files": [
     "lib",

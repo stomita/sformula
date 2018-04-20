@@ -3,7 +3,7 @@ import test from 'ava';
 import { parse, type ReturnType } from '..'; 
 import { loadFormulaDefs } from './utils/formulaDef';
 import { describe, createFormulaSchema, resetFormulaSchema } from './utils/schema';
-import { loadTestRecords, truncateAllTestRecords, getExpectedRecords } from './utils/testRecords';
+import { loadTestRecords, truncateAllTestRecords, insertTestRecords, getExpectedRecords } from './utils/testRecords';
 
 
 function zeropad(n: number) {
@@ -31,13 +31,15 @@ let expectedRecords;
  * 
  */
 test.before(async () => {
-  if (process.env.SKIP_REBUILD_FORMULA_SCHEMA) {
-    await truncateAllTestRecords(FORMULA_TEST_OBJECT);
-  } else {
+  if (!process.env.SKIP_LOADING_TEST_RECORDS && !process.env.SKIP_REBUILD_FORMULA_SCHEMA) {
     await resetFormulaSchema(FORMULA_TEST_OBJECT);
     await createFormulaSchema(FORMULA_TEST_OBJECT, formulaDefs);
   }
   testRecords = loadTestRecords();
+  if (!process.env.SKIP_LOADING_TEST_RECORDS) {
+    await truncateAllTestRecords(FORMULA_TEST_OBJECT);
+    await insertTestRecords(FORMULA_TEST_OBJECT, testRecords);
+  }
   expectedRecords = await getExpectedRecords(FORMULA_TEST_OBJECT, testRecords); 
 });
 

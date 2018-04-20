@@ -8,7 +8,7 @@ import { parseFormula } from './formula';
 import { context as builtins, types as builtinTypeDict } from './builtin';
 import { extractFields } from './fieldExtraction';
 import { createFieldTypeDictionary } from './fieldType';
-import { traverseExpression, isCompatibleType, validationError, invalidTypeError } from './traverse';
+import { traverse, isCompatibleType, validationError, invalidTypeError } from './traverse';
 
 export type ReturnType = $PropertyType<PrimitiveExpressionType, 'type'>;
 
@@ -59,7 +59,7 @@ export function create(compiled: CompiledFormula): Formula {
 
 function traverseAndCreateFormula(expression, fieldTypes, fields, { returnType, blankAsZero }) {
   const { expression: expression_, returnType: calculatedType } =
-    traverseExpression(expression, { ...fieldTypes, ...builtinTypeDict }, blankAsZero);
+    traverse(expression, { ...fieldTypes, ...builtinTypeDict }, blankAsZero);
   if (calculatedType.type === 'object' || calculatedType.type === 'function' || calculatedType.type === 'template') {
     throw invalidTypeError(expression, calculatedType.type, ['string', 'number', 'currency', 'date', 'datetime', 'boolean']);
   }

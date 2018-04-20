@@ -39,6 +39,15 @@ export async function resetFormulaSchema(sobject: string) {
 export async function createFormulaSchema(sobject: string, formulaDefs: FormulaDef[]) {
   const conn = await getConnection();
   const fields = [{
+    fullName: 'Key__c',
+    externalId: true,
+    label: 'Key',
+    length: 50,
+    required: true,
+    trackTrending: false,
+    type: 'Text',
+    unique: true,
+  }, {
     type: 'Checkbox',
     fullName: 'Checkbox01__c',
     defaultValue: false,
