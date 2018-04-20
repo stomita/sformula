@@ -44,6 +44,8 @@
     "require": [
       "babel-register"
     ],
+    "concurrency": 1,
+    "verbose": true,
     "files": [
       "test/**/*.test.js"
     ]
