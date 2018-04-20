@@ -4,16 +4,24 @@ import type {
   Context, ExpressionType, ExpressionTypeDictionary,
 } from './types';
 
-type ContextDefinition = {
-  [name: string]: {
-    value: any,
-    type: ExpressionType,
-  }
-};
-
 const MSECS_IN_DAY = 24 * 60 * 60 * 1000;
 
-const builtins: ContextDefinition = {
+const builtins = {
+  'TEXT': {
+    value: (v: any) => {
+      const ret = v == null ? null : String(v);
+      // console.log('TEXT() ', v, '=>', JSON.stringify(ret));
+      return ret;
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'any' },
+        optional: false,
+      }],
+      returns: { type: 'string' },
+    },
+  },
   'TODAY': {
     value: () => {
       return moment().format('YYYY-MM-DD');
@@ -43,10 +51,35 @@ const builtins: ContextDefinition = {
       returns: { type: 'template', ref: 'T' },
     },
   },
+  'ISNULL': {
+    value: (value: any) => {
+      return value == null;
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'any' },
+        optional: false,
+      }],
+      returns: { type: 'boolean' },
+    },
+  },
+  'ISBLANK': {
+    value: (value: any) => {
+      return value == null || value === '';
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'any' },
+        optional: false,
+      }],
+      returns: { type: 'boolean' },
+    },
+  },
   'NULLVALUE': {
     value: (value: any, alt: any) => {
-      const ret = value == null ? alt : value;
-      return ret;
+      return value == null ? alt : value;
     },
     type: {
       type: 'function',
@@ -60,6 +93,23 @@ const builtins: ContextDefinition = {
       returns: { type: 'template', ref: 'T' },
     },
   },
+  'BLANKVALUE': {
+    value: (value: any, alt: any) => {
+      return (value == null || value === '' ? alt : value);
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'template', ref: 'T' },
+        optional: false,
+      }, {
+        argument: { type: 'template', ref: 'T' },
+        optional: false,
+      }],
+      returns: { type: 'template', ref: 'T' },
+    },
+  },
+
 
   // builtin operators 
   '$$CONCAT_STRING$$': {
@@ -76,6 +126,38 @@ const builtins: ContextDefinition = {
         optional: false,
       }],
       returns: { type: 'string' },
+    },
+  },
+  '$$EQ_STRING$$': {
+    value: (s1: ?string, s2: ?string) => {
+      return (s1 || '') === (s2 || '');
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'string' },
+        optional: false,
+      }, {
+        argument: { type: 'string' },
+        optional: false,
+      }],
+      returns: { type: 'boolean' },
+    },
+  },
+  '$$NEQ_STRING$$': {
+    value: (s1: ?string, s2: ?string) => {
+      return (s1 || '') !== (s2 || '');
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'string' },
+        optional: false,
+      }, {
+        argument: { type: 'string' },
+        optional: false,
+      }],
+      returns: { type: 'boolean' },
     },
   },
   '$$ADD_NUMBER$$': {
@@ -218,6 +300,40 @@ const builtins: ContextDefinition = {
     value: (n1: ?number, n2: ?number) => {
       if (n1 == null || n2 == null) { return false; }
       return n1 >= n2;
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'number' },
+        optional: false,
+      }, {
+        argument: { type: 'number' },
+        optional: false,
+      }],
+      returns: { type: 'boolean' },
+    },
+  },
+  '$$EQ_NUMBER$$': {
+    value: (n1: ?number, n2: ?number) => {
+      if (n1 == null || n2 == null) { return false; }
+      return n1 === n2;
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'number' },
+        optional: false,
+      }, {
+        argument: { type: 'number' },
+        optional: false,
+      }],
+      returns: { type: 'boolean' },
+    },
+  },
+  '$$NEQ_NUMBER$$': {
+    value: (n1: ?number, n2: ?number) => {
+      if (n1 == null || n2 == null) { return false; }
+      return n1 !== n2;
     },
     type: {
       type: 'function',
@@ -537,7 +653,25 @@ const builtins: ContextDefinition = {
       returns: { type: 'boolean' },
     },
   },
+
+  // override builtin functions for certain data types
+  '$$FN_TEXT_DATETIME$$': {
+    value: (d: string) => {
+      if (d == null) { return 'Z'; }
+      return moment(d).utc().format('YYYY-MM-DD HH:mm:ss[Z]');
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'datetime' },
+        optional: false,
+      }],
+      returns: { type: 'string' },
+    },
+  },
 };
+
+export type BuiltinFunctionName = $Keys<typeof builtins>;
 
 const types: ExpressionTypeDictionary = Object.keys(builtins).reduce((types, name) => {
   const type = builtins[name].type;

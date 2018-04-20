@@ -114,6 +114,58 @@ export async function createFormulaSchema(sobject: string, formulaDefs: FormulaD
     trackTrending: false,
     type: 'TextArea',
   }, {
+    fullName: 'Picklist01__c',
+    externalId: false,
+    label: 'Picklist #01',
+    required: false,
+    trackTrending: false,
+    type: 'Picklist',
+    valueSet: {
+      restricted: false,
+      valueSetDefinition: {
+        sorted: false,
+        value: [{
+          fullName: '1',
+          default: false,
+          label: 'Yes',
+        }, {
+          fullName: '2',
+          default: false,
+          label: 'No',
+        }],
+      },
+    },
+  }, {
+    fullName: 'Picklist02__c',
+    externalId: false,
+    label: 'Picklist #02',
+    required: false,
+    trackTrending: false,
+    type: 'Picklist',
+    valueSet: {
+      restricted: false,
+      valueSetDefinition: {
+        sorted: false,
+        value: [{
+          fullName: '0',
+          default: false,
+          label: 'Not Known',
+        }, {
+          fullName: '1',
+          default: false,
+          label: 'Male',
+        }, {
+          fullName: '2',
+          default: false,
+          label: 'Female',
+        }, {
+          fullName: '9',
+          default: false,
+          label: 'Not Applicable',
+        }],
+      },
+    },
+  }, {
     fullName: 'Date01__c',
     externalId: false,
     label: 'Date #01',

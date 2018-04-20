@@ -5,6 +5,7 @@ import type {
   ObjectExpression, Identifier, Literal,
 } from 'esformula';
 import type { ExpressionType, ExpressionTypeDictionary } from './types';
+import type { BuiltinFunctionName } from './builtin';
 
 export type TraverseResult = {
   expression: Expression,
@@ -43,11 +44,20 @@ export function unexpectedError(expression: Expression, message: string) {
   return validationError(expression, 'UNEXPECTED_ERROR', message);
 }
 
-function createCallExpression(name: string, args: $PropertyType<CallExpression, 'arguments'>) {
+function createCallExpression(name: BuiltinFunctionName, args: $PropertyType<CallExpression, 'arguments'>) {
   return {
     type: 'CallExpression',
     callee: { type: 'Identifier', name },
     arguments: args,
+  };
+}
+
+function overrideFunction(expression: CallExpression, name: BuiltinFunctionName) {
+  const { type, callee, ...rexpression } = expression;
+  return {
+    type: 'CallExpression',
+    callee: { type: 'Identifier', name },
+    ...rexpression,
   };
 }
 
@@ -59,26 +69,48 @@ function createLiteral(value: string | number | boolean | null): Literal {
   };
 }
 
+function injectCallExpression(expression: CallExpression, argumentTypes: ExpressionType[]): Expression {
+  const { callee, arguments: args } = expression;
+  if (callee.type === 'Identifier') {
+    switch (callee.name) {
+      case 'TEXT':
+        console.log('TEXT call expression', argumentTypes);
+        if (argumentTypes[0].type === 'datetime') {
+          return overrideFunction(expression, '$$FN_TEXT_DATETIME$$');
+        }
+      default:
+        break;
+    }
+  }
+  return expression;
+}
+
 function nullValue(result: TraverseResult, blankAsZero: boolean) {
   const { expression, returnType } = result;
-  let nullValue: Literal | ObjectExpression;
-  if (returnType.type === 'boolean') {
-    nullValue = createLiteral(false);
+  let altValue: Literal | ObjectExpression | null = null;
+  if (returnType.type === 'string') {
+    altValue = createLiteral('');
+  } else if (returnType.type === 'boolean') {
+    altValue = createLiteral(false);
   } else if (returnType.type === 'number' || returnType.type === 'currency') {
-    nullValue = createLiteral(blankAsZero ? 0 : null);
+    altValue = createLiteral(blankAsZero ? 0 : null);
   } else if (returnType.type === 'object') {
-    nullValue = {
+    altValue = {
       type: 'ObjectExpression',
       properties: [],
     };
-  } else {
-    nullValue = createLiteral(null);
+  } else if (returnType.type !== 'function') {
+    altValue = createLiteral(null);
   }
-  return {
-    expression: createCallExpression('NULLVALUE', [ expression, nullValue ]),
-    returnType,
-  };
+  if (altValue) {
+    return {
+      expression: createCallExpression('NULLVALUE', [ expression, altValue ]),
+      returnType,
+    };
+  }
+  return result;
 }
+
 
 function traverseUnaryExpression(
   expression: UnaryExpression,
@@ -392,6 +424,7 @@ function traverseCallExpression(
     throw invalidArgLengthError(callee, argLen, [minArgLen, maxArgLen]);
   }
   const args_ = [];
+  const argumentTypes = [];
   const templateTypes: { [name: string]: ?ExpressionType } = {};
   for (const [i, arg] of args.entries()) {
     if (arg.type === 'SpreadElement') {
@@ -413,6 +446,7 @@ function traverseCallExpression(
       throw invalidTypeError(arg, argumentType.type, [expectedType.type]);
     }
     args_.push(argument.expression);
+    argumentTypes.push(argumentType);
   }
   const returnType = (
     calleeType.returns.type === 'template' ?
@@ -420,12 +454,12 @@ function traverseCallExpression(
     calleeType.returns
   );
   return {
-    expression: {
+    expression: injectCallExpression({
       type: 'CallExpression',
       callee: callee_,
       arguments: args_,
       ...rexpression,
-    },
+    }, argumentTypes),
     returnType,
   };
 }
@@ -520,24 +554,23 @@ export function traverse(
   blankAsZero: boolean,
 ): TraverseResult {
   const result = traverseExpression(expression, typeDict, blankAsZero);
-  if (result.expression.type === 'CallExpression') {
-    const { callee } = result.expression; 
-    if (callee.type === 'Identifier' && callee.name === 'NULLVALUE') {
-      return result;
-    }
+  const { expression: expression_, returnType } = result;
+  if (returnType.type === 'string') {
+    return {
+      expression: createCallExpression('BLANKVALUE', [expression_, createLiteral(null)]),
+      returnType,
+    };
   }
-  return nullValue(result, false);
+  return result;
 }
 
 /**
  * 
  */
 export function isCompatibleType(srcType: string, dstType: string) {
-  if (srcType === dstType) {
-    return true;
-  }
-  if (srcType === 'datetime' && dstType === 'date') {
-    return true;
-  }
-  return false;
+  return (
+    srcType === dstType ||
+    srcType === 'any' || dstType === 'any' ||
+    (srcType === 'datetime' && dstType === 'date')
+  );
 }

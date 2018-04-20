@@ -42,6 +42,47 @@
   precision: 18
   scale: 0
 -
+  type: Text
+  formula: "''"
+-
+  type: Text
+  formula: "NULL"
+-
+  type: Text
+  formula: NULLVALUE(Text01__c, 'A')
+-
+  type: Text
+  formula: NULLVALUE(Text01__c, 'A')
+  blankAsZero: true
+-
+  type: Text
+  formula: BLANKVALUE(Text01__c, 'A')
+-
+  type: Text
+  formula: BLANKVALUE(Text01__c, 'A')
+  blankAsZero: true
+-
+  type: Checkbox
+  formula: ISNULL(Text01__c)
+-
+  type: Checkbox
+  formula: ISBLANK(Text01__c)
+-
+  type: Checkbox
+  formula: "FALSE"
+-
+  type: Checkbox
+  formula: Text01__c = ''
+-
+  type: Checkbox
+  formula: Text01__c != ''
+-
+  type: Checkbox
+  formula: Text01__c = NULL
+-
+  type: Checkbox
+  formula: Text01__c != NULL
+-
   type: Checkbox
   formula: Number01__c + 2 < 0.5 * Number02__c
 -
@@ -80,12 +121,6 @@
   formula: '!Checkbox01__c'
 -
   type: Checkbox
-  formula: Number01__c < Number02__c
--
-  type: Checkbox
-  formula: Text01__c = Text02__c
--
-  type: Checkbox
   formula: '!!Checkbox01__c'
 -
   type: Checkbox
@@ -104,7 +139,40 @@
   formula: NULLVALUE(Parent__r.Date01__c, Date01__c)
 -
   type: Checkbox
+  formula: Number01__c < Number02__c
+-
+  type: Checkbox
+  formula: Number01__c > Number02__c
+-
+  type: Checkbox
+  formula: Number01__c = Number02__c
+-
+  type: Checkbox
+  formula: Number01__c != Number02__c
+-
+  type: Checkbox
   formula: 'Text01__c = Text02__c'
+-
+  type: Checkbox
+  formula: 'Text01__c != Text02__c'
+-
+  type: Text
+  formula: 'TEXT(Number01__c)'
+-
+  type: Text
+  blankAsZero: true,
+  formula: 'TEXT(Number01__c)'
+-
+  type: Text
+  formula: 'TEXT(Date01__c)'
+-
+  type: Text
+  formula: 'TEXT(Datetime01__c)'
+-
+  type: Text
+  formula: 'TEXT(Picklist01__c)'
+
+
 
 
 

@@ -20,6 +20,12 @@ export type PrimitiveExpressionType = {
   precision?: number,
   scale?: number,
 } | {
+  type: 'picklist',
+  picklistValues: Array<{
+    label: string,
+    value: string,
+  }>
+} | {
   type: 'any',
 };
 
@@ -49,6 +55,10 @@ export type DescribeFieldResult = {
   type: string,
   precision: number,
   scale: number,
+  picklistValues: Array<{
+    value: string,
+    label: string,
+  }>,
   relationshipName: string | null,
   referenceTo: string[] | null,
 };
