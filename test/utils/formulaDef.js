@@ -18,8 +18,8 @@ export type FormulaDef = {
 };
 
 
-export async function loadFormulaDefs(): Promise<FormulaDef[]> {
-  const data = await fs.readFile(path.join(__dirname, '../fixtures/formula-defs.yml'));
+export function loadFormulaDefs(): FormulaDef[] {
+  const data = fs.readFileSync(path.join(__dirname, '../fixtures/formula-defs.yml'));
   const defs = yaml.safeLoad(data);
   return defs.map((def, i) => ({
     name: `Formula${zeropad(i + 1)}__c`,
