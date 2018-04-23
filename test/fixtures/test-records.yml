@@ -44,6 +44,15 @@
   Number01__c: 0
   Number02__c: 1
 -
+  Number01__c: 13
+  Number02__c: 1
+-
+  Number01__c: 4
+  Number02__c: 31
+-
+  Number01__c: 12
+  Number02__c: -8
+-
   Text01__c: ''
 -
   Text02__c: null
@@ -56,6 +65,12 @@
 -
   Text01__c: null
   Text02__c: null
+-
+  Text01__c: '2018'
+  Text02__c: '12'
+-
+  Text01__c: '2000'
+  Text02__c: '13'
 -
   Checkbox01__c: false
 -

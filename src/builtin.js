@@ -45,6 +45,23 @@ const builtins = {
       returns: { type: 'date' },
     },
   },
+  'DATEVALUE': {
+    value: (s: ?string) => {
+      if (s == null || s === '') {
+        return null;
+      }
+      const dd = moment(s, 'YYYY-MM-DD');
+      return dd.isValid() ? dd.format('YYYY-MM-DD') : null;
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'any' },
+        optional: false,
+      }],
+      returns: { type: 'date' },
+    },
+  },
   'TODAY': {
     value: () => {
       return moment().format('YYYY-MM-DD');

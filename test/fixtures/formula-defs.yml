@@ -179,11 +179,7 @@
   formula: DATE(10000, Number01__c, Number02__c)
 -
   type: Date
-  formula: DATE(2000, 0, 0)
-
-
-
-
-
-
-
+  formula: DATE(2018, 1, 1)
+-
+  type: Date
+  formula: TODAY()
