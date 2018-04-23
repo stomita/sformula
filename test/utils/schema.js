@@ -226,39 +226,44 @@ export async function createFormulaSchema(sobject: string, formulaDefs: FormulaD
     type: fd.type,
   })); 
 
+  let fieldDefs = [...fields, ...formulaFields]
   const label = sobject.replace(/__c$/, '');
-  const objectXml = metadata.CustomObject({
-    fullName: sobject,
-    fields: [
-      ...fields,
-      ...formulaFields
-    ],
-    label,
-    pluralLabel: label,
-    nameField: {
-      type: 'AutoNumber',
-      fullName: 'Name',
-      label: '#'
-    },
-    deploymentStatus: 'Deployed',
-    sharingModel: 'ReadWrite'
-  });
-  const packageXml = metadata.Package({
-    types: [{
-      name: 'CustomObject', members: [sobject]
-    }, {
-      name: 'CustomField',
-      members: [...fields, ...formulaFields].map(fd => `${sobject}.${fd.fullName}`),
-    }],
-    version: '42.0',
-  });
-  const zip = new AdmZip();
-  zip.addFile('src/package.xml', new Buffer(packageXml));
-  zip.addFile(`src/objects/${sobject}.object`, new Buffer(objectXml));
-  const res = await conn.metadata.deploy(zip.toBuffer()).complete({ details: true });
-  if (res.status !== 'Succeeded') {
-    console.error(res.details);
-    throw new Error('Schema creation failed');
+  // request field definition in serveral batches
+  // in order to avoid 'unexpected error' in server
+  // when creating many formula fields at once
+  while (fieldDefs.length > 0) {
+    const createFields = fieldDefs.slice(0, 40);
+    const objectXml = metadata.CustomObject({
+      fullName: sobject,
+      fields: fieldDefs.slice(0, 40),
+      label,
+      pluralLabel: label,
+      nameField: {
+        type: 'AutoNumber',
+        fullName: 'Name',
+        label: '#'
+      },
+      deploymentStatus: 'Deployed',
+      sharingModel: 'ReadWrite'
+    });
+    const packageXml = metadata.Package({
+      types: [{
+        name: 'CustomObject', members: [sobject]
+      }, {
+        name: 'CustomField',
+        members: createFields.map(fd => `${sobject}.${fd.fullName}`),
+      }],
+      version: '42.0',
+    });
+    const zip = new AdmZip();
+    zip.addFile('src/package.xml', new Buffer(packageXml));
+    zip.addFile(`src/objects/${sobject}.object`, new Buffer(objectXml));
+    const res = await conn.metadata.deploy(zip.toBuffer()).complete({ details: true });
+    if (res.status !== 'Succeeded') {
+      console.error(res.details);
+      throw new Error('Schema creation failed');
+    }
+    fieldDefs = fieldDefs.slice(40);
   }
   console.log('Created formula test schema');
   const profile = await conn.metadata.read('Profile', 'Admin');
