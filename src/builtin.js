@@ -20,6 +20,26 @@ const builtins = {
       returns: { type: 'string' },
     },
   },
+  'ADDMONTHS': {
+    value: (d: ?string, n: ?number) => {
+      if (d == null || n == null) {
+        return null;
+      }
+      const dt = DateTime.fromISO(d);
+      return dt.isValid ? dt.plus({ months: n }).toISODate() : null;
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'date' },
+        optional: false,
+      }, {
+        argument: { type: 'number' },
+        optional: false,
+      }],
+      returns: { type: 'date' },
+    },
+  },
   'DATE': {
     value: (y: ?number, m: ?number, d: ?number) => {
       if (y == null || m == null || d == null || y > 9999) {

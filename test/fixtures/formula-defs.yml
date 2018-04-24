@@ -219,3 +219,6 @@
 -
   type: Date
   formula: DATEVALUE(Text01__c & '-' & Text02__c & '-01')
+-
+  type: Date
+  formula: ADDMONTHS(Date01__c, Number01__c)
