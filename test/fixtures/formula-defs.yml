@@ -221,6 +221,9 @@
   formula: ADDMONTHS(Date01__c, Number01__c)
 -
   type: DateTime
+  formula: DATETIMEVALUE(Date01__c)
+-
+  type: DateTime
   formula: DATETIMEVALUE(Datetime01__c)
 -
   type: DateTime
@@ -228,6 +231,9 @@
 -
   type: Date
   formula: DATEVALUE(Text01__c & '-' & Text02__c & '-01')
+-
+  type: Date
+  formula: DATEVALUE(Datetime01__c)
 -
   type: Number
   formula: YEAR(Date01__c)
@@ -243,7 +249,6 @@
   formula: DAY(Date01__c)
   precision: 18
   scale: 0
-
 
 
 

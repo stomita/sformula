@@ -71,9 +71,9 @@ const builtins = {
       if (s == null || s === '') {
         return null;
       }
-      let dt = DateTime.fromISO(s);
+      let dt = DateTime.fromISO(s, { zone: 'utc' });
       if (!dt.isValid) {
-        dt = DateTime.fromFormat(s + '+0000', 'yyyy-MM-dd HH:mm:ssZZZ');
+        dt = DateTime.fromFormat(s, 'yyyy-MM-dd HH:mm:ss', { zone: 'utc' });
       }
       return dt.isValid ? dt.toUTC().toFormat(ISO8601_DATETIME_FORMAT) : null;
     },
@@ -119,7 +119,7 @@ const builtins = {
       }],
       returns: { type: 'number' },
     },
-  }, 
+  },
   'MONTH': {
     value: (s: ?string) => {
       if (s == null || s === '') {
@@ -136,7 +136,7 @@ const builtins = {
       }],
       returns: { type: 'number' },
     },
-  }, 
+  },
   'DAY': {
     value: (s: ?string) => {
       if (s == null || s === '') {
@@ -153,7 +153,7 @@ const builtins = {
       }],
       returns: { type: 'number' },
     },
-  }, 
+  },
   'TODAY': {
     value: () => {
       return DateTime.utc().toISODate();
