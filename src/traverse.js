@@ -572,16 +572,3 @@ export function traverse(
   }
   return result;
 }
-
-/**
- * 
- */
-export function isCompatibleType(srcType: string, dstType: string) {
-  return (
-    srcType === dstType ||
-    srcType === 'any' || dstType === 'any' ||
-    (srcType === 'datetime' && dstType === 'date') ||
-    ((srcType === 'number' || srcType === 'currency' || srcType === 'percent') &&
-     (dstType === 'number' || dstType === 'currency' || dstType === 'percent'))
-  );
-}

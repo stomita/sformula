@@ -9,9 +9,7 @@ const MSECS_IN_DAY = 24 * 60 * 60 * 1000;
 const builtins = {
   'TEXT': {
     value: (v: any) => {
-      const ret = v == null ? null : String(v);
-      // console.log('TEXT() ', v, '=>', JSON.stringify(ret));
-      return ret;
+      return v == null ? null : String(v);
     },
     type: {
       type: 'function',

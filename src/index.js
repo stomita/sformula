@@ -1,5 +1,4 @@
 /* @flow */
-import { DateTime } from 'luxon';
 import { build as buildFormula } from 'esformula';
 import type { Expression } from 'esformula';
 import type {
@@ -9,7 +8,8 @@ import { parseFormula } from './formula';
 import { context as builtins, types as builtinTypeDict } from './builtin';
 import { extractFields } from './fieldExtraction';
 import { createFieldTypeDictionary } from './fieldType';
-import { traverse, isCompatibleType, validationError, invalidTypeError } from './traverse';
+import { traverse, validationError, invalidTypeError } from './traverse';
+import { isCastatibleType, castValue } from './cast';
 
 export type ReturnType = $PropertyType<PrimitiveExpressionType, 'type'>;
 
@@ -42,11 +42,6 @@ export type ParseOptions = {
   blankAsZero?: boolean,
 };
 
-function applyScale(n: number, scale: number) {
-  const power = 10 ** scale;
-  return Math.round(n * power) / power;
-}
-
 /**
  * 
  */
@@ -57,19 +52,8 @@ export function create(compiled: CompiledFormula): Formula {
     compiled,
     returnType,
     evaluate(context?: Context = {}) {
-      let ret = esformula.evaluate({ ...context, ...builtins });
-      if (ret == null) { return ret; }
-      if (returnType === 'date' && calculatedType === 'datetime') {
-        return DateTime.fromISO(ret).toUTC().toISODate();
-      }
-      if (returnType === 'percent' && calculatedType !== 'percent') {
-        ret = ret * 100;
-      }
-      if (typeof scale === 'number' &&
-          (returnType === 'number' || returnType === 'currency' || returnType === 'percent')) {
-        ret = applyScale(ret, scale);
-      }
-      return ret;
+      const value = esformula.evaluate({ ...context, ...builtins });
+      return castValue(value, calculatedType, returnType, scale);
     },
   };
 }
@@ -82,7 +66,7 @@ function traverseAndCreateFormula(expression, fieldTypes, fields, options) {
       calculatedType.type === 'function' || calculatedType.type === 'template') {
     throw invalidTypeError(expression, calculatedType.type, ['string', 'number', 'currency', 'percent', 'date', 'datetime', 'boolean']);
   }
-  if (returnType && !isCompatibleType(calculatedType.type, returnType)) {
+  if (returnType && !isCastatibleType(calculatedType.type, returnType)) {
     throw invalidTypeError(expression, calculatedType.type, [returnType]);
   }
   return create({
