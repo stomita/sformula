@@ -228,4 +228,22 @@
 -
   type: Date
   formula: DATEVALUE(Text01__c & '-' & Text02__c & '-01')
+-
+  type: Number
+  formula: YEAR(Date01__c)
+  precision: 18
+  scale: 0
+-
+  type: Number
+  formula: MONTH(Date01__c)
+  precision: 18
+  scale: 0
+-
+  type: Number
+  formula: DAY(Date01__c)
+  precision: 18
+  scale: 0
+
+
+
 

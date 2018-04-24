@@ -103,6 +103,57 @@ const builtins = {
       returns: { type: 'date' },
     },
   },
+  'YEAR': {
+    value: (s: ?string) => {
+      if (s == null || s === '') {
+        return null;
+      }
+      const dt = DateTime.fromISO(s);
+      return dt.isValid ? dt.year : null;
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'date' },
+        optional: false,
+      }],
+      returns: { type: 'number' },
+    },
+  }, 
+  'MONTH': {
+    value: (s: ?string) => {
+      if (s == null || s === '') {
+        return null;
+      }
+      const dt = DateTime.fromISO(s);
+      return dt.isValid ? dt.month : null;
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'date' },
+        optional: false,
+      }],
+      returns: { type: 'number' },
+    },
+  }, 
+  'DAY': {
+    value: (s: ?string) => {
+      if (s == null || s === '') {
+        return null;
+      }
+      const dt = DateTime.fromISO(s);
+      return dt.isValid ? dt.day : null;
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'date' },
+        optional: false,
+      }],
+      returns: { type: 'number' },
+    },
+  }, 
   'TODAY': {
     value: () => {
       return DateTime.utc().toISODate();
