@@ -97,24 +97,32 @@
   blankAsZero: true
 -
   type: Date
+  formula: Date01__c + Number01__c
+-
+  type: Date
   formula: Date01__c + 0.5
 -
   type: Date
   formula: Datetime01__c - 0.5
 -
+  type: Currency
+  formula: Currency01__c * Number02__c
+  precision: 18
+  scale: 2
+-
   type: Number
   formula: Datetime01__c - Datetime02__c
-  precision: 14
+  precision: 18
   scale: 4
 -
   type: Number
   formula: Date01__c - Date02__c
-  precision: 14
+  precision: 18
   scale: 4
 -
   type: Number
   formula: (Date01__c + 1) - (Date01__c + 0.1 + 0.9)
-  precision: 14
+  precision: 18
   scale: 4
 -
   type: Checkbox
@@ -183,3 +191,6 @@
 -
   type: Date
   formula: TODAY()
+-
+  type: Date
+  formula: DATEVALUE(Text01__c & '-' & Text02__c & '-01')

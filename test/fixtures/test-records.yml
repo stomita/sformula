@@ -53,6 +53,27 @@
   Number01__c: 12
   Number02__c: -8
 -
+  Number01__c: 4
+  Number02__c: 3
+-
+  Number01__c: 5
+  Number02__c: 3
+-
+  Number01__c: -4
+  Number02__c: 3
+-
+  Number01__c: -5
+  Number02__c: 3
+-
+  Number01__c: 5
+  Number02__c: 3.45
+-
+  Number01__c: 10
+  Number02__c: -1.54
+-
+  Currency01__c: 1215
+  Number02__c: 1.08
+-
   Text01__c: ''
 -
   Text02__c: null
