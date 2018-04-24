@@ -44,13 +44,13 @@ test.before(async () => {
 });
 
 for (const [i, formulaDef] of formulaDefs.entries()) {
-  const { type, name, formula, blankAsZero } = formulaDef;
+  const { type, name, formula, scale, blankAsZero } = formulaDef;
   /**
    * 
    */
   test.serial(`formula#${zeropad(i + 1)}: ${formula}${ blankAsZero ? ' (blank as zero) ' : ''}`, async (t) => {
     const returnType = toReturnType(type);
-    const fml = await parse(formula, { ...describer, returnType, blankAsZero });
+    const fml = await parse(formula, { ...describer, returnType, scale, blankAsZero });
     for (const [i, record] of testRecords.entries()) {
       const expected = expectedRecords[i][name];
       t.true(
