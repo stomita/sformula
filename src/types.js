@@ -10,11 +10,11 @@ export type PrimitiveExpressionType = {
   precision?: number,
   scale?: number,
 } | {
-  type: 'percent',
+  type: 'currency',
   precision?: number,
   scale?: number,
 } | {
-  type: 'currency',
+  type: 'percent',
   precision?: number,
   scale?: number,
 } | {
@@ -24,16 +24,18 @@ export type PrimitiveExpressionType = {
 } | {
   type: 'datetime',
 } | {
+  type: 'any',
+};
+
+export type AdditionalPrimitiveExpressionType = {
   type: 'picklist',
   picklistValues: Array<{
     label: string,
     value: string,
   }>
-} | {
-  type: 'any',
 };
 
-export type ExpressionType = PrimitiveExpressionType | {
+export type ExpressionType = PrimitiveExpressionType | AdditionalPrimitiveExpressionType | {
   type: 'object',
   sobject: string,
   properties: ExpressionTypeDictionary,

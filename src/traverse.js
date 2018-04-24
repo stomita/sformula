@@ -581,7 +581,7 @@ export function isCompatibleType(srcType: string, dstType: string) {
     srcType === dstType ||
     srcType === 'any' || dstType === 'any' ||
     (srcType === 'datetime' && dstType === 'date') ||
-    ((srcType === 'number' || srcType === 'currency') &&
-     (dstType === 'number' || dstType === 'currency'))
+    ((srcType === 'number' || srcType === 'currency' || srcType === 'percent') &&
+     (dstType === 'number' || dstType === 'currency' || dstType === 'percent'))
   );
 }

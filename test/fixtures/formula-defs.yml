@@ -115,10 +115,10 @@
   precision: 18
   scale: 2
 -
-  type: Number
-  formula: Percent01__c / Percent02__c
+  type: Percent
+  formula: Number01__c / Number02__c + Percent01__c
   precision: 18
-  scale: 2
+  scale: 4
 -
   type: Currency
   formula: Currency01__c * Currency02__c

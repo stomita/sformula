@@ -1,4 +1,5 @@
 /* @flow */
+import { DateTime } from 'luxon';
 import { build as buildFormula } from 'esformula';
 import type { Expression } from 'esformula';
 import type {
@@ -57,11 +58,16 @@ export function create(compiled: CompiledFormula): Formula {
     returnType,
     evaluate(context?: Context = {}) {
       let ret = esformula.evaluate({ ...context, ...builtins });
+      if (ret == null) { return ret; }
       if (returnType === 'date' && calculatedType === 'datetime') {
-        return ret && ret.substring(0, 10);
+        return DateTime.fromISO(ret).toUTC().toISODate();
       }
-      if (returnType === 'number' && typeof scale === 'number') {
-        ret = ret != null ? applyScale(ret, scale) : ret;
+      if (returnType === 'percent' && calculatedType !== 'percent') {
+        ret = ret * 100;
+      }
+      if (typeof scale === 'number' &&
+          (returnType === 'number' || returnType === 'currency' || returnType === 'percent')) {
+        ret = applyScale(ret, scale);
       }
       return ret;
     },
@@ -72,8 +78,9 @@ function traverseAndCreateFormula(expression, fieldTypes, fields, options) {
   const { returnType, scale, blankAsZero } = options;
   const { expression: expression_, returnType: calculatedType } =
     traverse(expression, { ...fieldTypes, ...builtinTypeDict }, blankAsZero);
-  if (calculatedType.type === 'object' || calculatedType.type === 'function' || calculatedType.type === 'template') {
-    throw invalidTypeError(expression, calculatedType.type, ['string', 'number', 'currency', 'date', 'datetime', 'boolean']);
+  if (calculatedType.type === 'picklist' || calculatedType.type === 'object' ||
+      calculatedType.type === 'function' || calculatedType.type === 'template') {
+    throw invalidTypeError(expression, calculatedType.type, ['string', 'number', 'currency', 'percent', 'date', 'datetime', 'boolean']);
   }
   if (returnType && !isCompatibleType(calculatedType.type, returnType)) {
     throw invalidTypeError(expression, calculatedType.type, [returnType]);
