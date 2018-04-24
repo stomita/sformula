@@ -218,7 +218,14 @@
   formula: TODAY()
 -
   type: Date
-  formula: DATEVALUE(Text01__c & '-' & Text02__c & '-01')
+  formula: ADDMONTHS(Date01__c, Number01__c)
+-
+  type: DateTime
+  formula: DATETIMEVALUE(Datetime01__c)
+-
+  type: DateTime
+  formula: DATETIMEVALUE("2017-12-31 06:08:24")
 -
   type: Date
-  formula: ADDMONTHS(Date01__c, Number01__c)
+  formula: DATEVALUE(Text01__c & '-' & Text02__c & '-01')
+

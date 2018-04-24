@@ -6,6 +6,9 @@ import type {
 
 const MSECS_IN_DAY = 24 * 60 * 60 * 1000;
 
+// Salesforce always returns Datetime value in iso8601 with zero timezone offset (+0000)
+const ISO8601_DATETIME_FORMAT = 'yyyy-MM-dd\'T\'HH:mm:ss.SSSZZZ';
+
 const builtins = {
   'TEXT': {
     value: (v: any) => {
@@ -61,6 +64,26 @@ const builtins = {
         optional: false,
       }],
       returns: { type: 'date' },
+    },
+  },
+  'DATETIMEVALUE': {
+    value: (s: ?string) => {
+      if (s == null || s === '') {
+        return null;
+      }
+      let dt = DateTime.fromISO(s);
+      if (!dt.isValid) {
+        dt = DateTime.fromFormat(s + '+0000', 'yyyy-MM-dd HH:mm:ssZZZ');
+      }
+      return dt.isValid ? dt.toUTC().toFormat(ISO8601_DATETIME_FORMAT) : null;
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'any' },
+        optional: false,
+      }],
+      returns: { type: 'datetime' },
     },
   },
   'DATEVALUE': {
@@ -595,7 +618,7 @@ const builtins = {
       if (d == null || n == null) { return null; }
       const dt = DateTime.fromISO(d);
       if (!dt.isValid) { return null; }
-      return dt.plus({ milliseconds: n * MSECS_IN_DAY }).toUTC().toISO();
+      return dt.plus({ milliseconds: n * MSECS_IN_DAY }).toUTC().toFormat(ISO8601_DATETIME_FORMAT);
     },
     type: {
       type: 'function',
@@ -614,7 +637,7 @@ const builtins = {
       if (d == null || n == null) { return null; }
       const dt = DateTime.fromISO(d);
       if (!dt.isValid) { return null; }
-      return dt.plus({ milliseconds: -n * MSECS_IN_DAY }).toUTC().toISO();
+      return dt.plus({ milliseconds: -n * MSECS_IN_DAY }).toUTC().toFormat(ISO8601_DATETIME_FORMAT);
     },
     type: {
       type: 'function',
