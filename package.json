@@ -21,7 +21,7 @@
   ],
   "dependencies": {
     "esformula": "^1.0.7",
-    "moment": "^2.22.1"
+    "luxon": "^1.1.0"
   },
   "devDependencies": {
     "adm-zip": "^0.4.7",

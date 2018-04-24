@@ -1,5 +1,5 @@
 /* @flow */
-import moment from 'moment';
+import { DateTime } from 'luxon';
 import type {
   Context, ExpressionType, ExpressionTypeDictionary,
 } from './types';
@@ -27,8 +27,8 @@ const builtins = {
       if (y == null || m == null || d == null || y > 9999) {
         return null;
       }
-      const dd = moment([y, m-1, d]);
-      return dd.isValid() ? dd.format('YYYY-MM-DD') : null;
+      const dd = DateTime.utc(y, m, d);
+      return dd.isValid ? dd.toISODate() : null;
     },
     type: {
       type: 'function',
@@ -50,8 +50,8 @@ const builtins = {
       if (s == null || s === '') {
         return null;
       }
-      const dd = moment(s, 'YYYY-MM-DD');
-      return dd.isValid() ? dd.format('YYYY-MM-DD') : null;
+      const dt = DateTime.fromISO(s);
+      return dt.isValid ? dt.toISODate() : null;
     },
     type: {
       type: 'function',
@@ -64,7 +64,7 @@ const builtins = {
   },
   'TODAY': {
     value: () => {
-      return moment().format('YYYY-MM-DD');
+      return DateTime.utc().toISODate();
     },
     type: {
       type: 'function',
@@ -390,7 +390,9 @@ const builtins = {
   '$$ADD_DATE$$': {
     value: (d: string, n: number) => {
       if (d == null || n == null) { return null; }
-      return moment(d).add(Math.floor(n), 'days').format('YYYY-MM-DD');
+      const dt = DateTime.fromISO(d);
+      if (!dt.isValid) { return null; }
+      return dt.plus({ day: n }).toISODate();
     },
     type: {
       type: 'function',
@@ -407,7 +409,9 @@ const builtins = {
   '$$SUBTRACT_DATE$$': {
     value: (d: ?string, n: ?number) => {
       if (d == null || n == null) { return null; }
-      return moment(d).add(Math.floor(-n), 'days').format('YYYY-MM-DD');
+      const dt = DateTime.fromISO(d);
+      if (!dt.isValid) { return null; }
+      return dt.plus({ day: -n }).toISODate();
     },
     type: {
       type: 'function',
@@ -424,7 +428,11 @@ const builtins = {
   '$$DIFF_DATE$$': {
     value: (d1: string, d2: string) => {
       if (d1 == null || d2 == null) { return null; }
-      return moment(d1).diff(d2, 'days');
+      const dt1 = DateTime.fromISO(d1);
+      if (!dt1.isValid) { return null; }
+      const dt2 = DateTime.fromISO(d2);
+      if (!dt2.isValid) { return null; }
+      return dt1.diff(dt2, 'days').as('days');
     },
     type: {
       type: 'function',
@@ -441,7 +449,11 @@ const builtins = {
   '$$LT_DATE$$': {
     value: (d1: string, d2: string) => {
       if (d1 == null || d2 == null) { return false; }
-      return moment(d1).isBefore(d2);
+      const dt1 = DateTime.fromISO(d1);
+      if (!dt1.isValid) { return false; }
+      const dt2 = DateTime.fromISO(d2);
+      if (!dt2.isValid) { return false; }
+      return dt1.valueOf() < dt2.valueOf();
     },
     type: {
       type: 'function',
@@ -458,7 +470,11 @@ const builtins = {
   '$$LTE_DATE$$': {
     value: (d1: string, d2: string) => {
       if (d1 == null || d2 == null) { return false; }
-      return moment(d1).isSameOrBefore(d2);
+      const dt1 = DateTime.fromISO(d1);
+      if (!dt1.isValid) { return false; }
+      const dt2 = DateTime.fromISO(d2);
+      if (!dt2.isValid) { return false; }
+      return dt1.valueOf() <= dt2.valueOf();
     },
     type: {
       type: 'function',
@@ -475,7 +491,11 @@ const builtins = {
   '$$GT_DATE$$': {
     value: (d1: string, d2: string) => {
       if (d1 == null || d2 == null) { return false; }
-      return moment(d1).isAfter(d2);
+      const dt1 = DateTime.fromISO(d1);
+      if (!dt1.isValid) { return false; }
+      const dt2 = DateTime.fromISO(d2);
+      if (!dt2.isValid) { return false; }
+      return dt1.valueOf() > dt2.valueOf();
     },
     type: {
       type: 'function',
@@ -492,7 +512,11 @@ const builtins = {
   '$$GTE_DATE$$': {
     value: (d1: string, d2: string) => {
       if (d1 == null || d2 == null) { return false; }
-      return moment(d1).isSameOrAfter(d2);
+      const dt1 = DateTime.fromISO(d1);
+      if (!dt1.isValid) { return false; }
+      const dt2 = DateTime.fromISO(d2);
+      if (!dt2.isValid) { return false; }
+      return dt1.valueOf() >= dt2.valueOf();
     },
     type: {
       type: 'function',
@@ -509,7 +533,11 @@ const builtins = {
   '$$EQ_DATE$$': {
     value: (d1: string, d2: string) => {
       if (d1 == null || d2 == null) { return false; }
-      return moment(d1).isSame(d2);
+      const dt1 = DateTime.fromISO(d1);
+      if (!dt1.isValid) { return false; }
+      const dt2 = DateTime.fromISO(d2);
+      if (!dt2.isValid) { return false; }
+      return dt1.hasSame(dt2, 'day');
     },
     type: {
       type: 'function',
@@ -526,7 +554,11 @@ const builtins = {
   '$$NEQ_DATE$$': {
     value: (d1: string, d2: string) => {
       if (d1 == null || d2 == null) { return false; }
-      return !moment(d1).isSame(d2);
+      const dt1 = DateTime.fromISO(d1);
+      if (!dt1.isValid) { return false; }
+      const dt2 = DateTime.fromISO(d2);
+      if (!dt2.isValid) { return false; }
+      return !dt1.hasSame(dt2, 'day');
     },
     type: {
       type: 'function',
@@ -543,7 +575,9 @@ const builtins = {
   '$$ADD_DATETIME$$': {
     value: (d: ?string, n: ?number) => {
       if (d == null || n == null) { return null; }
-      return moment(d).add(n * MSECS_IN_DAY, 'milliseconds').toISOString();
+      const dt = DateTime.fromISO(d);
+      if (!dt.isValid) { return null; }
+      return dt.plus({ milliseconds: n * MSECS_IN_DAY }).toUTC().toISO();
     },
     type: {
       type: 'function',
@@ -560,7 +594,9 @@ const builtins = {
   '$$SUBTRACT_DATETIME$$': {
     value: (d: ?string, n: ?number) => {
       if (d == null || n == null) { return null; }
-      return moment(d).add(-n * MSECS_IN_DAY, 'milliseconds').toISOString();
+      const dt = DateTime.fromISO(d);
+      if (!dt.isValid) { return null; }
+      return dt.plus({ milliseconds: -n * MSECS_IN_DAY }).toUTC().toISO();
     },
     type: {
       type: 'function',
@@ -575,9 +611,13 @@ const builtins = {
     },
   },
   '$$DIFF_DATETIME$$': {
-    value: (d1: string, d2: string) => {
+    value: (d1: ?string, d2: ?string) => {
       if (d1 == null || d2 == null) { return null; }
-      return moment(d1).diff(d2, 'milliseconds') / MSECS_IN_DAY;
+      const dt1 = DateTime.fromISO(d1);
+      if (!dt1.isValid) { return null; }
+      const dt2 = DateTime.fromISO(d2);
+      if (!dt2.isValid) { return null; }
+      return dt1.diff(dt2, 'milliseconds').as('milliseconds') / MSECS_IN_DAY;
     },
     type: {
       type: 'function',
@@ -592,9 +632,13 @@ const builtins = {
     },
   },
   '$$LT_DATETIME$$': {
-    value: (d1: string, d2: string) => {
+    value: (d1: ?string, d2: ?string) => {
       if (d1 == null || d2 == null) { return false; }
-      return moment(d1).isBefore(d2);
+      const dt1 = DateTime.fromISO(d1);
+      if (!dt1.isValid) { return null; }
+      const dt2 = DateTime.fromISO(d2);
+      if (!dt2.isValid) { return null; }
+      return dt1.valueOf() < dt2.valueOf();
     },
     type: {
       type: 'function',
@@ -611,7 +655,11 @@ const builtins = {
   '$$LTE_DATETIME$$': {
     value: (d1: string, d2: string) => {
       if (d1 == null || d2 == null) { return false; }
-      return moment(d1).isSameOrBefore(d2);
+      const dt1 = DateTime.fromISO(d1);
+      if (!dt1.isValid) { return null; }
+      const dt2 = DateTime.fromISO(d2);
+      if (!dt2.isValid) { return null; }
+      return dt1.valueOf() <= dt2.valueOf();
     },
     type: {
       type: 'function',
@@ -628,7 +676,11 @@ const builtins = {
   '$$GT_DATETIME$$': {
     value: (d1: string, d2: string) => {
       if (d1 == null || d2 == null) { return false; }
-      return moment(d1).isAfter(d2);
+      const dt1 = DateTime.fromISO(d1);
+      if (!dt1.isValid) { return null; }
+      const dt2 = DateTime.fromISO(d2);
+      if (!dt2.isValid) { return null; }
+      return dt1.valueOf() > dt2.valueOf();
     },
     type: {
       type: 'function',
@@ -645,7 +697,11 @@ const builtins = {
   '$$GTE_DATETIME$$': {
     value: (d1: string, d2: string) => {
       if (d1 == null || d2 == null) { return false; }
-      return moment(d1).isSameOrAfter(d2);
+      const dt1 = DateTime.fromISO(d1);
+      if (!dt1.isValid) { return null; }
+      const dt2 = DateTime.fromISO(d2);
+      if (!dt2.isValid) { return null; }
+      return dt1.valueOf() >= dt2.valueOf();
     },
     type: {
       type: 'function',
@@ -662,7 +718,11 @@ const builtins = {
   '$$EQ_DATETIME$$': {
     value: (d1: string, d2: string) => {
       if (d1 == null || d2 == null) { return false; }
-      return moment(d1).isSame(d2);
+      const dt1 = DateTime.fromISO(d1);
+      if (!dt1.isValid) { return false; }
+      const dt2 = DateTime.fromISO(d2);
+      if (!dt2.isValid) { return false; }
+      return dt1.hasSame(dt2, 'millisecond');
     },
     type: {
       type: 'function',
@@ -679,7 +739,11 @@ const builtins = {
   '$$NEQ_DATETIME$$': {
     value: (d1: string, d2: string) => {
       if (d1 == null || d2 == null) { return false; }
-      return !moment(d1).isSame(d2);
+      const dt1 = DateTime.fromISO(d1);
+      if (!dt1.isValid) { return false; }
+      const dt2 = DateTime.fromISO(d2);
+      if (!dt2.isValid) { return false; }
+      return !dt1.hasSame(dt2, 'millisecond');
     },
     type: {
       type: 'function',
@@ -698,7 +762,9 @@ const builtins = {
   '$$FN_TEXT_DATETIME$$': {
     value: (d: string) => {
       if (d == null) { return 'Z'; }
-      return moment(d).utc().format('YYYY-MM-DD HH:mm:ss[Z]');
+      const dt = DateTime.fromISO(d);
+      if (!dt.isValid) { return null; }
+      return dt.toUTC().toFormat('yyyy-MM-dd HH:mm:ss\'Z\'');
     },
     type: {
       type: 'function',
