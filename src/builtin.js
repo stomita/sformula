@@ -23,6 +23,42 @@ const builtins = {
       returns: { type: 'string' },
     },
   },
+  'AND': {
+    value: (...conds: Array<?boolean>) => {
+      for (const c of conds) {
+        if (!c) {
+          return false;
+        }
+      }
+      return true;
+    },
+    type: {
+      type: 'function',
+      arguments: Array.from({ length: 50 }).map((_, i) => ({
+        argument: { type: 'boolean' },
+        optional: i > 0,
+      })),
+      returns: { type: 'boolean' },
+    },
+  },
+  'OR': {
+    value: (...conds: Array<?boolean>) => {
+      for (const c of conds) {
+        if (c) {
+          return true;
+        }
+      }
+      return false;
+    },
+    type: {
+      type: 'function',
+      arguments: Array.from({ length: 50 }).map((_, i) => ({
+        argument: { type: 'boolean' },
+        optional: i > 0,
+      })),
+      returns: { type: 'boolean' },
+    },
+  },
   'ADDMONTHS': {
     value: (d: ?string, n: ?number) => {
       if (d == null || n == null) {

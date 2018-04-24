@@ -253,6 +253,12 @@
   type: DateTime
   formula: NOW()
   fluctuation: 5000
+-
+  type: Checkbox
+  formula: AND(Checkbox01__c, Number01__c >= 0)
+-
+  type: Checkbox
+  formula: OR(Checkbox01__c, Number01__c >= 0)
 
 
 
