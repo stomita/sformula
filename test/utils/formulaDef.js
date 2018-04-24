@@ -15,6 +15,7 @@ export type FormulaDef = {
   blankAsZero?: boolean,
   precision?: number,
   scale?: number,
+  fluctuation?: number,
 };
 
 

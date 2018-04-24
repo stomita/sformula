@@ -1,5 +1,6 @@
 /* @flow */
 import test from 'ava';
+import { DateTime } from 'luxon';
 import { parse, type ReturnType } from '..'; 
 import { loadFormulaDefs } from './utils/formulaDef';
 import { describe, createFormulaSchema, resetFormulaSchema } from './utils/schema';
@@ -16,6 +17,33 @@ function toReturnType(type: string): ReturnType {
     type === 'Text' ? 'string' :
     type.toLowerCase()
   ): any);
+}
+
+const ISO8601_DATETIME_FORMAT = 'yyyy-MM-dd\'T\'HH:mm:ss.SSSZZZ';
+
+function calcFluctuatedValue(
+  value: string | number | null,
+  fluctuation: number,
+  returnType: ReturnType
+) {
+  if ((returnType === 'number' || returnType === 'currency' || returnType === 'percent') && typeof value === 'number') {
+    return ([ value - fluctuation, value + fluctuation ] : [ number, number ]);
+  }
+  if ((returnType === 'datetime') && typeof value === 'string') {
+    const dt = DateTime.fromISO(value);
+    return ([
+      dt.plus(-fluctuation).toUTC().toFormat(ISO8601_DATETIME_FORMAT),
+      dt.plus(fluctuation).toUTC().toFormat(ISO8601_DATETIME_FORMAT),
+    ] : [string, string]);
+  }
+  return ([value, value] : [typeof value, typeof value]);
+}
+
+function between(value: any, lower: any, upper: any) {
+  return (
+    (value == null && lower == null && upper === null) ||
+    (value >= lower && value <= upper)
+  );
 }
 
 const FORMULA_TEST_OBJECT = 'FormulaTest__c';
@@ -44,7 +72,7 @@ test.before(async () => {
 });
 
 for (const [i, formulaDef] of formulaDefs.entries()) {
-  const { type, name, formula, scale, blankAsZero } = formulaDef;
+  const { type, name, formula, scale, blankAsZero, fluctuation = 0 } = formulaDef;
   /**
    * 
    */
@@ -53,10 +81,20 @@ for (const [i, formulaDef] of formulaDefs.entries()) {
     const fml = await parse(formula, { ...describer, returnType, scale, blankAsZero });
     for (const [i, record] of testRecords.entries()) {
       const expected = expectedRecords[i][name];
-      t.true(
-        expected === fml.evaluate(record),
-        'evaluated value is not equals to the expected'
-      );
+      // Test result may differ from expected if relative datetime values are included in the formula (e.g. "NOW()").
+      // So applying fluctuation value to the expected value and assert the result is in the range.
+      if (fluctuation > 0) {
+        const [expectedLower, expectedUpper] = calcFluctuatedValue(expected, fluctuation, returnType);
+        t.true(
+          between(fml.evaluate(record), expectedLower, expectedUpper),
+          'evaluated value is not considered to be matching expected in fluctuation range'
+        );
+      } else {
+        t.true(
+          expected === fml.evaluate(record),
+          'evaluated value is not equals to the expected'
+        );
+      }
     }
     t.pass();
   });

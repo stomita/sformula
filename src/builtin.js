@@ -164,6 +164,16 @@ const builtins = {
       returns: { type: 'date' },
     },
   },
+  'NOW': {
+    value: () => {
+      return DateTime.utc().toFormat(ISO8601_DATETIME_FORMAT);
+    },
+    type: {
+      type: 'function',
+      arguments: [],
+      returns: { type: 'datetime' },
+    },
+  },
   'IF': {
     value: (test: boolean, cons: any, alt: any) => {
       return test ? cons : alt;
