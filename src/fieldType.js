@@ -23,6 +23,8 @@ async function describeFieldType(field: string, describer: Describer): Promise<E
       return { type: 'date' };
     case 'datetime':
       return { type: 'datetime' };
+    case 'percent':
+      return { type: 'percent', precision: fieldDef.precision, scale: fieldDef.scale };
     case 'currency':
       return { type: 'currency', precision: fieldDef.precision, scale: fieldDef.scale };
     case 'picklist':

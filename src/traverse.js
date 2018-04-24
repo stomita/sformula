@@ -92,7 +92,7 @@ function nullValue(result: TraverseResult, blankAsZero: boolean) {
     altValue = createLiteral('');
   } else if (returnType.type === 'boolean') {
     altValue = createLiteral(false);
-  } else if (returnType.type === 'number' || returnType.type === 'currency') {
+  } else if (returnType.type === 'number' || returnType.type === 'currency' || returnType.type === 'percent') {
     altValue = createLiteral(blankAsZero ? 0 : null);
   } else if (returnType.type === 'object') {
     altValue = {
@@ -364,6 +364,7 @@ function traverseBinaryExpression(
     case 'string':
       return traverseStringBinaryExpression(expression, left, right);
     case 'number':
+    case 'currency':
       return traverseNumberBinaryExpression(expression, left, right);
     case 'date':
       return traverseDateBinaryExpression(expression, left, right);
@@ -505,6 +506,14 @@ function traverseIdentifier(
   if (!returnType) {
     throw new Error(`identifier type information is not found: ${expression.name}`);
   }
+  if (returnType.type === 'percent') {
+    const { precision, scale } = returnType;
+    const percent = nullValue({ expression, returnType }, blankAsZero).expression;
+    return {
+      expression: createCallExpression('$$MULTIPLY_NUMBER$$', [createLiteral(0.01), percent]),
+      returnType: { type: 'number', precision, scale },
+    };
+  }
   return nullValue({ expression, returnType }, blankAsZero);
 }
 
@@ -571,6 +580,8 @@ export function isCompatibleType(srcType: string, dstType: string) {
   return (
     srcType === dstType ||
     srcType === 'any' || dstType === 'any' ||
-    (srcType === 'datetime' && dstType === 'date')
+    (srcType === 'datetime' && dstType === 'date') ||
+    ((srcType === 'number' || srcType === 'currency') &&
+     (dstType === 'number' || dstType === 'currency'))
   );
 }

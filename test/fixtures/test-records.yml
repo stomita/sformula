@@ -74,6 +74,9 @@
   Currency01__c: 1215
   Number02__c: 1.08
 -
+  Percent01__c: 89.4
+  Number01__c: 250
+-
   Text01__c: ''
 -
   Text02__c: null

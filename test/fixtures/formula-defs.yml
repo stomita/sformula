@@ -105,6 +105,31 @@
   type: Date
   formula: Datetime01__c - 0.5
 -
+  type: Number
+  formula: Percent01__c * Number01__c
+  precision: 18
+  scale: 2
+-
+  type: Number
+  formula: Percent01__c
+  precision: 18
+  scale: 2
+-
+  type: Number
+  formula: Percent01__c / Percent02__c
+  precision: 18
+  scale: 2
+-
+  type: Currency
+  formula: Currency01__c * Currency02__c
+  precision: 18
+  scale: 2
+-
+  type: Currency
+  formula: Percent01__c * Currency01__c
+  precision: 18
+  scale: 2
+-
   type: Currency
   formula: Currency01__c * Number02__c
   precision: 18

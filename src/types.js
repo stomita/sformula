@@ -10,15 +10,19 @@ export type PrimitiveExpressionType = {
   precision?: number,
   scale?: number,
 } | {
+  type: 'percent',
+  precision?: number,
+  scale?: number,
+} | {
+  type: 'currency',
+  precision?: number,
+  scale?: number,
+} | {
   type: 'boolean',
 } | {
   type: 'date',
 } | {
   type: 'datetime',
-} | {
-  type: 'currency',
-  precision?: number,
-  scale?: number,
 } | {
   type: 'picklist',
   picklistValues: Array<{
