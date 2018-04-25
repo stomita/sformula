@@ -98,6 +98,14 @@
   type: Checkbox
   formula: ISPICKVAL(Picklist01__c, "1")
 -
+  type: Text
+  formula: IF(Number01__c < 5, Text01__c, Text02__c)
+-
+  type: Number
+  formula: IF(ISBLANK(Text01__c), Number01__c, -1) * Number02__c
+  precision: 18
+  scale: 2
+-
   type: Checkbox
   formula: "FALSE"
 -
