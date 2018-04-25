@@ -174,7 +174,7 @@ const builtins = {
   },
   'TODAY': {
     value: () => {
-      return DateTime.utc().toISODate();
+      return DateTime.local().toISODate();
     },
     type: {
       type: 'function',
