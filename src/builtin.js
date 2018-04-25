@@ -194,12 +194,14 @@ const builtins = {
   },
   'AND': {
     value: (...conds: Array<?boolean>) => {
+      let ret = true;
       for (const c of conds) {
-        if (!c) {
+        if (c === false) {
           return false;
         }
+        if (c == null) { ret = null; }
       }
-      return true;
+      return ret;
     },
     type: {
       type: 'function',
@@ -212,12 +214,14 @@ const builtins = {
   },
   'OR': {
     value: (...conds: Array<?boolean>) => {
+      let ret = false;
       for (const c of conds) {
-        if (c) {
+        if (c === true) {
           return true;
         }
+        if (c == null) { ret = null; }
       }
-      return false;
+      return ret;
     },
     type: {
       type: 'function',
@@ -230,7 +234,7 @@ const builtins = {
   },
   'NOT': {
     value: (v: ?boolean) => {
-      if (v == null) { return false; }
+      if (v == null) { return null; }
       return !v;
     },
     type: {
@@ -526,9 +530,37 @@ const builtins = {
       returns: { type: 'number' },
     },
   },
+  '$$MINUS_NUMBER$$': {
+    value: (n: ?number) => {
+      if (n == null) { return null; }
+      return -n;
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'number' },
+        optional: false,
+      }],
+      returns: { type: 'number' },
+    },
+  },
+  '$$PLUS_NUMBER$$': {
+    value: (n: ?number) => {
+      if (n == null) { return null; }
+      return +n;
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'number' },
+        optional: false,
+      }],
+      returns: { type: 'number' },
+    },
+  },
   '$$LT_NUMBER$$': {
     value: (n1: ?number, n2: ?number) => {
-      if (n1 == null || n2 == null) { return false; }
+      if (n1 == null || n2 == null) { return null; }
       return n1 < n2;
     },
     type: {
@@ -545,7 +577,7 @@ const builtins = {
   },
   '$$LTE_NUMBER$$': {
     value: (n1: ?number, n2: ?number) => {
-      if (n1 == null || n2 == null) { return false; }
+      if (n1 == null || n2 == null) { return null; }
       return n1 <= n2;
     },
     type: {
@@ -562,7 +594,7 @@ const builtins = {
   },
   '$$GT_NUMBER$$': {
     value: (n1: ?number, n2: ?number) => {
-      if (n1 == null || n2 == null) { return false; }
+      if (n1 == null || n2 == null) { return null; }
       return n1 > n2;
     },
     type: {
@@ -579,7 +611,7 @@ const builtins = {
   },
   '$$GTE_NUMBER$$': {
     value: (n1: ?number, n2: ?number) => {
-      if (n1 == null || n2 == null) { return false; }
+      if (n1 == null || n2 == null) { return null; }
       return n1 >= n2;
     },
     type: {
@@ -596,7 +628,7 @@ const builtins = {
   },
   '$$EQ_NUMBER$$': {
     value: (n1: ?number, n2: ?number) => {
-      if (n1 == null || n2 == null) { return false; }
+      if (n1 == null || n2 == null) { return null; }
       return n1 === n2;
     },
     type: {
@@ -613,7 +645,7 @@ const builtins = {
   },
   '$$NEQ_NUMBER$$': {
     value: (n1: ?number, n2: ?number) => {
-      if (n1 == null || n2 == null) { return false; }
+      if (n1 == null || n2 == null) { return null; }
       return n1 !== n2;
     },
     type: {
@@ -689,11 +721,11 @@ const builtins = {
   },
   '$$LT_DATE$$': {
     value: (d1: string, d2: string) => {
-      if (d1 == null || d2 == null) { return false; }
+      if (d1 == null || d2 == null) { return null; }
       const dt1 = DateTime.fromISO(d1);
-      if (!dt1.isValid) { return false; }
+      if (!dt1.isValid) { return null; }
       const dt2 = DateTime.fromISO(d2);
-      if (!dt2.isValid) { return false; }
+      if (!dt2.isValid) { return null; }
       return dt1.valueOf() < dt2.valueOf();
     },
     type: {
@@ -710,11 +742,11 @@ const builtins = {
   },
   '$$LTE_DATE$$': {
     value: (d1: string, d2: string) => {
-      if (d1 == null || d2 == null) { return false; }
+      if (d1 == null || d2 == null) { return null; }
       const dt1 = DateTime.fromISO(d1);
-      if (!dt1.isValid) { return false; }
+      if (!dt1.isValid) { return null; }
       const dt2 = DateTime.fromISO(d2);
-      if (!dt2.isValid) { return false; }
+      if (!dt2.isValid) { return null; }
       return dt1.valueOf() <= dt2.valueOf();
     },
     type: {
@@ -731,11 +763,11 @@ const builtins = {
   },
   '$$GT_DATE$$': {
     value: (d1: string, d2: string) => {
-      if (d1 == null || d2 == null) { return false; }
+      if (d1 == null || d2 == null) { return null; }
       const dt1 = DateTime.fromISO(d1);
-      if (!dt1.isValid) { return false; }
+      if (!dt1.isValid) { return null; }
       const dt2 = DateTime.fromISO(d2);
-      if (!dt2.isValid) { return false; }
+      if (!dt2.isValid) { return null; }
       return dt1.valueOf() > dt2.valueOf();
     },
     type: {
@@ -752,11 +784,11 @@ const builtins = {
   },
   '$$GTE_DATE$$': {
     value: (d1: string, d2: string) => {
-      if (d1 == null || d2 == null) { return false; }
+      if (d1 == null || d2 == null) { return null; }
       const dt1 = DateTime.fromISO(d1);
-      if (!dt1.isValid) { return false; }
+      if (!dt1.isValid) { return null; }
       const dt2 = DateTime.fromISO(d2);
-      if (!dt2.isValid) { return false; }
+      if (!dt2.isValid) { return null; }
       return dt1.valueOf() >= dt2.valueOf();
     },
     type: {
@@ -773,11 +805,11 @@ const builtins = {
   },
   '$$EQ_DATE$$': {
     value: (d1: string, d2: string) => {
-      if (d1 == null || d2 == null) { return false; }
+      if (d1 == null || d2 == null) { return null; }
       const dt1 = DateTime.fromISO(d1);
-      if (!dt1.isValid) { return false; }
+      if (!dt1.isValid) { return null; }
       const dt2 = DateTime.fromISO(d2);
-      if (!dt2.isValid) { return false; }
+      if (!dt2.isValid) { return null; }
       return dt1.hasSame(dt2, 'day');
     },
     type: {
@@ -794,11 +826,11 @@ const builtins = {
   },
   '$$NEQ_DATE$$': {
     value: (d1: string, d2: string) => {
-      if (d1 == null || d2 == null) { return false; }
+      if (d1 == null || d2 == null) { return null; }
       const dt1 = DateTime.fromISO(d1);
-      if (!dt1.isValid) { return false; }
+      if (!dt1.isValid) { return null; }
       const dt2 = DateTime.fromISO(d2);
-      if (!dt2.isValid) { return false; }
+      if (!dt2.isValid) { return null; }
       return !dt1.hasSame(dt2, 'day');
     },
     type: {
@@ -874,7 +906,7 @@ const builtins = {
   },
   '$$LT_DATETIME$$': {
     value: (d1: ?string, d2: ?string) => {
-      if (d1 == null || d2 == null) { return false; }
+      if (d1 == null || d2 == null) { return null; }
       const dt1 = DateTime.fromISO(d1);
       if (!dt1.isValid) { return null; }
       const dt2 = DateTime.fromISO(d2);
@@ -895,7 +927,7 @@ const builtins = {
   },
   '$$LTE_DATETIME$$': {
     value: (d1: string, d2: string) => {
-      if (d1 == null || d2 == null) { return false; }
+      if (d1 == null || d2 == null) { return null; }
       const dt1 = DateTime.fromISO(d1);
       if (!dt1.isValid) { return null; }
       const dt2 = DateTime.fromISO(d2);
@@ -916,7 +948,7 @@ const builtins = {
   },
   '$$GT_DATETIME$$': {
     value: (d1: string, d2: string) => {
-      if (d1 == null || d2 == null) { return false; }
+      if (d1 == null || d2 == null) { return null; }
       const dt1 = DateTime.fromISO(d1);
       if (!dt1.isValid) { return null; }
       const dt2 = DateTime.fromISO(d2);
@@ -937,7 +969,7 @@ const builtins = {
   },
   '$$GTE_DATETIME$$': {
     value: (d1: string, d2: string) => {
-      if (d1 == null || d2 == null) { return false; }
+      if (d1 == null || d2 == null) { return null; }
       const dt1 = DateTime.fromISO(d1);
       if (!dt1.isValid) { return null; }
       const dt2 = DateTime.fromISO(d2);
@@ -958,11 +990,11 @@ const builtins = {
   },
   '$$EQ_DATETIME$$': {
     value: (d1: string, d2: string) => {
-      if (d1 == null || d2 == null) { return false; }
+      if (d1 == null || d2 == null) { return null; }
       const dt1 = DateTime.fromISO(d1);
-      if (!dt1.isValid) { return false; }
+      if (!dt1.isValid) { return null; }
       const dt2 = DateTime.fromISO(d2);
-      if (!dt2.isValid) { return false; }
+      if (!dt2.isValid) { return null; }
       return dt1.hasSame(dt2, 'millisecond');
     },
     type: {
@@ -979,11 +1011,11 @@ const builtins = {
   },
   '$$NEQ_DATETIME$$': {
     value: (d1: string, d2: string) => {
-      if (d1 == null || d2 == null) { return false; }
+      if (d1 == null || d2 == null) { return null; }
       const dt1 = DateTime.fromISO(d1);
-      if (!dt1.isValid) { return false; }
+      if (!dt1.isValid) { return null; }
       const dt2 = DateTime.fromISO(d2);
-      if (!dt2.isValid) { return false; }
+      if (!dt2.isValid) { return null; }
       return !dt1.hasSame(dt2, 'millisecond');
     },
     type: {

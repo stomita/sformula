@@ -23,6 +23,9 @@ function applyScale(n: number, scale: number) {
  * 
  */
 export function castValue(value: any, srcType: string, dstType: string, scale: ?number) {
+  if (dstType === 'boolean') {
+    return !!value;
+  }
   if (value == null) { return value; }
   if (dstType === 'date' && srcType === 'datetime') {
     return DateTime.fromISO(value).toUTC().toISODate();

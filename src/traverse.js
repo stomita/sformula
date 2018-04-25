@@ -113,6 +113,11 @@ function nullValue(result: TraverseResult, blankAsZero: boolean) {
   return result;
 }
 
+const UNARY_OPERATOR_FN = {
+  '-': '$$MINUS_NUMBER$$',
+  '+': '$$PLUS_NUMBER$$',
+  '!': 'NOT',
+};
 
 function traverseUnaryExpression(
   expression: UnaryExpression,
@@ -122,6 +127,9 @@ function traverseUnaryExpression(
   const { type, operator, ...rexpression } = expression;
   const { expression: argument, returnType: argumentType } =
     traverseExpression(expression.argument, typeDict, blankAsZero);
+  if (operator !== '-' && operator !== '+' && operator !== '!') {
+    throw invalidOperatorError(expression.argument, argumentType.type, operator);
+  }
   switch (argumentType.type) {
     case 'number':
       if (operator !== '-' && operator === '+') {
@@ -137,7 +145,7 @@ function traverseUnaryExpression(
       throw invalidTypeError(expression.argument, argumentType.type, ['boolean']);
   }
   return {
-    expression: { type: 'UnaryExpression', operator, argument, ...rexpression },
+    expression: createCallExpression(UNARY_OPERATOR_FN[operator], [argument]),
     returnType: argumentType,
   };
 }
@@ -403,6 +411,13 @@ function traverseBinaryExpression(
   }
 }
 
+
+const LOGICAL_OPERATOR_FN = {
+  '&&': 'AND',
+  '||': 'OR',
+};
+
+
 function traverseLogicalExpression(
   expression: LogicalExpression,
   typeDict: ExpressionTypeDictionary,
@@ -419,14 +434,8 @@ function traverseLogicalExpression(
         throw invalidTypeError(expression.right, rightType, ['boolean']);
       }
       return {
-        expression: {
-          type: 'LogicalExpression',
-          operator,
-          ...rexpression,
-          left: left.expression,
-          right: right.expression,
-        },
-        returnType: left.returnType,
+        expression: createCallExpression(LOGICAL_OPERATOR_FN[operator], [left.expression, right.expression]),
+        returnType: { type: 'boolean' },
       };
     default:
       throw invalidTypeError(expression.left, leftType, ['boolean']);
