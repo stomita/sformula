@@ -30,6 +30,9 @@ export function castValue(value: any, srcType: string, dstType: string, scale: ?
   if (dstType === 'percent' && srcType !== 'percent') {
     value = value * 100;
   }
+  if (dstType !== 'percent' && srcType === 'percent') {
+    value = value * 0.01;
+  }
   if (typeof scale === 'number' &&
       (dstType === 'number' || dstType === 'currency' || dstType === 'percent')) {
     value = applyScale(value, scale);

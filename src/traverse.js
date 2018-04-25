@@ -74,9 +74,11 @@ function injectCallExpression(expression: CallExpression, argumentTypes: Express
   if (callee.type === 'Identifier') {
     switch (callee.name) {
       case 'TEXT':
-        console.log('TEXT call expression', argumentTypes);
         if (argumentTypes[0].type === 'datetime') {
           return overrideFunction(expression, '$$FN_TEXT_DATETIME$$');
+        }
+        if (argumentTypes[0].type === 'percent') {
+          return overrideFunction(expression, '$$FN_TEXT_PERCENT$$');
         }
       default:
         break;
@@ -189,15 +191,26 @@ const NUMBER_OPERATOR_FN = {
   '!==': '$$NEQ_NUMBER$$',
 };
 
+function convertPercentToNumber(expression: Expression, precision?: number, scale?: number) {
+  return {
+    expression: createCallExpression('$$MULTIPLY_NUMBER$$', [createLiteral(0.01), expression]),
+    returnType: { type: 'number', precision, scale },
+  };
+}
+
 function traverseNumberBinaryExpression(
   expression: BinaryExpression,
   left: TraverseResult,
   right: TraverseResult,
 ): TraverseResult {
   const { type, operator, ...rexpression } = expression;
-  const rightType = right.returnType.type;
-  if (rightType !== 'number' && rightType !== 'currency' && rightType !== 'any') {
-    throw invalidTypeError(expression.right, rightType, ['number', 'currency']);
+  const rightType = right.returnType;
+  if (rightType.type === 'percent') {
+    const numRight = convertPercentToNumber(right.expression, rightType.precision, rightType.scale);
+    return traverseNumberBinaryExpression(expression, left, numRight);
+  }
+  if (rightType.type !== 'number' && rightType.type !== 'currency' && rightType.type !== 'any') {
+    throw invalidTypeError(expression.right, rightType.type, ['number', 'currency']);
   }
   switch (operator) {
     case '+':
@@ -224,6 +237,19 @@ function traverseNumberBinaryExpression(
     default:
       throw invalidOperatorError(expression.left, left.returnType.type, operator);
   }
+}
+
+function traversePercentBinaryExpression(
+  expression: BinaryExpression,
+  left: TraverseResult,
+  right: TraverseResult,
+): TraverseResult {
+  const { returnType: leftType } = left;
+  if (leftType.type !== 'percent') {
+    throw unexpectedError(expression, 'could not be reached here');
+  }
+  const numLeft = convertPercentToNumber(left.expression, leftType.precision, leftType.scale);
+  return traverseNumberBinaryExpression(expression, numLeft, right);
 }
 
 const DATE_OPERATOR_FN = {
@@ -366,6 +392,8 @@ function traverseBinaryExpression(
     case 'number':
     case 'currency':
       return traverseNumberBinaryExpression(expression, left, right);
+    case 'percent':
+      return traversePercentBinaryExpression(expression, left, right);
     case 'date':
       return traverseDateBinaryExpression(expression, left, right);
     case 'datetime':
@@ -447,9 +475,9 @@ function traverseCallExpression(
           templateTypes[expectedType.ref] = argumentType;
         }
       } else {
-        const extendTypes = expectedType.extends && expectedType.extends.map(etype => etype.type);
-        if (extendTypes && extendTypes.indexOf(argumentType.type) < 0 && argumentType.type !== 'any') {
-          throw invalidTypeError(arg, argumentType.type, extendTypes);
+        const anyOfTypes = expectedType.anyOf && expectedType.anyOf.map(t => t.type);
+        if (anyOfTypes && anyOfTypes.indexOf(argumentType.type) < 0 && argumentType.type !== 'any') {
+          throw invalidTypeError(arg, argumentType.type, anyOfTypes);
         }
         templateTypes[expectedType.ref] = argumentType;
       }
@@ -515,14 +543,6 @@ function traverseIdentifier(
   const returnType = typeDict[expression.name];
   if (!returnType) {
     throw new Error(`identifier type information is not found: ${expression.name}`);
-  }
-  if (returnType.type === 'percent') {
-    const { precision, scale } = returnType;
-    const percent = nullValue({ expression, returnType }, blankAsZero).expression;
-    return {
-      expression: createCallExpression('$$MULTIPLY_NUMBER$$', [createLiteral(0.01), percent]),
-      returnType: { type: 'number', precision, scale },
-    };
   }
   return nullValue({ expression, returnType }, blankAsZero);
 }

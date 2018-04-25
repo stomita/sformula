@@ -51,7 +51,7 @@ export type ExpressionType = PrimitiveExpressionType | AdditionalPrimitiveExpres
 } | {
   type: 'template',
   ref: string,
-  extends?: Array<PrimitiveExpressionType>,
+  anyOf?: ExpressionType[],
 };
 
 export type ExpressionTypeDictionary = {

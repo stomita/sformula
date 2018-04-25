@@ -17,7 +17,26 @@ const builtins = {
     type: {
       type: 'function',
       arguments: [{
-        argument: { type: 'any' },
+        argument: {
+          type: 'template',
+          ref: 'T',
+          anyOf: [{
+            type: 'boolean',
+          }, {
+            type: 'currency',
+          }, {
+            type: 'number',
+          }, {
+            type: 'percent',
+          }, {
+            type: 'date',
+          }, {
+            type: 'datetime',
+          }, {
+            type: 'picklist',
+            picklistValues: [],
+          }],
+        },
         optional: false,
       }],
       returns: { type: 'string' },
@@ -953,6 +972,24 @@ const builtins = {
       returns: { type: 'string' },
     },
   },
+  '$$FN_TEXT_PERCENT$$': {
+    value: (d: number) => {
+      if (d == null) { return ''; }
+      d = d * 0.01;
+      const sign = d > 0 ? 1 : -1;
+      const dstr = String(d * sign);
+      return (sign > 0 ? '' : '-') + (dstr[0] === '0' ? dstr.substring(1) : dstr);
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'percent' },
+        optional: false,
+      }],
+      returns: { type: 'string' },
+    },
+  },
+
 };
 
 export type BuiltinFunctionName = $Keys<typeof builtins>;

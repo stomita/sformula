@@ -81,6 +81,14 @@
   Percent01__c: 89.4
   Number01__c: 250
 -
+  Number02__c: 1250.8359
+  Percent02__c: 110.4521
+  Currency02__c: 149800.55
+-
+  Number02__c: -2319.182
+  Percent02__c: -90.5
+  Currency02__c: -2800.50
+-
   Text01__c: ''
 -
   Text01__c: null
