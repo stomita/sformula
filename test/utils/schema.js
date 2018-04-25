@@ -36,8 +36,44 @@ export async function resetFormulaSchema(sobject: string) {
   console.log('Deleted existing formula test schema');
 }
 
+export async function createFormulaObjectFields(sobject: string, fields: Object[]) {
+  const conn = await getConnection();
+  const label = sobject.replace(/__c$/, '');
+  const objectXml = metadata.CustomObject({
+    fullName: sobject,
+    fields,
+    label,
+    pluralLabel: label,
+    nameField: {
+      type: 'AutoNumber',
+      fullName: 'Name',
+      label: '#'
+    },
+    deploymentStatus: 'Deployed',
+    sharingModel: 'ReadWrite'
+  });
+  const packageXml = metadata.Package({
+    types: [{
+      name: 'CustomObject', members: [sobject]
+    }, {
+      name: 'CustomField',
+      members: fields.map(fd => `${sobject}.${fd.fullName}`),
+    }],
+    version: '42.0',
+  });
+  const zip = new AdmZip();
+  zip.addFile('src/package.xml', new Buffer(packageXml));
+  zip.addFile(`src/objects/${sobject}.object`, new Buffer(objectXml));
+  const res = await conn.metadata.deploy(zip.toBuffer()).complete({ details: true });
+  if (res.status !== 'Succeeded') {
+    console.error(res.details);
+    throw new Error('Schema creation failed');
+  }
+}
+
 export async function createFormulaSchema(sobject: string, formulaDefs: FormulaDef[]) {
   const conn = await getConnection();
+
   const fields = [{
     fullName: 'Key__c',
     externalId: true,
@@ -245,6 +281,8 @@ export async function createFormulaSchema(sobject: string, formulaDefs: FormulaD
     type: 'Lookup',
   }];
 
+  await createFormulaObjectFields(sobject, fields);
+
   const formulaFields = formulaDefs.map((fd, i) => ({
     fullName: `Formula${zeropad(i + 1)}__c`, 
     externalId: false,
@@ -266,46 +304,8 @@ export async function createFormulaSchema(sobject: string, formulaDefs: FormulaD
     type: fd.type,
   })); 
 
-  let fieldDefs = [...fields, ...formulaFields]
-  const label = sobject.replace(/__c$/, '');
-  // request field definition in serveral batches
-  // in order to avoid 'unexpected error' in server
-  // when creating many formula fields at once
-  const BATCH_FIELD_DEF_NUM = 25;
-  while (fieldDefs.length > 0) {
-    const createFields = fieldDefs.slice(0, BATCH_FIELD_DEF_NUM);
-    const objectXml = metadata.CustomObject({
-      fullName: sobject,
-      fields: fieldDefs.slice(0, BATCH_FIELD_DEF_NUM),
-      label,
-      pluralLabel: label,
-      nameField: {
-        type: 'AutoNumber',
-        fullName: 'Name',
-        label: '#'
-      },
-      deploymentStatus: 'Deployed',
-      sharingModel: 'ReadWrite'
-    });
-    const packageXml = metadata.Package({
-      types: [{
-        name: 'CustomObject', members: [sobject]
-      }, {
-        name: 'CustomField',
-        members: createFields.map(fd => `${sobject}.${fd.fullName}`),
-      }],
-      version: '42.0',
-    });
-    const zip = new AdmZip();
-    zip.addFile('src/package.xml', new Buffer(packageXml));
-    zip.addFile(`src/objects/${sobject}.object`, new Buffer(objectXml));
-    const res = await conn.metadata.deploy(zip.toBuffer()).complete({ details: true });
-    if (res.status !== 'Succeeded') {
-      console.error(res.details);
-      throw new Error('Schema creation failed');
-    }
-    fieldDefs = fieldDefs.slice(BATCH_FIELD_DEF_NUM);
-  }
+  await createFormulaObjectFields(sobject, formulaFields);
+
   console.log('Created formula test schema');
   const profile = await conn.metadata.read('Profile', 'Admin');
   await conn.metadata.update('Profile', {
