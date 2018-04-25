@@ -254,11 +254,22 @@
   formula: NOW()
   fluctuation: 5000
 -
-  type: Checkbox
-  formula: AND(Checkbox01__c, Number01__c >= 0)
+  type: Text
+  formula: CASE(Number01__c, 0, Text01__c, 1, Text02__c, NULL)
 -
-  type: Checkbox
-  formula: OR(Checkbox01__c, Number01__c >= 0)
+  type: Date
+  formula: |-
+    CASE(
+      Text01__c,
+      'A', TODAY() + 1,
+      'B', TODAY() + 2,
+      'C', TODAY() + 3,
+      'D', TODAY() + 4,
+      'E', TODAY() + 5,
+      NULL, TODAY(),
+      NULL
+    )
+
 
 
 

@@ -4,7 +4,7 @@ import type {
   MemberExpression, CallExpression,
   ObjectExpression, Identifier, Literal,
 } from 'esformula';
-import type { ExpressionType, ExpressionTypeDictionary } from './types';
+import type { ExpressionType, ExpressionTypeDictionary, FunctionArgType } from './types';
 import type { BuiltinFunctionName } from './builtin';
 
 export type TraverseResult = {
@@ -418,8 +418,10 @@ function traverseCallExpression(
   if (calleeType.type !== 'function') {
     throw invalidTypeError(callee, calleeType.type, ['function']);
   }
-  const minArgLen = calleeType.arguments.filter(a => !a.optional).length;
-  const maxArgLen = calleeType.arguments.length;
+  const calleeArgTypes: FunctionArgType[] =
+    Array.isArray(calleeType.arguments) ? calleeType.arguments : calleeType.arguments(args.length);
+  const minArgLen = calleeArgTypes.filter(a => !a.optional).length;
+  const maxArgLen = calleeArgTypes.length;
   const argLen = args.length;
   if (argLen < minArgLen || maxArgLen < argLen) {
     throw invalidArgLengthError(callee, argLen, [minArgLen, maxArgLen]);
@@ -433,14 +435,22 @@ function traverseCallExpression(
     }
     const argument = traverseExpression(arg, typeDict, blankAsZero);
     const argumentType = argument.returnType;
-    const expectedType = calleeType.arguments[i].argument;
+    const expectedType = calleeArgTypes[i].argument;
     if (expectedType.type === 'template') {
-      let templateType = templateTypes[expectedType.ref];
+      const templateType = templateTypes[expectedType.ref];
       if (templateType) {
-        if (templateType.type !== 'any' && argumentType.type !== templateType.type) {
+        if (templateType.type !== 'any' && argumentType.type !== 'any' &&
+            argumentType.type !== templateType.type) {
           throw invalidTypeError(arg, argumentType.type, [templateType.type]);
         }
+        if (templateType.type === 'any' && argumentType.type !== 'any') {
+          templateTypes[expectedType.ref] = argumentType;
+        }
       } else {
+        const extendTypes = expectedType.extends && expectedType.extends.map(etype => etype.type);
+        if (extendTypes && extendTypes.indexOf(argumentType.type) < 0 && argumentType.type !== 'any') {
+          throw invalidTypeError(arg, argumentType.type, extendTypes);
+        }
         templateTypes[expectedType.ref] = argumentType;
       }
     } else if (expectedType.type !== 'any' && argumentType.type !== expectedType.type) {

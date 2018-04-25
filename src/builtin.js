@@ -23,42 +23,6 @@ const builtins = {
       returns: { type: 'string' },
     },
   },
-  'AND': {
-    value: (...conds: Array<?boolean>) => {
-      for (const c of conds) {
-        if (!c) {
-          return false;
-        }
-      }
-      return true;
-    },
-    type: {
-      type: 'function',
-      arguments: Array.from({ length: 50 }).map((_, i) => ({
-        argument: { type: 'boolean' },
-        optional: i > 0,
-      })),
-      returns: { type: 'boolean' },
-    },
-  },
-  'OR': {
-    value: (...conds: Array<?boolean>) => {
-      for (const c of conds) {
-        if (c) {
-          return true;
-        }
-      }
-      return false;
-    },
-    type: {
-      type: 'function',
-      arguments: Array.from({ length: 50 }).map((_, i) => ({
-        argument: { type: 'boolean' },
-        optional: i > 0,
-      })),
-      returns: { type: 'boolean' },
-    },
-  },
   'ADDMONTHS': {
     value: (d: ?string, n: ?number) => {
       if (d == null || n == null) {
@@ -208,6 +172,82 @@ const builtins = {
       type: 'function',
       arguments: [],
       returns: { type: 'datetime' },
+    },
+  },
+  'AND': {
+    value: (...conds: Array<?boolean>) => {
+      for (const c of conds) {
+        if (!c) {
+          return false;
+        }
+      }
+      return true;
+    },
+    type: {
+      type: 'function',
+      arguments: Array.from({ length: 50 }).map((_, i) => ({
+        argument: { type: 'boolean' },
+        optional: i > 0,
+      })),
+      returns: { type: 'boolean' },
+    },
+  },
+  'OR': {
+    value: (...conds: Array<?boolean>) => {
+      for (const c of conds) {
+        if (c) {
+          return true;
+        }
+      }
+      return false;
+    },
+    type: {
+      type: 'function',
+      arguments: Array.from({ length: 50 }).map((_, i) => ({
+        argument: { type: 'boolean' },
+        optional: i > 0,
+      })),
+      returns: { type: 'boolean' },
+    },
+  },
+  'CASE': {
+    value: (...args: Array<?any>) => {
+      const value = args[0] == null ? '' : args[0];
+      for (let i = 1; i < args.length - 1; i += 2) {
+        const match = args[i] == null ? '' : args[i];
+        const ret = args[i + 1];
+        if (match === value) {
+          return ret;
+        }
+      }
+      return args[args.length - 1];
+    },
+    type: {
+      type: 'function',
+      arguments: (argLen: number) => {
+        const repeatCnt = Math.max(Math.floor((argLen - 2) / 2), 1); 
+        return [
+          {
+            argument: { type: 'template', ref: 'T' },
+            optional: false,
+          },
+          ...Array.from({ length: repeatCnt }).reduce((cases) => [
+            ...cases,
+            {
+              argument: { type: 'template', ref: 'T' }, // T || S
+              optional: false,
+            }, {
+              argument: { type: 'template', ref: 'S' },
+              optional: false,
+            },
+          ], []),
+          {
+            argument: { type: 'template', ref: 'S' },
+            optional: false,
+          }
+        ];
+      },
+      returns: { type: 'template', ref: 'S' },
     },
   },
   'IF': {

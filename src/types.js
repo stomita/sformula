@@ -35,20 +35,23 @@ export type AdditionalPrimitiveExpressionType = {
   }>
 };
 
+export type FunctionArgType = {
+  argument: ExpressionType,
+  optional: boolean
+};
+
 export type ExpressionType = PrimitiveExpressionType | AdditionalPrimitiveExpressionType | {
   type: 'object',
   sobject: string,
   properties: ExpressionTypeDictionary,
 } | {
   type: 'function',
-  arguments: Array<{
-    argument: ExpressionType,
-    optional: boolean
-  }>,
+  arguments: FunctionArgType[] | (number) => FunctionArgType[],
   returns: ExpressionType,
 } | {
   type: 'template',
-  ref: string
+  ref: string,
+  extends?: Array<PrimitiveExpressionType>,
 };
 
 export type ExpressionTypeDictionary = {

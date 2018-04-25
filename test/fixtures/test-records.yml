@@ -83,6 +83,10 @@
 -
   Text01__c: ''
 -
+  Text01__c: null
+-
+  Text02__c: ''
+-
   Text02__c: null
 -
   Text01__c: ''
@@ -124,6 +128,12 @@
     Parent__r:
       Date02__c: '2017-12-29'
 -
-  Text01__c: null
+  Text01__c: 'A'
 -
-  Text02__c: ''
+  Text01__c: 'B'
+-
+  Text01__c: 'C'
+-
+  Text01__c: 'D'
+-
+  Text01__c: 'Z'
