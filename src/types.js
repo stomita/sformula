@@ -29,7 +29,7 @@ export type PrimitiveExpressionType = {
 
 export type AdditionalPrimitiveExpressionType = {
   type: 'picklist',
-  picklistValues: Array<{
+  picklistValues?: Array<{
     label: string,
     value: string,
   }>

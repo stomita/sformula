@@ -271,11 +271,12 @@ export async function createFormulaSchema(sobject: string, formulaDefs: FormulaD
   // request field definition in serveral batches
   // in order to avoid 'unexpected error' in server
   // when creating many formula fields at once
+  const BATCH_FIELD_DEF_NUM = 25;
   while (fieldDefs.length > 0) {
-    const createFields = fieldDefs.slice(0, 40);
+    const createFields = fieldDefs.slice(0, BATCH_FIELD_DEF_NUM);
     const objectXml = metadata.CustomObject({
       fullName: sobject,
-      fields: fieldDefs.slice(0, 40),
+      fields: fieldDefs.slice(0, BATCH_FIELD_DEF_NUM),
       label,
       pluralLabel: label,
       nameField: {
@@ -303,7 +304,7 @@ export async function createFormulaSchema(sobject: string, formulaDefs: FormulaD
       console.error(res.details);
       throw new Error('Schema creation failed');
     }
-    fieldDefs = fieldDefs.slice(40);
+    fieldDefs = fieldDefs.slice(BATCH_FIELD_DEF_NUM);
   }
   console.log('Created formula test schema');
   const profile = await conn.metadata.read('Profile', 'Admin');

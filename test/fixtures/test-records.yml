@@ -112,6 +112,12 @@
   Text01__c: '2000'
   Text02__c: '13'
 -
+  Text01__c: '-1.05'
+-
+  Text01__c: '.05'
+-
+  Text01__c: '3e-3'
+-
   Checkbox01__c: false
 -
   Checkbox01__c: false
@@ -145,3 +151,12 @@
   Text01__c: 'D'
 -
   Text01__c: 'Z'
+-
+  Picklist01__c: '2'
+  Picklist02__c: '1'
+-
+  Picklist01__c: '1'
+  Picklist02__c: '0'
+-
+  Picklist01__c: null
+  Picklist02__c: null

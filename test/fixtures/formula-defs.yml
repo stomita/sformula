@@ -69,6 +69,12 @@
   formula: ISBLANK(Text01__c)
 -
   type: Checkbox
+  formula: ISNUMBER(Text01__c)
+-
+  type: Checkbox
+  formula: ISPICKVAL(Picklist01__c, "1")
+-
+  type: Checkbox
   formula: "FALSE"
 -
   type: Checkbox

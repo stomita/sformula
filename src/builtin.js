@@ -34,7 +34,6 @@ const builtins = {
             type: 'datetime',
           }, {
             type: 'picklist',
-            picklistValues: [],
           }],
         },
         optional: false,
@@ -309,6 +308,37 @@ const builtins = {
       type: 'function',
       arguments: [{
         argument: { type: 'any' },
+        optional: false,
+      }],
+      returns: { type: 'boolean' },
+    },
+  },
+  'ISNUMBER': {
+    value: (value: ?string) => {
+      if (value == null || value == '') { return false; } 
+      return !Number.isNaN(Number(value));
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'string' },
+        optional: false,
+      }],
+      returns: { type: 'boolean' },
+    },
+  },
+  'ISPICKVAL': {
+    value: (v: ?string, s: ?string) => {
+      if (v == null || s == null) { return false; }
+      return (v || '') === (s || '');
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'picklist' },
+        optional: false,
+      }, {
+        argument: { type: 'string' },
         optional: false,
       }],
       returns: { type: 'boolean' },
