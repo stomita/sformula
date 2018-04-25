@@ -63,6 +63,15 @@
   blankAsZero: true
 -
   type: Checkbox
+  formula: AND(Number01__c > 0, Number02__c < 100, Checkbox01__c)
+-
+  type: Checkbox
+  formula: OR(Number01__c > 0, Number02__c < 100, Checkbox02__c)
+-
+  type: Checkbox
+  formula: NOT(Number01__c > 0)
+-
+  type: Checkbox
   formula: ISNULL(Text01__c)
 -
   type: Checkbox

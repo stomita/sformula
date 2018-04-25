@@ -228,6 +228,20 @@ const builtins = {
       returns: { type: 'boolean' },
     },
   },
+  'NOT': {
+    value: (v: ?boolean) => {
+      if (v == null) { return false; }
+      return !v;
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'boolean' },
+        optional: false,
+      }],
+      returns: { type: 'boolean' },
+    },
+  },
   'CASE': {
     value: (...args: Array<?any>) => {
       const value = args[0] == null ? '' : args[0];
