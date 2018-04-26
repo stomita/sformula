@@ -304,7 +304,13 @@ export async function createFormulaSchema(sobject: string, formulaDefs: FormulaD
     type: fd.type,
   })); 
 
-  await createFormulaObjectFields(sobject, formulaFields);
+  // request field definition in serveral batches
+  // in order to avoid 'unexpected error' in server
+  // when creating many formula fields at once
+  const MAX_BATCH_FIELD_NUM = 30;
+  for (let i = 0; i < formulaFields.length; i += MAX_BATCH_FIELD_NUM) {
+    await createFormulaObjectFields(sobject, formulaFields.slice(i, i + MAX_BATCH_FIELD_NUM));
+  }
 
   console.log('Created formula test schema');
   const profile = await conn.metadata.read('Profile', 'Admin');
