@@ -513,7 +513,48 @@ const builtins = {
       returns: { type: 'template', ref: 'T' },
     },
   },
-
+  'EXP': {
+    value: (n: ?number) => {
+      if (n == null) { return null; }
+      return Math.pow(Math.E, n);
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'number' },
+        optional: false,
+      }],
+      returns: { type: 'number' },
+    },
+  },
+  'LN': {
+    value: (n: ?number) => {
+      if (n == null || n <= 0) { return null; }
+      return Math.log(n);
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'number' },
+        optional: false,
+      }],
+      returns: { type: 'number' },
+    },
+  },
+  'LOG': {
+    value: (n: ?number) => {
+      if (n == null || n <= 0) { return null; }
+      return Math.log10(n);
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'number' },
+        optional: false,
+      }],
+      returns: { type: 'number' },
+    },
+  },
 
   // builtin operators 
   '$$CONCAT_STRING$$': {
