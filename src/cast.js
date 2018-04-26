@@ -14,7 +14,10 @@ export function isCastatibleType(srcType: string, dstType: string) {
   );
 }
 
-function applyScale(n: number, scale: number) {
+/**
+ * 
+ */
+export function applyScale(n: number, scale: number) {
   const power = 10 ** scale;
   return Math.round(n * power) / power;
 }

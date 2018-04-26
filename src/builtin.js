@@ -1,5 +1,6 @@
 /* @flow */
 import { DateTime } from 'luxon';
+import { applyScale } from './cast';
 import type {
   Context, ExpressionType, ExpressionTypeDictionary,
 } from './types';
@@ -9,10 +10,39 @@ const MSECS_IN_DAY = 24 * 60 * 60 * 1000;
 // Salesforce always returns Datetime value in iso8601 with zero timezone offset (+0000)
 const ISO8601_DATETIME_FORMAT = 'yyyy-MM-dd\'T\'HH:mm:ss.SSSZZZ';
 
+type MaybeTypeAnnotated<T> = T | [T, string, ?number, ?number];
+
 const builtins = {
   'TEXT': {
-    value: (v: any) => {
-      return v == null ? null : String(v);
+    value: (value: MaybeTypeAnnotated<string | number | boolean | null>) => {
+      let v, vType, precision, scale;
+      if (Array.isArray(value)) {
+        [v, vType, precision, scale] = value;
+      } else {
+        v = value;
+      }
+      if (vType === 'datetime') {
+        if (v == null) { return 'Z'; }
+        if (typeof v !== 'string') { v = String(v); }
+        const dt = DateTime.fromISO(v);
+        if (!dt.isValid) { return null; }
+        return dt.toUTC().toFormat('yyyy-MM-dd HH:mm:ss\'Z\'');
+      }
+      if (v == null) { return null; }
+      if (typeof v === 'number') {
+        if (vType === 'percent') {
+          v = v * 0.01;
+        }
+        if (typeof scale === 'number' && (vType === 'number' || vType === 'currency' || vType === 'percent')) {
+          v = applyScale(v, scale);
+        }
+        if (vType === 'percent') {
+          const sign = v >= 0 ? 1 : -1;
+          const vstr = String(v * sign);
+          return (sign === 1 ? '' : '-') + (vstr[0] === '0' && vstr[1] === '.' ? vstr.substring(1) : vstr);
+        }
+      }
+      return String(v);
     },
     type: {
       type: 'function',
@@ -389,6 +419,39 @@ const builtins = {
         optional: false,
       }, {
         argument: { type: 'template', ref: 'T' },
+        optional: false,
+      }],
+      returns: { type: 'template', ref: 'T' },
+    },
+  },
+  'FLOOR': {
+    value: (value: MaybeTypeAnnotated<?number>) => {
+      let v, vType;
+      if (Array.isArray(value)) {
+        [v, vType] = value;
+      } else {
+        v = value;
+      }
+      if (v == null) { return null; }
+      if (vType === 'percent') {
+        return v >= 0 ? Math.floor(v * 0.01) * 100 : -Math.floor(-v * 0.01) * 100;
+      }
+      return v >= 0 ? Math.floor(v) : -Math.floor(-v);
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: {
+          type: 'template',
+          ref: 'T',
+          anyOf: [{
+            type: 'number',
+          }, {
+            type: 'currency',
+          }, {
+            type: 'percent',
+          }],
+        },
         optional: false,
       }],
       returns: { type: 'template', ref: 'T' },
@@ -1028,41 +1091,6 @@ const builtins = {
         optional: false,
       }],
       returns: { type: 'boolean' },
-    },
-  },
-
-  // override builtin functions for certain data types
-  '$$FN_TEXT_DATETIME$$': {
-    value: (d: string) => {
-      if (d == null) { return 'Z'; }
-      const dt = DateTime.fromISO(d);
-      if (!dt.isValid) { return null; }
-      return dt.toUTC().toFormat('yyyy-MM-dd HH:mm:ss\'Z\'');
-    },
-    type: {
-      type: 'function',
-      arguments: [{
-        argument: { type: 'datetime' },
-        optional: false,
-      }],
-      returns: { type: 'string' },
-    },
-  },
-  '$$FN_TEXT_PERCENT$$': {
-    value: (d: number) => {
-      if (d == null) { return ''; }
-      d = d * 0.01;
-      const sign = d > 0 ? 1 : -1;
-      const dstr = String(d * sign);
-      return (sign > 0 ? '' : '-') + (dstr[0] === '0' ? dstr.substring(1) : dstr);
-    },
-    type: {
-      type: 'function',
-      arguments: [{
-        argument: { type: 'percent' },
-        optional: false,
-      }],
-      returns: { type: 'string' },
     },
   },
 

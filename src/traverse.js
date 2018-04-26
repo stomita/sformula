@@ -2,7 +2,7 @@
 import type {
   Expression, UnaryExpression, BinaryExpression, LogicalExpression,
   MemberExpression, CallExpression,
-  ObjectExpression, Identifier, Literal,
+  ObjectExpression, ArrayExpression, Identifier, Literal,
 } from 'esformula';
 import type { ExpressionType, ExpressionTypeDictionary, FunctionArgType } from './types';
 import type { BuiltinFunctionName } from './builtin';
@@ -69,17 +69,37 @@ function createLiteral(value: string | number | boolean | null): Literal {
   };
 }
 
+function createArrayExpression(elements): ArrayExpression {
+  return { type: 'ArrayExpression', elements };
+}
+
+function annotateArgumentTypes(name, args, argTypes) {
+  const annotatedArgs = args.map((arg, i) => {
+    const argType = argTypes[i];
+    switch (argType.type) {
+      case 'number':
+      case 'currency':
+      case 'percent':
+        return createArrayExpression([
+          arg,
+          createLiteral(argType.type),
+          createLiteral(argType.precision == null ? null : argType.precision),
+          createLiteral(argType.scale == null ? null : argType.scale),
+        ]);
+      default:
+        return createArrayExpression([ arg, createLiteral(argType.type) ]);
+    }
+  });
+  return createCallExpression(name, annotatedArgs);
+}
+
 function injectCallExpression(expression: CallExpression, argumentTypes: ExpressionType[]): Expression {
   const { callee, arguments: args } = expression;
   if (callee.type === 'Identifier') {
     switch (callee.name) {
       case 'TEXT':
-        if (argumentTypes[0].type === 'datetime') {
-          return overrideFunction(expression, '$$FN_TEXT_DATETIME$$');
-        }
-        if (argumentTypes[0].type === 'percent') {
-          return overrideFunction(expression, '$$FN_TEXT_PERCENT$$');
-        }
+      case 'FLOOR':
+        return annotateArgumentTypes(callee.name, args, argumentTypes);
       default:
         break;
     }
