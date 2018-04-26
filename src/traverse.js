@@ -98,6 +98,7 @@ function injectCallExpression(expression: CallExpression, argumentTypes: Express
   if (callee.type === 'Identifier') {
     switch (callee.name) {
       case 'TEXT':
+      case 'CEILING':
       case 'FLOOR':
         return annotateArgumentTypes(callee.name, args, argumentTypes);
       default:

@@ -319,24 +319,6 @@
     )
 -
   type: Number
-  formula: FLOOR(Number02__c)
-  precision: 18
-  scale: 0
--
-  type: Currency
-  formula: FLOOR(Currency02__c)
-  precision: 18
-  scale: 0
--
-  type: Percent
-  formula: FLOOR(Percent02__c)
-  precision: 18
-  scale: 4 
--
-  type: Text
-  formula: TEXT(FLOOR(Percent02__c))
--
-  type: Number
   formula: ABS(Number02__c)
   precision: 18
   scale: 0
@@ -350,8 +332,33 @@
   formula: ABS(Percent02__c)
   precision: 18
   scale: 4 
-
-
-
-
-
+-
+  type: Number
+  formula: CEILING(Number02__c)
+  precision: 18
+  scale: 0
+-
+  type: Currency
+  formula: CEILING(Currency02__c)
+  precision: 18
+  scale: 0
+-
+  type: Percent
+  formula: CEILING(Percent02__c)
+  precision: 18
+  scale: 4 
+-
+  type: Number
+  formula: FLOOR(Number02__c)
+  precision: 18
+  scale: 0
+-
+  type: Currency
+  formula: FLOOR(Currency02__c)
+  precision: 18
+  scale: 0
+-
+  type: Percent
+  formula: FLOOR(Percent02__c)
+  precision: 18
+  scale: 4 

@@ -447,6 +447,39 @@ const builtins = {
       returns: { type: 'template', ref: 'T' },
     },
   },
+  'CEILING': {
+    value: (value: MaybeTypeAnnotated<?number>) => {
+      let v, vType;
+      if (Array.isArray(value)) {
+        [v, vType] = value;
+      } else {
+        v = value;
+      }
+      if (v == null) { return null; }
+      if (vType === 'percent') {
+        return v >= 0 ? Math.ceil(v * 0.01) * 100 : -Math.ceil(-v * 0.01) * 100;
+      }
+      return v >= 0 ? Math.ceil(v) : -Math.ceil(-v);
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: {
+          type: 'template',
+          ref: 'T',
+          anyOf: [{
+            type: 'number',
+          }, {
+            type: 'currency',
+          }, {
+            type: 'percent',
+          }],
+        },
+        optional: false,
+      }],
+      returns: { type: 'template', ref: 'T' },
+    },
+  },
   'FLOOR': {
     value: (value: MaybeTypeAnnotated<?number>) => {
       let v, vType;
