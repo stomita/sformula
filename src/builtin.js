@@ -424,6 +424,29 @@ const builtins = {
       returns: { type: 'template', ref: 'T' },
     },
   },
+  'ABS': {
+    value: (v: ?number) => {
+      return v == null ? null : v >= 0 ? v : -v;
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: {
+          type: 'template',
+          ref: 'T',
+          anyOf: [{
+            type: 'number',
+          }, {
+            type: 'currency',
+          }, {
+            type: 'percent',
+          }],
+        },
+        optional: false,
+      }],
+      returns: { type: 'template', ref: 'T' },
+    },
+  },
   'FLOOR': {
     value: (value: MaybeTypeAnnotated<?number>) => {
       let v, vType;

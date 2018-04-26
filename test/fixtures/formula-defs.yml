@@ -335,8 +335,21 @@
 -
   type: Text
   formula: TEXT(FLOOR(Percent02__c))
-
-
+-
+  type: Number
+  formula: ABS(Number02__c)
+  precision: 18
+  scale: 0
+-
+  type: Currency
+  formula: ABS(Currency02__c)
+  precision: 18
+  scale: 0
+-
+  type: Percent
+  formula: ABS(Percent02__c)
+  precision: 18
+  scale: 4 
 
 
 
