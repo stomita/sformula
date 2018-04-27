@@ -1,9 +1,13 @@
 {
   "name": "sformula",
-  "description": "Library for parsing / evaluating Salesforce formula in JavaScript",
-  "version": "1.0.2",
+  "description": "Library for parsing / evaluating Salesforce formula in client-side JavaScript",
+  "version": "1.0.3",
   "main": "lib/index.js",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stomita/sformula"
+  },
   "scripts": {
     "prepare": "npm run build",
     "build": "npm-run-all build:lib build:parser build:flow build:web",
@@ -16,6 +20,13 @@
     "test:skipRebuild": "SKIP_REBUILD_FORMULA_SCHEMA=true ava",
     "test:skipPrepare": "SKIP_LOADING_TEST_RECORDS=true ava"
   },
+  "keywords": [
+    "salesforce",
+    "formula",
+    "javascript",
+    "parser",
+    "eval"
+  ],
   "files": [
     "dist",
     "lib",
