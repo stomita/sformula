@@ -17,6 +17,7 @@
     "test:skipPrepare": "SKIP_LOADING_TEST_RECORDS=true ava"
   },
   "files": [
+    "dist",
     "lib",
     "src"
   ],
