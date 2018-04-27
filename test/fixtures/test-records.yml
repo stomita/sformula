@@ -191,3 +191,6 @@
 -
   Text01__c: 'ABCABCDE'
   Text02__c: 'AB'
+-
+  Text01__c: 'ABCABCDE'
+  Text02__c: ''

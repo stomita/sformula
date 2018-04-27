@@ -41,6 +41,29 @@ export default {
       returns: { type: 'boolean' },
     },
   },
+  'FIND': {
+    value: (search: ?string, str: ?string, start?: ?number) => {
+      if (str == null || str === '' || search == null || search === '' ||
+          (start != null && start <= 0)) {
+        return 0;
+      }
+      return str.indexOf(search || '', (start || 1) - 1) + 1;
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'string' },
+        optional: false,
+      }, {
+        argument: { type: 'string' },
+        optional: false,
+      }, {
+        argument: { type: 'number' },
+        optional: true,
+      }],
+      returns: { type: 'number' },
+    },
+  },
   'TEXT': {
     value: (value: MaybeTypeAnnotated<string | number | boolean | null>) => {
       let v, vType, precision, scale;

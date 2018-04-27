@@ -488,3 +488,8 @@
 -
   type: Checkbox
   formula: CONTAINS(Text01__c, Text02__c)
+-
+  type: Number
+  formula: FIND(Text02__c, Text01__c, Number01__c)
+  precision: 18
+  scale: 0
