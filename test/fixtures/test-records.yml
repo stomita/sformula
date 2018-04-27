@@ -183,26 +183,35 @@
   Picklist01__c: null
   Picklist02__c: null
 -
-  Text01__c: 'ABCABCDE'
+  Text01__c: 'abcABCde'
+  Text02__c: 'bcA'
+-
+  Text01__c: 'abcABCde'
   Text02__c: 'BCA'
 -
-  Text01__c: 'ABCABCDE'
-  Text02__c: 'BCDE'
+  Text01__c: 'abcABCde'
+  Text02__c: 'aB'
 -
-  Text01__c: 'ABCABCDE'
-  Text02__c: 'AB'
+  Text01__c: 'abcABCde'
+  Text02__c: 'ab'
 -
-  Text01__c: 'ABCABCDE'
+  Text01__c: 'abcABCde'
   Text02__c: ''
 -
-  Text01__c: 'ABCABCDE'
+  Text01__c: 'abcABCde'
   Number01__c: 4
 -
-  Text01__c: 'ABCABCDE'
+  Text01__c: 'abcABCde'
   Number01__c: -3
 -
-  Text01__c: 'ABCABCDE'
+  Text01__c: 'abcABCde'
   Number01__c: 0
 -
-  Text01__c: 'ABCABCDE'
+  Text01__c: 'abcABCde'
   Number01__c: 15
+-
+  Text01__c: 'abcあいう０１２ＡＢＣ'
+  Text02__c: 'A'
+-
+  Text01__c: 'abcあいう０１２ＡＢＣ'
+  Text02__c: 'Ａ'

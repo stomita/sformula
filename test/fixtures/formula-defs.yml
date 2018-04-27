@@ -520,3 +520,9 @@
 -
   type: Text
   formula: MID(Text01__c, -1, Number01__c)
+-
+  type: Text
+  formula: LOWER(Text01__c)
+-
+  type: Text
+  formula: UPPER(Text01__c)
