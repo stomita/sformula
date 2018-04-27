@@ -154,6 +154,20 @@ export default {
       returns: { type: 'string' },
     },
   },
+  'TRIM': {
+    value: (str: ?string) => {
+      if (str == null) { return null; }
+      return str.replace(/^\s+|\s+$/g, '');
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'string' },
+        optional: false,
+      }],
+      returns: { type: 'string' },
+    },
+  },
   'TEXT': {
     value: (value: MaybeTypeAnnotated<string | number | boolean | null>) => {
       let v, vType, precision, scale;

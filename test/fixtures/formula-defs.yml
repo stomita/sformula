@@ -526,3 +526,7 @@
 -
   type: Text
   formula: UPPER(Text01__c)
+-
+  type: Text
+  formula: TRIM("  " + Text01__c + "  ")
+
