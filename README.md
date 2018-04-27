@@ -124,13 +124,20 @@ parse('IF(CONTAINS(Owner.Title, "Engineer"), Number01__c + 2.5, Number02__c * 0.
 
 - [x] ADDMONTHS
 - [x] DATE
-- [x] DATETIMEVALUE
 - [x] DATEVALUE
+- [x] DATETIMEVALUE
+- [ ] TIMEVALUE
 - [x] YEAR
 - [x] MONTH
 - [x] DAY
+- [ ] WEEKDAY
+- [ ] HOUR
+- [ ] MINUTE
+- [ ] SECOND
+- [ ] MILLISECOND
 - [x] TODAY
 - [x] NOW
+- [ ] TIMENOW
 
 ### Logical Functions
 
@@ -142,7 +149,6 @@ parse('IF(CONTAINS(Owner.Title, "Engineer"), Number01__c + 2.5, Number02__c * 0.
 - [x] ISNULL
 - [x] ISBLANK
 - [x] ISNUMBER
-- [x] ISPICKVAL
 - [x] NULLVALUE
 - [x] BLANKVALUE
 
@@ -161,11 +167,15 @@ parse('IF(CONTAINS(Owner.Title, "Engineer"), Number01__c + 2.5, Number02__c * 0.
 - [x] MAX
 - [x] MIN
 - [x] MOD
+- [ ] GEOLOCATION
+- [ ] DISTANCE
 
 ### Text Functions
 
 - [x] BEGINS
 - [x] CONTAINS
+- [ ] INCLUDES
+- [x] ISPICKVAL
 - [x] FIND
 - [x] LEFT
 - [x] RIGHT
@@ -180,13 +190,18 @@ parse('IF(CONTAINS(Owner.Title, "Engineer"), Number01__c + 2.5, Number02__c * 0.
 - [x] TEXT 
 - [ ] VALUE
 - [ ] CASESAFEID
-- [ ] INCLUDES
+- [ ] ~~BR~~ *(will not be supported)*
 - [ ] ~~GETSESSIONID~~ *(will not be supported)*
 - [ ] ~~HYPERLINK~~ *(will not be supported)*
 - [ ] ~~IMAGE~~ *(will not be supported)*
+
+### Other Functions
+
+- [ ] CURRENCYRATE
+
 
 ## Limitations
 
 Salesforce formula is "case-insensitive". For example, when `IF(Field01__c > Field02__c, Owner.LastName, "-")` is valid `if(FIELD01__c > field02__c, owner.lastName, "-")` is also a valid formula and yields same result.
 
-For implementation reason, sformula treat formula as "case-sensitive", which always requires functions to be written in UPPERCASE chars, fields to be written as same as which is defined in the API reference name.
+For implementation reason, sformula treats formula as "case-sensitive", which always requires functions to be written in UPPERCASE chars, fields to be written as same as which is defined in the API reference name.
