@@ -122,62 +122,68 @@ parse('IF(CONTAINS(Owner.Title, "Engineer"), Number01__c + 2.5, Number02__c * 0.
 
 ### Date / Datetime Functions
 
-- ADDMONTHS
-- DATE
-- DATETIMEVALUE
-- DATEVALUE
-- YEAR
-- MONTH
-- DAY
-- TODAY
-- NOW
+- [x] ADDMONTHS
+- [x] DATE
+- [x] DATETIMEVALUE
+- [x] DATEVALUE
+- [x] YEAR
+- [x] MONTH
+- [x] DAY
+- [x] TODAY
+- [x] NOW
 
 ### Logical Functions
 
-- AND
-- OR
-- NOT
-- CASE
-- IF
-- ISNULL
-- ISBLANK
-- ISNUMBER
-- ISPICKVAL
-- NULLVALUE
-- BLANKVALUE
+- [x] AND
+- [x] OR
+- [x] NOT
+- [x] CASE
+- [x] IF
+- [x] ISNULL
+- [x] ISBLANK
+- [x] ISNUMBER
+- [x] ISPICKVAL
+- [x] NULLVALUE
+- [x] BLANKVALUE
 
 ### Calculation Functions
 
-- ABS
-- CEILING
-- FLOOR
-- ROUND
-- MCEILING
-- MFLOOR
-- EXP
-- LN
-- LOG
-- SQRT
-- MAX
-- MIN
-- MOD
+- [x] ABS
+- [x] CEILING
+- [x] FLOOR
+- [x] ROUND
+- [x] MCEILING
+- [x] MFLOOR
+- [x] EXP
+- [x] LN
+- [x] LOG
+- [x] SQRT
+- [x] MAX
+- [x] MIN
+- [x] MOD
 
 ### Text Functions
 
-- BEGINS
-- CONTAINS
-- FIND
-- LEFT
-- RIGHT
-- MID
-- LOWER
-- UPPER
-- LPAD
-- RPAD
-- TRIM
-- LEN
-- TEXT 
-
+- [x] BEGINS
+- [x] CONTAINS
+- [x] FIND
+- [x] LEFT
+- [x] RIGHT
+- [x] MID
+- [x] LOWER
+- [x] UPPER
+- [x] LPAD
+- [x] RPAD
+- [ ] SUBSTITUTE
+- [x] TRIM
+- [x] LEN
+- [x] TEXT 
+- [ ] VALUE
+- [ ] CASESAFEID
+- [ ] INCLUDES
+- [ ] ~~GETSESSIONID~~ *(will not be supported)*
+- [ ] ~~HYPERLINK~~ *(will not be supported)*
+- [ ] ~~IMAGE~~ *(will not be supported)*
 
 ## Limitations
 
