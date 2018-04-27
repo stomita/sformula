@@ -394,6 +394,11 @@
   scale: 6
 -
   type: Number
+  formula: SQRT(Number01__c)
+  precision: 18
+  scale: 6
+-
+  type: Number
   formula: MAX(Number01__c, Number02__c, 0)
   precision: 18
   scale: 6

@@ -663,6 +663,20 @@ const builtins = {
       returns: { type: 'number' },
     },
   },
+  'SQRT': {
+    value: (n: ?number) => {
+      if (n == null || n < 0) { return null; }
+      return Math.sqrt(n);
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'number' },
+        optional: false,
+      }],
+      returns: { type: 'number' },
+    },
+  },
   'MAX': {
     value: (...nums: Array<MaybeTypeAnnotated<?number>>) => {
       let max = null;
