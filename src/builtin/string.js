@@ -43,8 +43,7 @@ export default {
   },
   'FIND': {
     value: (search: ?string, str: ?string, start?: ?number) => {
-      if (str == null || str === '' || search == null || search === '' ||
-          (start != null && start <= 0)) {
+      if (!str || !search || (start != null && start <= 0)) {
         return 0;
       }
       return str.indexOf(search || '', (start || 1) - 1) + 1;
@@ -66,7 +65,7 @@ export default {
   },
   'LEFT': {
     value: (str: ?string, num: ?number) => {
-      if (str == null || str === '' || num == null) {
+      if (!str || num == null) {
         return '';
       }
       return str.substring(0, num);
@@ -85,7 +84,7 @@ export default {
   },
   'RIGHT': {
     value: (str: ?string, num: ?number) => {
-      if (str == null || str === '' || num == null) {
+      if (!str || num == null) {
         return '';
       }
       return str.substring(str.length - num);
@@ -104,7 +103,7 @@ export default {
   },
   'MID': {
     value: (str: ?string, start: ?number, num: ?number) => {
-      if (str == null || str === '' || start == null || num == null) {
+      if (!str || start == null || num == null) {
         return '';
       }
       if (start <= 0) { start = 1; }
@@ -128,7 +127,7 @@ export default {
   },
   'LOWER': {
     value: (str: ?string) => {
-      if (str == null) { return null; }
+      if (str == null) { return ''; }
       return str.toLowerCase();
     },
     type: {
@@ -142,7 +141,7 @@ export default {
   },
   'UPPER': {
     value: (str: ?string) => {
-      if (str == null) { return null; }
+      if (str == null) { return ''; }
       return str.toUpperCase();
     },
     type: {
@@ -150,6 +149,52 @@ export default {
       arguments: [{
         argument: { type: 'string' },
         optional: false,
+      }],
+      returns: { type: 'string' },
+    },
+  },
+  'LPAD': {
+    value: (str: ?string, len: ?number, pstr?: ?string = ' ') => {
+      if (!str || !pstr || len == null) { return ''; }
+      const pchars = pstr || ' ';
+      const plen = len > str.length ? len - str.length : 0;
+      const padded = Array.from({ length: plen }).map((_, i) => pchars[i % pchars.length]).join('');
+      return (padded + str).substring(0, len);
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'string' },
+        optional: false,
+      }, {
+        argument: { type: 'number' },
+        optional: false,
+      }, {
+        argument: { type: 'string' },
+        optional: true,
+      }],
+      returns: { type: 'string' },
+    },
+  },
+  'RPAD': {
+    value: (str: ?string, len: ?number, pstr?: ?string = ' ') => {
+      if (!str || !pstr || len == null) { return ''; }
+      const pchars = pstr || ' ';
+      const plen = len > str.length ? len - str.length : 0;
+      const padded = Array.from({ length: plen }).map((_, i) => pchars[i % pchars.length]).join('');
+      return (str + padded).substring(0, len);
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'string' },
+        optional: false,
+      }, {
+        argument: { type: 'number' },
+        optional: false,
+      }, {
+        argument: { type: 'string' },
+        optional: true,
       }],
       returns: { type: 'string' },
     },

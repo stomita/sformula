@@ -43,6 +43,10 @@ export function castValue(value: any, srcType: string, dstType: string, scale: ?
       (dstType === 'number' || dstType === 'currency' || dstType === 'percent')) {
     value = applyScale(value, scale);
   }
+  // trim the space from the output
+  if (dstType === 'string' && srcType === 'string') {
+    value = String(value).replace(/^\s+|\s+$/g, '');
+  }
   return value;
 }
 

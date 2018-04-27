@@ -530,6 +530,27 @@
   type: Text
   formula: TRIM("  " + Text01__c + "  ")
 -
+  type: Text
+  formula: LPAD(Text01__c, Number01__c)
+-
+  type: Text
+  formula: LPAD(Text01__c, Number01__c, "_")
+-
+  type: Text
+  formula: LPAD(Text01__c, Number01__c, Text02__c)
+-
+  type: Text
+  formula: RPAD(Text01__c, Number01__c)
+-
+  type: Text
+  formula: RPAD(Text01__c, Number01__c, "_")
+-
+  type: Text
+  formula: RPAD(Text01__c, Number01__c, Text02__c)
+-
+  type: Text
+  formula: "'*' + RPAD(Text01__c, Number01__c) + LPAD(Text01__c, Number01__c) + '*'"
+-
   type: Number
   formula: LEN(Text01__c)
   precision: 18
@@ -539,5 +560,3 @@
   formula: LEN(Textarea01__c)
   precision: 18
   scale: 0
-
-
