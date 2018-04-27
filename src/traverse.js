@@ -100,8 +100,10 @@ function injectCallExpression(expression: CallExpression, argumentTypes: Express
       case 'TEXT':
       case 'MAX':
       case 'MIN':
+      case 'MOD':
       case 'CEILING':
       case 'FLOOR':
+      case 'ROUND':
       case 'MCEILING':
       case 'MFLOOR':
         return annotateArgumentTypes(callee.name, args, argumentTypes);

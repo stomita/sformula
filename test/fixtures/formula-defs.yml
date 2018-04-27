@@ -321,12 +321,12 @@
   type: Number
   formula: ABS(Number02__c)
   precision: 18
-  scale: 0
+  scale: 4
 -
   type: Currency
   formula: ABS(Currency02__c)
   precision: 18
-  scale: 0
+  scale: 2
 -
   type: Percent
   formula: ABS(Percent02__c)
@@ -346,7 +346,7 @@
   type: Percent
   formula: CEILING(Percent02__c)
   precision: 18
-  scale: 4 
+  scale: 0
 -
   type: Number
   formula: FLOOR(Number02__c)
@@ -361,7 +361,22 @@
   type: Percent
   formula: FLOOR(Percent02__c)
   precision: 18
-  scale: 4 
+  scale: 0
+-
+  type: Number
+  formula: ROUND(Number02__c, Number01__c)
+  precision: 18
+  scale: 6 
+-
+  type: Currency
+  formula: ROUND(Currency02__c, Number01__c)
+  precision: 18
+  scale: 6
+-
+  type: Percent
+  formula: ROUND(Percent02__c, Number01__c)
+  precision: 18
+  scale: 6
 -
   type: Number
   formula: EXP(8)
@@ -431,7 +446,7 @@
   type: Percent
   formula: MCEILING(Percent02__c)
   precision: 18
-  scale: 4 
+  scale: 0 
 -
   type: Number
   formula: MFLOOR(Number02__c)
@@ -446,19 +461,19 @@
   type: Percent
   formula: MFLOOR(Percent02__c)
   precision: 18
-  scale: 4 
+  scale: 0 
 -
   type: Number
   formula: MOD(Number02__c, Number01__c)
   precision: 18
-  scale: 0
+  scale: 4
 -
   type: Currency
   formula: MOD(Currency02__c, Number01__c)
   precision: 18
-  scale: 0
+  scale: 2
 -
   type: Percent
   formula: MOD(Percent02__c, Number01__c)
   precision: 18
-  scale: 0
+  scale: 4

@@ -513,6 +513,48 @@ const builtins = {
       returns: { type: 'template', ref: 'T' },
     },
   },
+  'ROUND': {
+    value: (value: MaybeTypeAnnotated<?number>, digits: MaybeTypeAnnotated<?number>) => {
+      let v, vType, d, dType;
+      if (Array.isArray(value)) {
+        [v, vType] = value;
+      } else {
+        v = value;
+      }
+      if (Array.isArray(digits)) {
+        [d, dType] = digits;
+      } else {
+        d = digits;
+      }
+      if (v == null || d == null) { return null; }
+      let factor = 10 ** Math.floor(d);
+      if (vType === 'percent') {
+        factor = factor * 0.01;
+      }
+      return Math.round(v * factor) / factor;
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: {
+          type: 'template',
+          ref: 'T',
+          anyOf: [{
+            type: 'number',
+          }, {
+            type: 'currency',
+          }, {
+            type: 'percent',
+          }],
+        },
+        optional: false,
+      }, {
+        argument: { type: 'number' },
+        optional: false,
+      }],
+      returns: { type: 'template', ref: 'T' },
+    },
+  },
   'MCEILING': {
     value: (value: MaybeTypeAnnotated<?number>) => {
       let v, vType;
@@ -692,9 +734,23 @@ const builtins = {
     },
   },
   'MOD': {
-    value: (n: ?number, d: ?number) => {
+    value: (num: MaybeTypeAnnotated<?number>, div: MaybeTypeAnnotated<?number>) => {
+      let n, nType, d, dType;
+      if (Array.isArray(num)) {
+        [n, nType] = num;
+      } else {
+        n = num;
+      }
+      if (Array.isArray(div)) {
+        [d, dType] = div;
+      } else {
+        d = div;
+      }
       if (n == null || d == null) { return null; }
       if (d === 0) { return n; }
+      if (nType === 'percent') {
+        return ((n * 0.01) % d) * 100;
+      }
       return n % d;
     },
     type: {

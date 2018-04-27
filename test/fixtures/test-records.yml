@@ -81,6 +81,7 @@
   Percent01__c: 89.4
   Number01__c: 250
 -
+  Number01__c: 0
   Number02__c: 1250.8359
   Percent02__c: 89.6
   Currency02__c: 149800.55
@@ -88,6 +89,27 @@
   Number02__c: -2319.182
   Percent02__c: -90.5
   Currency02__c: -2800.50
+-
+  Number01__c: 0
+  Number02__c: 152.498
+  Percent02__c: 48.67
+  Currency02__c: 98000.01
+-
+  Number01__c: 2
+  Number02__c: -1.0981
+  Percent02__c: -130.41
+  Currency02__c: -501.12
+-
+  Number01__c: 2
+  Number02__c: 152.498
+  Percent02__c: 48.67
+  Currency02__c: 98000.01
+-
+  Number01__c: 0
+  Number02__c: -1.0981
+  Percent02__c: -130.41
+  Currency02__c: -501.12
+
 -
   Text01__c: ''
 -
