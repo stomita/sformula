@@ -1,7 +1,7 @@
 {
   "name": "sformula",
   "description": "Library for parsing / evaluating Salesforce formula in JavaScript",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "lib/index.js",
   "license": "MIT",
   "scripts": {
