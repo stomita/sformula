@@ -447,3 +447,18 @@
   formula: MFLOOR(Percent02__c)
   precision: 18
   scale: 4 
+-
+  type: Number
+  formula: MOD(Number02__c, Number01__c)
+  precision: 18
+  scale: 0
+-
+  type: Currency
+  formula: MOD(Currency02__c, Number01__c)
+  precision: 18
+  scale: 0
+-
+  type: Percent
+  formula: MOD(Percent02__c, Number01__c)
+  precision: 18
+  scale: 0

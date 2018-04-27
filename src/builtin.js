@@ -691,6 +691,34 @@ const builtins = {
       returns: { type: 'number' },
     },
   },
+  'MOD': {
+    value: (n: ?number, d: ?number) => {
+      if (n == null || d == null) { return null; }
+      if (d === 0) { return n; }
+      return n % d;
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: {
+          type: 'template',
+          ref: 'T',
+          anyOf: [{
+            type: 'number',
+          }, {
+            type: 'currency',
+          }, {
+            type: 'percent'
+          }],
+        },
+        optional: false,
+      }, {
+        argument: { type: 'number' },
+        optional: false,
+      }],
+      returns: { type: 'template', ref: 'T' },
+    },
+  },
 
   // builtin operators 
   '$$CONCAT_STRING$$': {
