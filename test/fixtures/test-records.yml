@@ -194,3 +194,15 @@
 -
   Text01__c: 'ABCABCDE'
   Text02__c: ''
+-
+  Text01__c: 'ABCABCDE'
+  Number01__c: 4
+-
+  Text01__c: 'ABCABCDE'
+  Number01__c: -3
+-
+  Text01__c: 'ABCABCDE'
+  Number01__c: 0
+-
+  Text01__c: 'ABCABCDE'
+  Number01__c: 15

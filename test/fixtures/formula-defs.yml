@@ -493,3 +493,30 @@
   formula: FIND(Text02__c, Text01__c, Number01__c)
   precision: 18
   scale: 0
+-
+  type: Text
+  formula: LEFT(Text01__c, Number01__c)
+-
+  type: Text
+  formula: RIGHT(Text01__c, Number01__c)
+-
+  type: Text
+  formula: MID(Text01__c, Number01__c, Number01__c)
+-
+  type: Text
+  formula: MID(Text01__c, Number01__c, 3)
+-
+  type: Text
+  formula: MID(Text01__c, Number01__c, 10)
+-
+  type: Text
+  formula: MID(Text01__c, Number01__c, -1)
+-
+  type: Text
+  formula: MID(Text01__c, 3, Number01__c)
+-
+  type: Text
+  formula: MID(Text01__c, 10, Number01__c)
+-
+  type: Text
+  formula: MID(Text01__c, -1, Number01__c)

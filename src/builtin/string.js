@@ -64,6 +64,68 @@ export default {
       returns: { type: 'number' },
     },
   },
+  'LEFT': {
+    value: (str: ?string, num: ?number) => {
+      if (str == null || str === '' || num == null) {
+        return '';
+      }
+      return str.substring(0, num);
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'string' },
+        optional: false,
+      }, {
+        argument: { type: 'number' },
+        optional: false,
+      }],
+      returns: { type: 'string' },
+    },
+  },
+  'RIGHT': {
+    value: (str: ?string, num: ?number) => {
+      if (str == null || str === '' || num == null) {
+        return '';
+      }
+      return str.substring(str.length - num);
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'string' },
+        optional: false,
+      }, {
+        argument: { type: 'number' },
+        optional: false,
+      }],
+      returns: { type: 'string' },
+    },
+  },
+  'MID': {
+    value: (str: ?string, start: ?number, num: ?number) => {
+      if (str == null || str === '' || start == null || num == null) {
+        return '';
+      }
+      if (start <= 0) { start = 1; }
+      if (num < 0) { num = 0; }
+      return str.substring(start - 1, start + num - 1);
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'string' },
+        optional: false,
+      }, {
+        argument: { type: 'number' },
+        optional: false,
+      }, {
+        argument: { type: 'number' },
+        optional: false,
+      }],
+      returns: { type: 'string' },
+    },
+  },
   'TEXT': {
     value: (value: MaybeTypeAnnotated<string | number | boolean | null>) => {
       let v, vType, precision, scale;
