@@ -168,6 +168,20 @@ export default {
       returns: { type: 'string' },
     },
   },
+  'LEN': {
+    value: (str: ?string) => {
+      if (str == null) { return null; }
+      return str.length;
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'string' },
+        optional: false,
+      }],
+      returns: { type: 'number' },
+    },
+  },
   'TEXT': {
     value: (value: MaybeTypeAnnotated<string | number | boolean | null>) => {
       let v, vType, precision, scale;

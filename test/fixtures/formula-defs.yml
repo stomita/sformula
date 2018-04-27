@@ -529,4 +529,15 @@
 -
   type: Text
   formula: TRIM("  " + Text01__c + "  ")
+-
+  type: Number
+  formula: LEN(Text01__c)
+  precision: 18
+  scale: 0
+-
+  type: Number
+  formula: LEN(Textarea01__c)
+  precision: 18
+  scale: 0
+
 

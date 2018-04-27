@@ -217,3 +217,8 @@
   Text02__c: 'Ａ'
 -
   Text01__c: 'abcABCde 01201 444-888'
+-
+  Textarea01__c: |-
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+    Morbi bibendum, justo porta euismod tristique, ipsum dui scelerisque metus,
+    non eleifend odio orci nec massa.
