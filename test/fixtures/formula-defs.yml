@@ -383,8 +383,38 @@
   precision: 18
   scale: 6
 -
+  type: Currency
+  formula: MAX(Currency01__c, Currency02__c, 0)
+  precision: 18
+  scale: 2 
+-
+  type: Percent
+  formula: MAX(Percent01__c, Percent02__c, 0)
+  precision: 18
+  scale: 4
+-
+  type: Number
+  formula: MAX(Number02__c, Currency02__c, Percent02__c, 0)
+  precision: 18
+  scale: 6
+-
   type: Number
   formula: MIN(Number01__c, Number02__c, 100000)
+  precision: 18
+  scale: 6
+-
+  type: Currency
+  formula: MIN(Currency01__c, Currency02__c, 100000)
+  precision: 18
+  scale: 2
+-
+  type: Percent
+  formula: MIN(Percent01__c, Percent02__c, 50)
+  precision: 18
+  scale: 4
+-
+  type: Number
+  formula: MIN(Number02__c, Currency02__c, Percent02__c, 50)
   precision: 18
   scale: 6
 -

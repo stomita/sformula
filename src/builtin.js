@@ -622,10 +622,17 @@ const builtins = {
     },
   },
   'MAX': {
-    value: (...ns: Array<?number>) => {
+    value: (...nums: Array<MaybeTypeAnnotated<?number>>) => {
       let max = null;
-      for (const n of ns) {
+      for (const num of nums) {
+        let n, nType;
+        if (Array.isArray(num)) {
+          [n, nType] = num;
+        } else {
+          n = num;
+        }
         if (n == null) { return null; }
+        if (nType === 'percent') { n = n * 0.01; }
         if (max == null || max < n) { max = n; }
       }
       return max;
@@ -633,17 +640,34 @@ const builtins = {
     type: {
       type: 'function',
       arguments: Array.from({ length: 50 }).map((_, i) => ({
-        argument: { type: 'number' },
+        argument: {
+          type: 'template',
+          ref: `T${i}`,
+          anyOf: [{
+            type: 'number',
+          }, {
+            type: 'currency',
+          }, {
+            type: 'percent'
+          }],
+        },
         optional: i > 0,
       })),
       returns: { type: 'number' },
     },
   },
   'MIN': {
-    value: (...ns: Array<?number>) => {
+    value: (...nums: Array<MaybeTypeAnnotated<?number>>) => {
       let min = null;
-      for (const n of ns) {
+      for (const num of nums) {
+        let n, nType;
+        if (Array.isArray(num)) {
+          [n, nType] = num;
+        } else {
+          n = num;
+        }
         if (n == null) { return null; }
+        if (nType === 'percent') { n = n * 0.01; }
         if (min == null || min > n) { min = n; }
       }
       return min;
@@ -651,7 +675,17 @@ const builtins = {
     type: {
       type: 'function',
       arguments: Array.from({ length: 50 }).map((_, i) => ({
-        argument: { type: 'number' },
+        argument: {
+          type: 'template',
+          ref: `T${i}`,
+          anyOf: [{
+            type: 'number',
+          }, {
+            type: 'currency',
+          }, {
+            type: 'percent'
+          }],
+        },
         optional: i > 0,
       })),
       returns: { type: 'number' },

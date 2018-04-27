@@ -98,6 +98,8 @@ function injectCallExpression(expression: CallExpression, argumentTypes: Express
   if (callee.type === 'Identifier') {
     switch (callee.name) {
       case 'TEXT':
+      case 'MAX':
+      case 'MIN':
       case 'CEILING':
       case 'FLOOR':
       case 'MCEILING':
