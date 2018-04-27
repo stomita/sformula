@@ -158,23 +158,6 @@ export default {
       returns: { type: 'boolean' },
     },
   },
-  'ISPICKVAL': {
-    value: (v: ?string, s: ?string) => {
-      if (v == null || s == null) { return false; }
-      return (v || '') === (s || '');
-    },
-    type: {
-      type: 'function',
-      arguments: [{
-        argument: { type: 'picklist' },
-        optional: false,
-      }, {
-        argument: { type: 'string' },
-        optional: false,
-      }],
-      returns: { type: 'boolean' },
-    },
-  },
   'NULLVALUE': {
     value: (value: any, alt: any) => {
       return value == null ? alt : value;

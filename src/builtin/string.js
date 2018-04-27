@@ -41,6 +41,23 @@ export default {
       returns: { type: 'boolean' },
     },
   },
+  'ISPICKVAL': {
+    value: (v: ?string, s: ?string) => {
+      if (v == null || s == null) { return false; }
+      return (v || '') === (s || '');
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'picklist' },
+        optional: false,
+      }, {
+        argument: { type: 'string' },
+        optional: false,
+      }],
+      returns: { type: 'boolean' },
+    },
+  },
   'FIND': {
     value: (search: ?string, str: ?string, start?: ?number) => {
       if (!str || !search || (start != null && start <= 0)) {
@@ -195,6 +212,27 @@ export default {
       }, {
         argument: { type: 'string' },
         optional: true,
+      }],
+      returns: { type: 'string' },
+    },
+  },
+  'SUBSTITUTE': {
+    value: (str: ?string, search: ?string, replacement: ?string) => {
+      if (!str) { return ''; }
+      if (!search) { return str; }
+      return str.split(search).join(replacement || '');
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'string' },
+        optional: false,
+      }, {
+        argument: { type: 'string' },
+        optional: false,
+      }, {
+        argument: { type: 'string' },
+        optional: false,
       }],
       returns: { type: 'string' },
     },

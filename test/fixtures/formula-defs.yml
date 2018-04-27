@@ -528,6 +528,12 @@
   formula: UPPER(Text01__c)
 -
   type: Text
+  formula: SUBSTITUTE(Text01__c, Text02__c, '*')
+-
+  type: Text
+  formula: SUBSTITUTE(Text01__c, 'a', Text02__c)
+-
+  type: Text
   formula: TRIM("  " + Text01__c + "  ")
 -
   type: Text
