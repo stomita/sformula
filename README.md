@@ -70,7 +70,7 @@ Also, you can pass `blankAsZero` option when you want to regard the null value a
 ```javascript
 import { parseSync } from 'sformula';
 
-const fml = sformula.parseSync('CreatedDate - Offset__c', {
+const fml = parseSync('CreatedDate - Offset__c', {
   fieldTypes: {
     CreatedDate: { type: 'datetime' },
     Offset__c: { type: 'number', precision: 18, scale: 2 },
