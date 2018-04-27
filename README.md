@@ -188,7 +188,7 @@ parse('IF(CONTAINS(Owner.Title, "Engineer"), Number01__c + 2.5, Number02__c * 0.
 - [x] TRIM
 - [x] LEN
 - [x] TEXT 
-- [ ] VALUE
+- [x] VALUE
 - [ ] CASESAFEID
 - [ ] ~~BR~~ *(will not be supported)*
 - [ ] ~~GETSESSIONID~~ *(will not be supported)*

@@ -146,8 +146,10 @@ export default {
   },
   'ISNUMBER': {
     value: (value: ?string) => {
-      if (value == null || value == '') { return false; } 
-      return !Number.isNaN(Number(value));
+      if (!value) { return null; }
+      if (/^\-?0[box]/i.test(value)) { return false; }
+      const n = Number(value);
+      return !Number.isNaN(n)
     },
     type: {
       type: 'function',

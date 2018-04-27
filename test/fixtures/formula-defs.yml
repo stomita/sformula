@@ -96,6 +96,9 @@
   formula: ISNUMBER(Text01__c)
 -
   type: Checkbox
+  formula: NOT(ISNUMBER(Text01__c))
+-
+  type: Checkbox
   formula: ISPICKVAL(Picklist01__c, "1")
 -
   type: Text
@@ -566,3 +569,8 @@
   formula: LEN(Textarea01__c)
   precision: 18
   scale: 0
+-
+  type: Number
+  formula: VALUE(Text01__c)
+  precision: 18
+  scale: 6

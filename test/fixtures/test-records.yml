@@ -222,3 +222,15 @@
     Lorem ipsum dolor sit amet, consectetur adipiscing elit.
     Morbi bibendum, justo porta euismod tristique, ipsum dui scelerisque metus,
     non eleifend odio orci nec massa.
+-
+  Text01__c: '123.45'
+-
+  Text01__c: '1,000,000'
+-
+  Text01__c: '-123.45'
+-
+  Text01__c: '0x123'
+-
+  Text01__c: '0123'
+-
+  Text01__c: '3.5e-4'

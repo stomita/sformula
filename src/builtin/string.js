@@ -323,4 +323,19 @@ export default {
       returns: { type: 'string' },
     },
   },
+  'VALUE': {
+    value: (str: ?string) => {
+      if (!str || /^\-?0[box]/i.test(str)) { return null; }
+      const n = Number(str);
+      return Number.isNaN(n) ? null : n;
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: { type: 'string' },
+        optional: false,
+      }],
+      returns: { type: 'number' },
+    },
+  },
 };
