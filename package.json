@@ -1,6 +1,6 @@
 {
   "name": "sformula",
-  "description": "Salesforce formula parsing / executing in client side",
+  "description": "Library for parsing / evaluating Salesforce formula in JavaScript",
   "version": "1.0.0",
   "main": "lib/index.js",
   "license": "MIT",
@@ -11,6 +11,7 @@
     "build:lib": "babel -d lib src",
     "build:flow": "flow-copy-source src lib",
     "build:web": "webpack lib/index.js dist/sformula.js --output-library sformula",
+    "flow": "flow",
     "test": "ava",
     "test:skipRebuild": "SKIP_REBUILD_FORMULA_SCHEMA=true ava",
     "test:skipPrepare": "SKIP_LOADING_TEST_RECORDS=true ava"
