@@ -118,3 +118,69 @@ parse('IF(CONTAINS(Owner.Title, "Engineer"), Number01__c + 2.5, Number02__c * 0.
 
 ```
 
+## Supported Functions
+
+### Date / Datetime Functions
+
+- ADDMONTHS
+- DATE
+- DATETIMEVALUE
+- DATEVALUE
+- YEAR
+- MONTH
+- DAY
+- TODAY
+- NOW
+
+### Logical Functions
+
+- AND
+- OR
+- NOT
+- CASE
+- IF
+- ISNULL
+- ISBLANK
+- ISNUMBER
+- ISPICKVAL
+- NULLVALUE
+- BLANKVALUE
+
+### Calculation Functions
+
+- ABS
+- CEILING
+- FLOOR
+- ROUND
+- MCEILING
+- MFLOOR
+- EXP
+- LN
+- LOG
+- SQRT
+- MAX
+- MIN
+- MOD
+
+### Text Functions
+
+- BEGINS
+- CONTAINS
+- FIND
+- LEFT
+- RIGHT
+- MID
+- LOWER
+- UPPER
+- LPAD
+- RPAD
+- TRIM
+- LEN
+- TEXT 
+
+
+## Limitations
+
+Salesforce formula is "case-insensitive". For example, when `IF(Field01__c > Field02__c, Owner.LastName, "-")` is valid `if(FIELD01__c > field02__c, owner.lastName, "-")` is also a valid formula and yields same result.
+
+For implementation reason, sformula treat formula as "case-sensitive", which always requires functions to be written in UPPERCASE chars, fields to be written as same as which is defined in the API reference name.
