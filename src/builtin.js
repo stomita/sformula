@@ -555,6 +555,42 @@ const builtins = {
       returns: { type: 'number' },
     },
   },
+  'MAX': {
+    value: (...ns: Array<?number>) => {
+      let max = null;
+      for (const n of ns) {
+        if (n == null) { return null; }
+        if (max == null || max < n) { max = n; }
+      }
+      return max;
+    },
+    type: {
+      type: 'function',
+      arguments: Array.from({ length: 50 }).map((_, i) => ({
+        argument: { type: 'number' },
+        optional: i > 0,
+      })),
+      returns: { type: 'number' },
+    },
+  },
+  'MIN': {
+    value: (...ns: Array<?number>) => {
+      let min = null;
+      for (const n of ns) {
+        if (n == null) { return null; }
+        if (min == null || min > n) { min = n; }
+      }
+      return min;
+    },
+    type: {
+      type: 'function',
+      arguments: Array.from({ length: 50 }).map((_, i) => ({
+        argument: { type: 'number' },
+        optional: i > 0,
+      })),
+      returns: { type: 'number' },
+    },
+  },
 
   // builtin operators 
   '$$CONCAT_STRING$$': {
