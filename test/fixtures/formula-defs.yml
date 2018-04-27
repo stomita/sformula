@@ -482,3 +482,9 @@
   formula: MOD(Percent02__c, Number01__c)
   precision: 18
   scale: 4
+-
+  type: Checkbox
+  formula: BEGINS(Text01__c, Text02__c)
+-
+  type: Checkbox
+  formula: CONTAINS(Text01__c, Text02__c)

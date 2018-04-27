@@ -182,3 +182,12 @@
 -
   Picklist01__c: null
   Picklist02__c: null
+-
+  Text01__c: 'ABCABCDE'
+  Text02__c: 'BCA'
+-
+  Text01__c: 'ABCABCDE'
+  Text02__c: 'BCDE'
+-
+  Text01__c: 'ABCABCDE'
+  Text02__c: 'AB'

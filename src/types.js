@@ -58,6 +58,8 @@ export type ExpressionTypeDictionary = {
   [identifier: string]: ?ExpressionType
 };
 
+export type MaybeTypeAnnotated<T> = T | [T, string, ?number, ?number];
+
 export type DescribeFieldResult = {
   name: string,
   label: string,
@@ -82,3 +84,4 @@ export interface Describer {
   sobject: string,
   describe(sobjectType: string): Promise<DescribeSObjectResult>;
 }
+
