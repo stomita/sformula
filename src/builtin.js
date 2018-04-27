@@ -513,6 +513,72 @@ const builtins = {
       returns: { type: 'template', ref: 'T' },
     },
   },
+  'MCEILING': {
+    value: (value: MaybeTypeAnnotated<?number>) => {
+      let v, vType;
+      if (Array.isArray(value)) {
+        [v, vType] = value;
+      } else {
+        v = value;
+      }
+      if (v == null) { return null; }
+      if (vType === 'percent') {
+        return Math.ceil(v * 0.01) * 100;
+      }
+      return Math.ceil(v);
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: {
+          type: 'template',
+          ref: 'T',
+          anyOf: [{
+            type: 'number',
+          }, {
+            type: 'currency',
+          }, {
+            type: 'percent',
+          }],
+        },
+        optional: false,
+      }],
+      returns: { type: 'template', ref: 'T' },
+    },
+  },
+  'MFLOOR': {
+    value: (value: MaybeTypeAnnotated<?number>) => {
+      let v, vType;
+      if (Array.isArray(value)) {
+        [v, vType] = value;
+      } else {
+        v = value;
+      }
+      if (v == null) { return null; }
+      if (vType === 'percent') {
+        return Math.floor(v * 0.01) * 100;
+      }
+      return Math.floor(v);
+    },
+    type: {
+      type: 'function',
+      arguments: [{
+        argument: {
+          type: 'template',
+          ref: 'T',
+          anyOf: [{
+            type: 'number',
+          }, {
+            type: 'currency',
+          }, {
+            type: 'percent',
+          }],
+        },
+        optional: false,
+      }],
+      returns: { type: 'template', ref: 'T' },
+    },
+  },
   'EXP': {
     value: (n: ?number) => {
       if (n == null) { return null; }

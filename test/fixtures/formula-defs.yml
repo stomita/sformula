@@ -387,3 +387,33 @@
   formula: MIN(Number01__c, Number02__c, 100000)
   precision: 18
   scale: 6
+-
+  type: Number
+  formula: MCEILING(Number02__c)
+  precision: 18
+  scale: 0
+-
+  type: Currency
+  formula: MCEILING(Currency02__c)
+  precision: 18
+  scale: 0
+-
+  type: Percent
+  formula: MCEILING(Percent02__c)
+  precision: 18
+  scale: 4 
+-
+  type: Number
+  formula: MFLOOR(Number02__c)
+  precision: 18
+  scale: 0
+-
+  type: Currency
+  formula: MFLOOR(Currency02__c)
+  precision: 18
+  scale: 0
+-
+  type: Percent
+  formula: MFLOOR(Percent02__c)
+  precision: 18
+  scale: 4 

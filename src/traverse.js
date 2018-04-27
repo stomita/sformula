@@ -100,6 +100,8 @@ function injectCallExpression(expression: CallExpression, argumentTypes: Express
       case 'TEXT':
       case 'CEILING':
       case 'FLOOR':
+      case 'MCEILING':
+      case 'MFLOOR':
         return annotateArgumentTypes(callee.name, args, argumentTypes);
       default:
         break;
