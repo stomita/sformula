@@ -42,7 +42,7 @@ export type FunctionArgType = {
 
 export type ExpressionType = PrimitiveExpressionType | AdditionalPrimitiveExpressionType | {
   type: 'object',
-  sobject: string,
+  sobject?: string,
   properties: ExpressionTypeDictionary,
 } | {
   type: 'function',
