@@ -303,7 +303,7 @@
 -
   type: DateTime
   formula: NOW()
-  fluctuation: 5000
+  fluctuation: 10000
 -
   type: Text
   formula: CASE(Number01__c, 0, Text01__c, 1, Text02__c, NULL)

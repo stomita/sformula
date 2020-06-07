@@ -34,7 +34,7 @@
   ],
   "dependencies": {
     "esformula": "^1.0.7",
-    "luxon": "^1.1.0"
+    "luxon": "~1.18.2"
   },
   "devDependencies": {
     "adm-zip": "^0.4.7",
