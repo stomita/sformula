@@ -3,22 +3,26 @@
   "description": "Library for parsing / evaluating Salesforce formula in client-side JavaScript",
   "version": "1.0.4",
   "main": "lib/index.js",
+  "module": "module/index.js",
+  "types": "types/index.d.ts",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/stomita/sformula"
   },
   "scripts": {
-    "clean": "rimraf dist/* lib/*",
-    "prepare": "npm run build",
-    "build": "run-s build:parser build:lib build:web",
+    "clean": "rimraf dist/* lib/* module/* types/*",
+    "build": "run-s build:parser build:src build:bundle",
     "build:parser": "pegjs -o lib/parser.js src/parser.pegjs",
-    "build:lib": "babel --extensions '.ts' -d lib src",
-    "build:web": "webpack lib/index.js dist/sformula.js --output-library sformula",
+    "build:src": "run-p build:lib build:module build:typedef",
+    "build:lib": "BUILD_TARGET=lib babel --extensions '.ts' --source-maps -d lib src",
+    "build:module": "BUILD_TARGET=module babel --extensions '.ts' --source-maps -d module src",
+    "build:typedef": "tsc --project ./src/tsconfig.json --declaration --emitDeclarationOnly --outDir types --rootDir src",
+    "build:bundle": "webpack lib/index.js dist/sformula.js --output-library sformula",
     "typecheck": "tsc --noEmit",
-    "test": "ava",
-    "test:skipRebuild": "SKIP_REBUILD_FORMULA_SCHEMA=true ava",
-    "test:skipPrepare": "SKIP_LOADING_TEST_RECORDS=true ava"
+    "test": "jest",
+    "test:skipRebuild": "SKIP_REBUILD_FORMULA_SCHEMA=true jest",
+    "test:skipPrepare": "SKIP_LOADING_TEST_RECORDS=true jest"
   },
   "keywords": [
     "salesforce",
@@ -30,7 +34,9 @@
   "files": [
     "dist",
     "lib",
-    "src"
+    "module",
+    "src",
+    "types"
   ],
   "dependencies": {
     "esformula": "^2.0.1",
@@ -43,12 +49,13 @@
     "@babel/preset-typescript": "^7.10.1",
     "@types/adm-zip": "^0.4.33",
     "@types/fs-extra": "^9.0.1",
+    "@types/jest": "^25.2.3",
     "@types/js-yaml": "^3.12.4",
     "@types/luxon": "^1.24.0",
     "@types/node": "^14.0.12",
     "adm-zip": "^0.4.7",
-    "ava": "^0.24.0",
     "fs-extra": "^9.0.1",
+    "jest": "^26.0.1",
     "js-yaml": "^3.14.0",
     "jsforce": "^2.0.0-alpha.11",
     "json5": "^0.5.1",
