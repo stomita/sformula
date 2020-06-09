@@ -27,8 +27,8 @@ export async function resetFormulaSchema(sobject: string) {
     version: '42.0',
   });
   const zip = new AdmZip();
-  zip.addFile('src/package.xml', new Buffer(packageXml));
-  zip.addFile('src/destructiveChanges.xml', new Buffer(destructiveChangesXml));
+  zip.addFile('src/package.xml', Buffer.from(packageXml));
+  zip.addFile('src/destructiveChanges.xml', Buffer.from(destructiveChangesXml));
   const res = await conn.metadata.deploy(zip.toBuffer(), { purgeOnDelete: true }).complete(true);
   console.log('Deleted existing formula test schema');
 }
@@ -59,8 +59,8 @@ export async function createFormulaObjectFields(sobject: string, fields: Array<{
     version: '42.0',
   });
   const zip = new AdmZip();
-  zip.addFile('src/package.xml', new Buffer(packageXml));
-  zip.addFile(`src/objects/${sobject}.object`, new Buffer(objectXml));
+  zip.addFile('src/package.xml', Buffer.from(packageXml));
+  zip.addFile(`src/objects/${sobject}.object`, Buffer.from(objectXml));
   const res = await conn.metadata.deploy(zip.toBuffer()).complete(true);
   if (res.status !== 'Succeeded') {
     console.error(res.details);
