@@ -19,6 +19,7 @@
     "build:module": "BUILD_TARGET=module babel --extensions '.ts' --source-maps -d module src",
     "build:typedef": "tsc --project ./src/tsconfig.json --declaration --emitDeclarationOnly --outDir types --rootDir src",
     "build:bundle": "webpack lib/index.js dist/sformula.js --output-library sformula",
+    "lint": "eslint src test --ext .ts",
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "test:skipRebuild": "SKIP_REBUILD_FORMULA_SCHEMA=true jest",
@@ -53,7 +54,12 @@
     "@types/js-yaml": "^3.12.4",
     "@types/luxon": "^1.24.0",
     "@types/node": "^14.0.12",
+    "@typescript-eslint/eslint-plugin": "^3.2.0",
+    "@typescript-eslint/parser": "^3.2.0",
     "adm-zip": "^0.4.7",
+    "eslint": "^7.2.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.3",
     "fs-extra": "^9.0.1",
     "jest": "^26.0.1",
     "js-yaml": "^3.14.0",
@@ -61,20 +67,10 @@
     "json5": "^0.5.1",
     "npm-run-all": "^4.1.2",
     "pegjs": "^0.10.0",
+    "prettier": "^2.0.5",
     "rimraf": "^3.0.2",
     "salesforce-metadata-xml-builder": "^0.4.0",
     "typescript": "^3.9.5",
     "webpack": "^3.10.0"
-  },
-  "ava": {
-    "babel": "inherit",
-    "require": [
-      "babel-register"
-    ],
-    "concurrency": 1,
-    "verbose": true,
-    "files": [
-      "test/**/*.test.js"
-    ]
   }
 }
