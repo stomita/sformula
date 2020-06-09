@@ -1,41 +1,46 @@
-import path from 'path';
-import fs from 'fs-extra';
-import yaml from 'js-yaml';
-import { zeropad } from '.';
-import { getConnection } from './connection';
+import path from "path";
+import fs from "fs-extra";
+import yaml from "js-yaml";
+import { zeropad } from ".";
+import { getConnection } from "./connection";
 
 export type Record = {
-  Key__c: string,
-  Parent__r?: { $ref?: string },
-  [field: string]: any,
+  Key__c: string;
+  Parent__r?: { $ref?: string };
+  [field: string]: any;
 };
 
 let keySeq = 1;
-function genKey() { return `${zeropad(keySeq++)}`; }
-
-/**
- * 
- */
-export function loadTestRecords(): Record[] {
-  const data = fs.readFileSync(path.join(__dirname, '../fixtures/test-records.yml'), 'utf8');
-  const records: any[] = yaml.safeLoad(data);
-  return records.map((rec, i) => ({
-    Key__c: genKey(),
-    ...rec
-  }));;
+function genKey() {
+  return `${zeropad(keySeq++)}`;
 }
 
 /**
- * 
+ *
+ */
+export function loadTestRecords(): Record[] {
+  const data = fs.readFileSync(
+    path.join(__dirname, "../fixtures/test-records.yml"),
+    "utf8"
+  );
+  const records: any[] = yaml.safeLoad(data);
+  return records.map((rec) => ({
+    Key__c: genKey(),
+    ...rec,
+  }));
+}
+
+/**
+ *
  */
 export async function truncateAllTestRecords(sobject: string): Promise<void> {
   const conn = await getConnection();
   await conn.sobject(sobject).find().destroy();
-  console.log('truncated all test records in the table');
+  console.log("truncated all test records in the table");
 }
 
 /**
- * 
+ *
  */
 export async function insertTestRecords(sobject: string, records: Record[]) {
   const conn = await getConnection();
@@ -44,7 +49,6 @@ export async function insertTestRecords(sobject: string, records: Record[]) {
     const insertings: Record[] = [];
     const waitings: Record[] = [];
     const filterRecordEntry = (record: Record) => {
-      const key = record.Key__c;
       if (record.Parent__r) {
         const ref = record.Parent__r?.$ref;
         record = { ...record };
@@ -70,12 +74,12 @@ export async function insertTestRecords(sobject: string, records: Record[]) {
       } else {
         insertings.push(record);
       }
-    }
-    for (let record of records) {
+    };
+    for (const record of records) {
       filterRecordEntry(record);
     }
-    const rets: any[] = await conn.requestPost('/composite/sobjects', {
-      records: insertings.map(record => {
+    const rets: any[] = await conn.requestPost("/composite/sobjects", {
+      records: insertings.map((record) => {
         const { $ref, ...rec } = record;
         return {
           attributes: { type: sobject },
@@ -94,18 +98,26 @@ export async function insertTestRecords(sobject: string, records: Record[]) {
     }
   };
   await insertRecords(records);
-  console.log('inserted test records to server');
+  console.log("inserted test records to server");
 }
 
 /**
- * 
+ *
  */
-export async function getExpectedRecords(sobject: string, testRecords: Record[]) {
-  console.log('fetching expected record values');
+export async function getExpectedRecords(
+  sobject: string,
+  testRecords: Record[]
+) {
+  console.log("fetching expected record values");
   const conn = await getConnection();
-  const recs = await conn.sobject(sobject).find({}, '*,Parent__r.*,Parent__r.Parent__r.*');
-  const keyMap = recs.reduce((map, rec) => ({ ...map, [rec.Key__c]: rec }), {} as { [key: string]: Record });
-  const expectedRecs = testRecords.map(rec => keyMap[rec.Key__c]);
-  console.log('got expected record values from server');
+  const recs = await conn
+    .sobject(sobject)
+    .find({}, "*,Parent__r.*,Parent__r.Parent__r.*");
+  const keyMap = recs.reduce(
+    (map, rec) => ({ ...map, [rec.Key__c]: rec }),
+    {} as { [key: string]: Record }
+  );
+  const expectedRecs = testRecords.map((rec) => keyMap[rec.Key__c]);
+  console.log("got expected record values from server");
   return expectedRecs;
 }

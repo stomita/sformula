@@ -1,7 +1,7 @@
-import jsforce, { Connection } from 'jsforce';
+import jsforce, { Connection } from "jsforce";
 
 /**
- * 
+ *
  */
 let _conn: Promise<Connection>;
 
@@ -9,11 +9,11 @@ let _loggedIn: Promise<any>;
 
 export async function getConnection() {
   if (!_conn) {
-    _conn = process.env.SF_CONNECTION_NAME ?
-      jsforce.registry.getConnectionConfig(process.env.SF_CONNECTION_NAME).then(config =>
-        new jsforce.Connection(config ?? {})
-      ) :
-      Promise.resolve(new jsforce.Connection());
+    _conn = process.env.SF_CONNECTION_NAME
+      ? jsforce.registry
+          .getConnectionConfig(process.env.SF_CONNECTION_NAME)
+          .then((config) => new jsforce.Connection(config ?? {}))
+      : Promise.resolve(new jsforce.Connection());
   }
   const conn = await _conn;
   conn.metadata.pollInterval = 5000;

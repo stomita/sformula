@@ -1,92 +1,122 @@
 import type {
   Expression,
-  UnaryExpression, UnaryOperator,
-  BinaryExpression, BinaryOperator,
-  LogicalExpression, LogicalOperator,
+  UnaryExpression,
+  UnaryOperator,
+  BinaryExpression,
+  BinaryOperator,
+  LogicalExpression,
+  LogicalOperator,
   CallExpression,
   MemberExpression,
-  Identifier, Literal,
+  Identifier,
+  Literal,
   SpreadElement,
-} from 'esformula';
+} from "esformula";
 
 export function isReserved(id: string) {
   return /^(TRUE|FALSE|NULL)$/i.test(id);
 }
 
-export function concatinateLogicalExpressions(head: Expression, tail: Array<[LogicalOperator, Expression]>): Expression {
-  if (tail.length === 0) { return head; }
+export function concatinateLogicalExpressions(
+  head: Expression,
+  tail: Array<[LogicalOperator, Expression]>
+): Expression {
+  if (tail.length === 0) {
+    return head;
+  }
   const [[op, tail1], ...rtail] = tail;
   const expr = createLogicalExpression(op, head, tail1);
   return concatinateLogicalExpressions(expr, rtail);
 }
 
-export function concatinateBinaryExpressions(head: Expression, tail: Array<[BinaryOperator, Expression]>): Expression {
-  if (tail.length === 0) { return head; }
+export function concatinateBinaryExpressions(
+  head: Expression,
+  tail: Array<[BinaryOperator, Expression]>
+): Expression {
+  if (tail.length === 0) {
+    return head;
+  }
   const [[op, tail1], ...rtail] = tail;
   const expr = createBinaryExpression(op, head, tail1);
   return concatinateBinaryExpressions(expr, rtail);
 }
 
-export function createUnaryExpression(operator: UnaryOperator, argument: Expression): UnaryExpression {
+export function createUnaryExpression(
+  operator: UnaryOperator,
+  argument: Expression
+): UnaryExpression {
   return {
-    type: 'UnaryExpression',
+    type: "UnaryExpression",
     operator,
     argument,
     prefix: true,
   };
 }
 
-export function createBinaryExpression(operator: BinaryOperator, left: Expression, right: Expression): BinaryExpression {
+export function createBinaryExpression(
+  operator: BinaryOperator,
+  left: Expression,
+  right: Expression
+): BinaryExpression {
   return {
-    type: 'BinaryExpression',
+    type: "BinaryExpression",
     operator,
     left,
     right,
   };
 }
 
-export function createLogicalExpression(operator: LogicalOperator, left: Expression, right: Expression): LogicalExpression {
+export function createLogicalExpression(
+  operator: LogicalOperator,
+  left: Expression,
+  right: Expression
+): LogicalExpression {
   return {
-    type: 'LogicalExpression',
+    type: "LogicalExpression",
     operator,
     left,
     right,
   };
 }
 
-export function createCallExpression(callee: Identifier, args: Expression[]): CallExpression {
+export function createCallExpression(
+  callee: Identifier,
+  args: Expression[]
+): CallExpression {
   return {
-    type: 'CallExpression',
+    type: "CallExpression",
     callee,
-    arguments: args as any as Array<Expression | SpreadElement>,
+    arguments: (args as any) as Array<Expression | SpreadElement>,
   };
 }
 
-export function createFieldExpression(fieldPaths: Identifier[]): Identifier | MemberExpression {
+export function createFieldExpression(
+  fieldPaths: Identifier[]
+): Identifier | MemberExpression {
   if (fieldPaths.length < 2) {
     return fieldPaths[0];
   }
-  const [ object, property, ...fpaths ] = fieldPaths;
+  const [object, property, ...fpaths] = fieldPaths;
   let expression: MemberExpression = {
-    type: 'MemberExpression',
+    type: "MemberExpression",
     computed: false,
     object,
     property,
   };
   for (const field of fpaths) {
     expression = {
-      type: 'MemberExpression',
+      type: "MemberExpression",
       computed: false,
       object: expression,
       property: field,
-    }
+    };
   }
   return expression;
 }
 
 export function createIdentifier(name: string): Identifier {
   return {
-    type: 'Identifier',
+    type: "Identifier",
     name,
   };
 }
@@ -94,7 +124,7 @@ export function createIdentifier(name: string): Identifier {
 export function createNumberLiteral(n: string): Literal {
   const value = parseFloat(n);
   return {
-    type: 'Literal',
+    type: "Literal",
     value,
     raw: n,
   };
@@ -102,7 +132,7 @@ export function createNumberLiteral(n: string): Literal {
 
 export function createStringLiteral(s: string) {
   return {
-    type: 'Literal',
+    type: "Literal",
     value: s,
     raw: s,
   };
@@ -111,7 +141,7 @@ export function createStringLiteral(s: string) {
 export function createBooleanLiteral(b: string) {
   const value = b.toUpperCase() === "TRUE";
   return {
-    type: 'Literal',
+    type: "Literal",
     value,
     raw: b,
   };
@@ -119,7 +149,7 @@ export function createBooleanLiteral(b: string) {
 
 export function createNullLiteral(n: string) {
   return {
-    type: 'Literal',
+    type: "Literal",
     value: null,
     raw: n,
   };

@@ -1,50 +1,46 @@
 /* @flow */
-import type { Expression, MemberExpression } from 'esformula';
+import type { Expression, MemberExpression } from "esformula";
 
-
-function extractFieldsFromMemberExpression(expression: MemberExpression): string {
-  if (expression.object.type === 'Super') {
-    throw new Error('could not be reached here');
+function extractFieldsFromMemberExpression(
+  expression: MemberExpression
+): string {
+  if (expression.object.type === "Super") {
+    throw new Error("could not be reached here");
   }
   return [
     ...extractFieldsFromExpression(expression.object),
     ...extractFieldsFromExpression(expression.property),
-  ].join('.');
+  ].join(".");
 }
 
 function extractFieldsFromExpression(expression: Expression): string[] {
   switch (expression.type) {
-    case 'UnaryExpression':
+    case "UnaryExpression":
       return extractFieldsFromExpression(expression.argument);
-    case 'BinaryExpression':
-    case 'LogicalExpression':
+    case "BinaryExpression":
+    case "LogicalExpression":
       return [
         ...extractFieldsFromExpression(expression.left),
         ...extractFieldsFromExpression(expression.right),
       ];
-    case 'CallExpression':
+    case "CallExpression":
       return expression.arguments.reduce((fields, arg) => {
-        if (arg.type === 'SpreadElement') {
-          throw new Error('could not be reached here');
+        if (arg.type === "SpreadElement") {
+          throw new Error("could not be reached here");
         }
-        return [
-          ...fields,
-          ...extractFieldsFromExpression(arg),
-        ];
+        return [...fields, ...extractFieldsFromExpression(arg)];
       }, [] as string[]);
-    case 'MemberExpression':
-      return [
-        extractFieldsFromMemberExpression(expression)
-      ];
-    case 'Identifier':
-      return [ expression.name ];
+    case "MemberExpression":
+      return [extractFieldsFromMemberExpression(expression)];
+    case "Identifier":
+      return [expression.name];
     default:
       return [];
   }
 }
 
 /**
- * 
+ *
  */
 export function extractFields(expression: Expression) {
   const fields = extractFieldsFromExpression(expression);
