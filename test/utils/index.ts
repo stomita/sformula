@@ -1,4 +1,3 @@
-/* @flow */
 export function zeropad(n: number): string {
   return (n < 10 ? '00' : n < 100 ? '0' : '') + String(n);
 }

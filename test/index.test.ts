@@ -1,22 +1,21 @@
-/* @flow */
 import test from 'ava';
 import { DateTime } from 'luxon';
-import { parse, type ReturnType } from '..'; 
+import { parse, FormulaReturnType } from '../src'; 
 import { loadFormulaDefs } from './utils/formulaDef';
 import { describe, createFormulaSchema, resetFormulaSchema } from './utils/schema';
-import { loadTestRecords, truncateAllTestRecords, insertTestRecords, getExpectedRecords } from './utils/testRecords';
+import { loadTestRecords, truncateAllTestRecords, insertTestRecords, getExpectedRecords, Record } from './utils/testRecords';
 
 
 function zeropad(n: number) {
   return (n < 10 ? '00' : n < 100 ? '0' : '') + String(n);
 }
 
-function toReturnType(type: string): ReturnType {
-  return ((
+function toReturnType(type: string): FormulaReturnType {
+  return (
     type === 'Checkbox' ? 'boolean' :
     type === 'Text' ? 'string' :
     type.toLowerCase()
-  ): any);
+  ) as FormulaReturnType;
 }
 
 const ISO8601_DATETIME_FORMAT = 'yyyy-MM-dd\'T\'HH:mm:ss.SSSZZZ';
@@ -24,19 +23,19 @@ const ISO8601_DATETIME_FORMAT = 'yyyy-MM-dd\'T\'HH:mm:ss.SSSZZZ';
 function calcFluctuatedValue(
   value: string | number | null,
   fluctuation: number,
-  returnType: ReturnType
+  returnType: FormulaReturnType
 ) {
   if ((returnType === 'number' || returnType === 'currency' || returnType === 'percent') && typeof value === 'number') {
-    return ([ value - fluctuation, value + fluctuation ] : [ number, number ]);
+    return ([ value - fluctuation, value + fluctuation ] as [ number, number ]);
   }
   if ((returnType === 'datetime') && typeof value === 'string') {
     const dt = DateTime.fromISO(value);
     return ([
       dt.plus(-fluctuation).toUTC().toFormat(ISO8601_DATETIME_FORMAT),
       dt.plus(fluctuation).toUTC().toFormat(ISO8601_DATETIME_FORMAT),
-    ] : [string, string]);
+    ] as [string, string]);
   }
-  return ([value, value] : [typeof value, typeof value]);
+  return ([value, value] as [typeof value, typeof value]);
 }
 
 function between(value: any, lower: any, upper: any) {
@@ -52,8 +51,8 @@ const formulaDefs = loadFormulaDefs();
 
 const describer = { sobject: FORMULA_TEST_OBJECT, describe };
 
-let testRecords;
-let expectedRecords;
+let testRecords: Record[];
+let expectedRecords: Record[];
 
 /**
  * 

@@ -67,12 +67,12 @@ export type DescribeFieldResult = {
   type: string,
   precision: number,
   scale: number,
-  picklistValues: Array<{
+  picklistValues: Maybe<Array<{
     value: string,
     label: string,
-  }>,
-  relationshipName: string | null,
-  referenceTo: string[] | null,
+  }>>,
+  relationshipName: Maybe<string>,
+  referenceTo: Maybe<string[]>,
 };
 
 export type DescribeSObjectResult = {

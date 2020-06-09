@@ -28,7 +28,7 @@ async function describeFieldType(field: string, describer: Describer): Promise<E
     case 'currency':
       return { type: 'currency', precision: fieldDef.precision, scale: fieldDef.scale };
     case 'picklist':
-      return { type: 'picklist', picklistValues: fieldDef.picklistValues };
+      return { type: 'picklist', picklistValues: fieldDef.picklistValues ?? undefined };
     case 'reference':
       return (
         fieldDef.name === field ?
