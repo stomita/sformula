@@ -2,7 +2,7 @@
 import { DateTime } from 'luxon';
 import { applyScale } from '../cast';
 import { MSECS_IN_DAY, ISO8601_DATETIME_FORMAT } from './constants';
-import type { MaybeTypeAnnotated } from '../types';
+import type { MaybeTypeAnnotated, Maybe } from '../types';
 
 /**
  * 
@@ -10,7 +10,7 @@ import type { MaybeTypeAnnotated } from '../types';
 export default {
   // builtin operators 
   '$$CONCAT_STRING$$': {
-    value: (s1: ?string, s2: ?string) => {
+    value: (s1: Maybe<string>, s2: Maybe<string>) => {
       return (s1 || '') + (s2 || '');
     },
     type: {
@@ -26,7 +26,7 @@ export default {
     },
   },
   '$$EQ_STRING$$': {
-    value: (s1: ?string, s2: ?string) => {
+    value: (s1: Maybe<string>, s2: Maybe<string>) => {
       return (s1 || '') === (s2 || '');
     },
     type: {
@@ -42,7 +42,7 @@ export default {
     },
   },
   '$$NEQ_STRING$$': {
-    value: (s1: ?string, s2: ?string) => {
+    value: (s1: Maybe<string>, s2: Maybe<string>) => {
       return (s1 || '') !== (s2 || '');
     },
     type: {
@@ -58,7 +58,7 @@ export default {
     },
   },
   '$$ADD_NUMBER$$': {
-    value: (n1: ?number, n2: ?number) => {
+    value: (n1: Maybe<number>, n2: Maybe<number>) => {
       if (n1 == null || n2 == null) { return null; }
       return n1 + n2;
     },
@@ -75,7 +75,7 @@ export default {
     },
   },
   '$$SUBTRACT_NUMBER$$': {
-    value: (n1: ?number, n2: ?number) => {
+    value: (n1: Maybe<number>, n2: Maybe<number>) => {
       if (n1 == null || n2 == null) { return null; }
       return n1 - n2;
     },
@@ -92,7 +92,7 @@ export default {
     },
   },
   '$$MULTIPLY_NUMBER$$': {
-    value: (n1: ?number, n2: ?number) => {
+    value: (n1: Maybe<number>, n2: Maybe<number>) => {
       if (n1 == null || n2 == null) { return null; }
       return n1 * n2;
     },
@@ -109,7 +109,7 @@ export default {
     },
   },
   '$$DIVIDE_NUMBER$$': {
-    value: (n1: ?number, n2: ?number) => {
+    value: (n1: Maybe<number>, n2: Maybe<number>) => {
       if (n1 == null || n2 == null || n2 === 0) { return null; }
       return n1 / n2;
     },
@@ -126,7 +126,7 @@ export default {
     },
   },
   '$$POWER_NUMBER$$': {
-    value: (n1: ?number, n2: ?number) => {
+    value: (n1: Maybe<number>, n2: Maybe<number>) => {
       if (n1 == null || n2 == null) { return null; }
       return n1 ** n2;
     },
@@ -143,7 +143,7 @@ export default {
     },
   },
   '$$MINUS_NUMBER$$': {
-    value: (n: ?number) => {
+    value: (n: Maybe<number>) => {
       if (n == null) { return null; }
       return -n;
     },
@@ -157,7 +157,7 @@ export default {
     },
   },
   '$$PLUS_NUMBER$$': {
-    value: (n: ?number) => {
+    value: (n: Maybe<number>) => {
       if (n == null) { return null; }
       return +n;
     },
@@ -171,7 +171,7 @@ export default {
     },
   },
   '$$LT_NUMBER$$': {
-    value: (n1: ?number, n2: ?number) => {
+    value: (n1: Maybe<number>, n2: Maybe<number>) => {
       if (n1 == null || n2 == null) { return null; }
       return n1 < n2;
     },
@@ -188,7 +188,7 @@ export default {
     },
   },
   '$$LTE_NUMBER$$': {
-    value: (n1: ?number, n2: ?number) => {
+    value: (n1: Maybe<number>, n2: Maybe<number>) => {
       if (n1 == null || n2 == null) { return null; }
       return n1 <= n2;
     },
@@ -205,7 +205,7 @@ export default {
     },
   },
   '$$GT_NUMBER$$': {
-    value: (n1: ?number, n2: ?number) => {
+    value: (n1: Maybe<number>, n2: Maybe<number>) => {
       if (n1 == null || n2 == null) { return null; }
       return n1 > n2;
     },
@@ -222,7 +222,7 @@ export default {
     },
   },
   '$$GTE_NUMBER$$': {
-    value: (n1: ?number, n2: ?number) => {
+    value: (n1: Maybe<number>, n2: Maybe<number>) => {
       if (n1 == null || n2 == null) { return null; }
       return n1 >= n2;
     },
@@ -239,7 +239,7 @@ export default {
     },
   },
   '$$EQ_NUMBER$$': {
-    value: (n1: ?number, n2: ?number) => {
+    value: (n1: Maybe<number>, n2: Maybe<number>) => {
       if (n1 == null || n2 == null) { return null; }
       return n1 === n2;
     },
@@ -256,7 +256,7 @@ export default {
     },
   },
   '$$NEQ_NUMBER$$': {
-    value: (n1: ?number, n2: ?number) => {
+    value: (n1: Maybe<number>, n2: Maybe<number>) => {
       if (n1 == null || n2 == null) { return null; }
       return n1 !== n2;
     },
@@ -292,7 +292,7 @@ export default {
     },
   },
   '$$SUBTRACT_DATE$$': {
-    value: (d: ?string, n: ?number) => {
+    value: (d: Maybe<string>, n: Maybe<number>) => {
       if (d == null || n == null) { return null; }
       const dt = DateTime.fromISO(d);
       if (!dt.isValid) { return null; }
@@ -458,7 +458,7 @@ export default {
     },
   },
   '$$ADD_DATETIME$$': {
-    value: (d: ?string, n: ?number) => {
+    value: (d: Maybe<string>, n: Maybe<number>) => {
       if (d == null || n == null) { return null; }
       const dt = DateTime.fromISO(d);
       if (!dt.isValid) { return null; }
@@ -477,7 +477,7 @@ export default {
     },
   },
   '$$SUBTRACT_DATETIME$$': {
-    value: (d: ?string, n: ?number) => {
+    value: (d: Maybe<string>, n: Maybe<number>) => {
       if (d == null || n == null) { return null; }
       const dt = DateTime.fromISO(d);
       if (!dt.isValid) { return null; }
@@ -496,7 +496,7 @@ export default {
     },
   },
   '$$DIFF_DATETIME$$': {
-    value: (d1: ?string, d2: ?string) => {
+    value: (d1: Maybe<string>, d2: Maybe<string>) => {
       if (d1 == null || d2 == null) { return null; }
       const dt1 = DateTime.fromISO(d1);
       if (!dt1.isValid) { return null; }
@@ -517,7 +517,7 @@ export default {
     },
   },
   '$$LT_DATETIME$$': {
-    value: (d1: ?string, d2: ?string) => {
+    value: (d1: Maybe<string>, d2: Maybe<string>) => {
       if (d1 == null || d2 == null) { return null; }
       const dt1 = DateTime.fromISO(d1);
       if (!dt1.isValid) { return null; }

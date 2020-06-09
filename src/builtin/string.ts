@@ -1,14 +1,14 @@
 /* @flow */
 import { DateTime } from 'luxon';
 import { applyScale } from '../cast';
-import type { MaybeTypeAnnotated } from '../types';
+import type { MaybeTypeAnnotated, Maybe } from '../types';
 
 /**
  * 
  */
 export default {
   'BEGINS': {
-    value: (str: ?string, cstr: ?string) => {
+    value: (str: Maybe<string>, cstr: Maybe<string>) => {
       if (str == null || cstr == null) { return null; }
       return str.indexOf(cstr) === 0;
     },
@@ -25,7 +25,7 @@ export default {
     },
   },
   'CONTAINS': {
-    value: (str: ?string, cstr: ?string) => {
+    value: (str: Maybe<string>, cstr: Maybe<string>) => {
       if (str == null || cstr == null) { return null; }
       return str.indexOf(cstr) >= 0;
     },
@@ -42,7 +42,7 @@ export default {
     },
   },
   'ISPICKVAL': {
-    value: (v: ?string, s: ?string) => {
+    value: (v: Maybe<string>, s: Maybe<string>) => {
       if (v == null || s == null) { return false; }
       return (v || '') === (s || '');
     },
@@ -59,7 +59,7 @@ export default {
     },
   },
   'FIND': {
-    value: (search: ?string, str: ?string, start?: ?number) => {
+    value: (search: Maybe<string>, str: Maybe<string>, start?: Maybe<number>) => {
       if (!str || !search || (start != null && start <= 0)) {
         return 0;
       }
@@ -81,7 +81,7 @@ export default {
     },
   },
   'LEFT': {
-    value: (str: ?string, num: ?number) => {
+    value: (str: Maybe<string>, num: Maybe<number>) => {
       if (!str || num == null) {
         return '';
       }
@@ -100,7 +100,7 @@ export default {
     },
   },
   'RIGHT': {
-    value: (str: ?string, num: ?number) => {
+    value: (str: Maybe<string>, num: Maybe<number>) => {
       if (!str || num == null) {
         return '';
       }
@@ -119,7 +119,7 @@ export default {
     },
   },
   'MID': {
-    value: (str: ?string, start: ?number, num: ?number) => {
+    value: (str: Maybe<string>, start: Maybe<number>, num: Maybe<number>) => {
       if (!str || start == null || num == null) {
         return '';
       }
@@ -143,7 +143,7 @@ export default {
     },
   },
   'LOWER': {
-    value: (str: ?string) => {
+    value: (str: Maybe<string>) => {
       if (str == null) { return ''; }
       return str.toLowerCase();
     },
@@ -157,7 +157,7 @@ export default {
     },
   },
   'UPPER': {
-    value: (str: ?string) => {
+    value: (str: Maybe<string>) => {
       if (str == null) { return ''; }
       return str.toUpperCase();
     },
@@ -171,7 +171,7 @@ export default {
     },
   },
   'LPAD': {
-    value: (str: ?string, len: ?number, pstr?: ?string = ' ') => {
+    value: (str: Maybe<string>, len: Maybe<number>, pstr: Maybe<string> = ' ') => {
       if (!str || !pstr || len == null) { return ''; }
       const pchars = pstr || ' ';
       const plen = len > str.length ? len - str.length : 0;
@@ -194,7 +194,7 @@ export default {
     },
   },
   'RPAD': {
-    value: (str: ?string, len: ?number, pstr?: ?string = ' ') => {
+    value: (str: Maybe<string>, len: Maybe<number>, pstr: Maybe<string> = ' ') => {
       if (!str || !pstr || len == null) { return ''; }
       const pchars = pstr || ' ';
       const plen = len > str.length ? len - str.length : 0;
@@ -217,7 +217,7 @@ export default {
     },
   },
   'SUBSTITUTE': {
-    value: (str: ?string, search: ?string, replacement: ?string) => {
+    value: (str: Maybe<string>, search: Maybe<string>, replacement: Maybe<string>) => {
       if (!str) { return ''; }
       if (!search) { return str; }
       return str.split(search).join(replacement || '');
@@ -238,7 +238,7 @@ export default {
     },
   },
   'TRIM': {
-    value: (str: ?string) => {
+    value: (str: Maybe<string>) => {
       if (str == null) { return null; }
       return str.replace(/^\s+|\s+$/g, '');
     },
@@ -252,7 +252,7 @@ export default {
     },
   },
   'LEN': {
-    value: (str: ?string) => {
+    value: (str: Maybe<string>) => {
       if (str == null) { return null; }
       return str.length;
     },
@@ -324,7 +324,7 @@ export default {
     },
   },
   'VALUE': {
-    value: (str: ?string) => {
+    value: (str: Maybe<string>) => {
       if (!str || /^\-?0[box]/i.test(str)) { return null; }
       const n = Number(str);
       return Number.isNaN(n) ? null : n;

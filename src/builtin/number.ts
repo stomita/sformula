@@ -1,12 +1,12 @@
 /* @flow */
-import type { MaybeTypeAnnotated } from '../types';
+import type { MaybeTypeAnnotated, Maybe } from '../types';
 
 /**
  * 
  */
 export default {
   'ABS': {
-    value: (v: ?number) => {
+    value: (v: Maybe<number>) => {
       return v == null ? null : v >= 0 ? v : -v;
     },
     type: {
@@ -29,7 +29,7 @@ export default {
     },
   },
   'CEILING': {
-    value: (value: MaybeTypeAnnotated<?number>) => {
+    value: (value: MaybeTypeAnnotated<Maybe<number>>) => {
       let v, vType;
       if (Array.isArray(value)) {
         [v, vType] = value;
@@ -62,7 +62,7 @@ export default {
     },
   },
   'FLOOR': {
-    value: (value: MaybeTypeAnnotated<?number>) => {
+    value: (value: MaybeTypeAnnotated<Maybe<number>>) => {
       let v, vType;
       if (Array.isArray(value)) {
         [v, vType] = value;
@@ -95,7 +95,7 @@ export default {
     },
   },
   'ROUND': {
-    value: (value: MaybeTypeAnnotated<?number>, digits: MaybeTypeAnnotated<?number>) => {
+    value: (value: MaybeTypeAnnotated<Maybe<number>>, digits: MaybeTypeAnnotated<Maybe<number>>) => {
       let v, vType, d, dType;
       if (Array.isArray(value)) {
         [v, vType] = value;
@@ -137,7 +137,7 @@ export default {
     },
   },
   'MCEILING': {
-    value: (value: MaybeTypeAnnotated<?number>) => {
+    value: (value: MaybeTypeAnnotated<Maybe<number>>) => {
       let v, vType;
       if (Array.isArray(value)) {
         [v, vType] = value;
@@ -170,7 +170,7 @@ export default {
     },
   },
   'MFLOOR': {
-    value: (value: MaybeTypeAnnotated<?number>) => {
+    value: (value: MaybeTypeAnnotated<Maybe<number>>) => {
       let v, vType;
       if (Array.isArray(value)) {
         [v, vType] = value;
@@ -203,7 +203,7 @@ export default {
     },
   },
   'EXP': {
-    value: (n: ?number) => {
+    value: (n: Maybe<number>) => {
       if (n == null) { return null; }
       return Math.pow(Math.E, n);
     },
@@ -217,7 +217,7 @@ export default {
     },
   },
   'LN': {
-    value: (n: ?number) => {
+    value: (n: Maybe<number>) => {
       if (n == null || n <= 0) { return null; }
       return Math.log(n);
     },
@@ -231,7 +231,7 @@ export default {
     },
   },
   'LOG': {
-    value: (n: ?number) => {
+    value: (n: Maybe<number>) => {
       if (n == null || n <= 0) { return null; }
       return Math.log10(n);
     },
@@ -245,7 +245,7 @@ export default {
     },
   },
   'SQRT': {
-    value: (n: ?number) => {
+    value: (n: Maybe<number>) => {
       if (n == null || n < 0) { return null; }
       return Math.sqrt(n);
     },
@@ -259,7 +259,7 @@ export default {
     },
   },
   'MAX': {
-    value: (...nums: Array<MaybeTypeAnnotated<?number>>) => {
+    value: (...nums: Array<MaybeTypeAnnotated<Maybe<number>>>) => {
       let max = null;
       for (const num of nums) {
         let n, nType;
@@ -294,7 +294,7 @@ export default {
     },
   },
   'MIN': {
-    value: (...nums: Array<MaybeTypeAnnotated<?number>>) => {
+    value: (...nums: Array<MaybeTypeAnnotated<Maybe<number>>>) => {
       let min = null;
       for (const num of nums) {
         let n, nType;
@@ -329,7 +329,7 @@ export default {
     },
   },
   'MOD': {
-    value: (num: MaybeTypeAnnotated<?number>, div: MaybeTypeAnnotated<?number>) => {
+    value: (num: MaybeTypeAnnotated<Maybe<number>>, div: MaybeTypeAnnotated<Maybe<number>>) => {
       let n, nType, d, dType;
       if (Array.isArray(num)) {
         [n, nType] = num;

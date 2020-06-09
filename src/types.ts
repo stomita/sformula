@@ -1,4 +1,5 @@
-/* @flow */
+export type Maybe<T> = T | null | undefined;
+
 export type Context = {
   [name: string]: any,
 };
@@ -46,7 +47,7 @@ export type ExpressionType = PrimitiveExpressionType | AdditionalPrimitiveExpres
   properties: ExpressionTypeDictionary,
 } | {
   type: 'function',
-  arguments: FunctionArgType[] | (number) => FunctionArgType[],
+  arguments: FunctionArgType[] | ((p: number) => FunctionArgType[]),
   returns: ExpressionType,
 } | {
   type: 'template',
@@ -55,10 +56,10 @@ export type ExpressionType = PrimitiveExpressionType | AdditionalPrimitiveExpres
 };
 
 export type ExpressionTypeDictionary = {
-  [identifier: string]: ?ExpressionType
+  [identifier: string]: Maybe<ExpressionType>
 };
 
-export type MaybeTypeAnnotated<T> = T | [T, string, ?number, ?number];
+export type MaybeTypeAnnotated<T> = T | [T, string, Maybe<number>, Maybe<number>];
 
 export type DescribeFieldResult = {
   name: string,

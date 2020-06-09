@@ -1,6 +1,5 @@
-/* @flow */
 import type {
-  Program, Expression, ExpressionStatement,
+  Expression,
   UnaryExpression, UnaryOperator,
   BinaryExpression, BinaryOperator,
   LogicalExpression, LogicalOperator,
@@ -8,13 +7,13 @@ import type {
   MemberExpression,
   Identifier, Literal,
   SpreadElement,
-} from 'acorn';
+} from 'esformula';
 
 export function isReserved(id: string) {
   return /^(TRUE|FALSE|NULL)$/i.test(id);
 }
 
-export function concatinateLogicalExpressions(head: Expression, tail: Array<[BinaryOperator, Expression]>): Expression {
+export function concatinateLogicalExpressions(head: Expression, tail: Array<[LogicalOperator, Expression]>): Expression {
   if (tail.length === 0) { return head; }
   const [[op, tail1], ...rtail] = tail;
   const expr = createLogicalExpression(op, head, tail1);
@@ -59,7 +58,7 @@ export function createCallExpression(callee: Identifier, args: Expression[]): Ca
   return {
     type: 'CallExpression',
     callee,
-    arguments: ((args: any): Array<Expression | SpreadElement>),
+    arguments: args as any as Array<Expression | SpreadElement>,
   };
 }
 

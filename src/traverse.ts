@@ -1,4 +1,3 @@
-/* @flow */
 import type {
   Expression, UnaryExpression, BinaryExpression, LogicalExpression,
   MemberExpression, CallExpression,
@@ -16,8 +15,8 @@ export function validationError(expression: Expression, name: string, message: s
   const err = new Error(message);
   err.name = name;
   if (expression.loc) {
-    err.lineNumber = expression.loc.start.line;
-    err.columnNumber = expression.loc.start.column;
+    (err as any).lineNumber = expression.loc.start.line;
+    (err as any).columnNumber = expression.loc.start.column;
   }
   return err;
 }
@@ -44,7 +43,7 @@ export function unexpectedError(expression: Expression, message: string) {
   return validationError(expression, 'UNEXPECTED_ERROR', message);
 }
 
-function createCallExpression(name: BuiltinFunctionName, args: $PropertyType<CallExpression, 'arguments'>) {
+function createCallExpression(name: string, args: CallExpression['arguments']): CallExpression {
   return {
     type: 'CallExpression',
     callee: { type: 'Identifier', name },
@@ -69,11 +68,11 @@ function createLiteral(value: string | number | boolean | null): Literal {
   };
 }
 
-function createArrayExpression(elements): ArrayExpression {
+function createArrayExpression(elements: ArrayExpression['elements']): ArrayExpression {
   return { type: 'ArrayExpression', elements };
 }
 
-function annotateArgumentTypes(name, args, argTypes) {
+function annotateArgumentTypes(name: string, args: CallExpression['arguments'], argTypes: ExpressionType[]) {
   const annotatedArgs = args.map((arg, i) => {
     const argType = argTypes[i];
     switch (argType.type) {
@@ -226,7 +225,7 @@ const NUMBER_OPERATOR_FN = {
   '!==': '$$NEQ_NUMBER$$',
 };
 
-function convertPercentToNumber(expression: Expression, precision?: number, scale?: number) {
+function convertPercentToNumber(expression: Expression, precision?: number, scale?: number): TraverseResult {
   return {
     expression: createCallExpression('$$MULTIPLY_NUMBER$$', [createLiteral(0.01), expression]),
     returnType: { type: 'number', precision, scale },
@@ -492,7 +491,7 @@ function traverseCallExpression(
   }
   const args_ = [];
   const argumentTypes = [];
-  const templateTypes: { [name: string]: ?ExpressionType } = {};
+  const templateTypes: { [name: string]: ExpressionType | undefined } = {};
   for (const [i, arg] of args.entries()) {
     if (arg.type === 'SpreadElement') {
       throw unexpectedError(expression, 'argument cannot be a spread element type');
@@ -583,8 +582,8 @@ function traverseIdentifier(
   return nullValue({ expression, returnType }, blankAsZero);
 }
 
-function traverseLiteral(expression: Literal) {
-  const returnType =
+function traverseLiteral(expression: Literal): TraverseResult {
+  const returnType: ExpressionType =
     typeof expression.value === 'number' ?
       { type: 'number' } :
     typeof expression.value === 'string' ?

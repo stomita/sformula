@@ -1,3 +1,3 @@
 const { parse } = require('./parser');
 
-module.exports.parseFormula = parse;
+export const parseFormula = parse;

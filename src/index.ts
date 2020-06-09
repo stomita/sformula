@@ -1,8 +1,7 @@
-/* @flow */
 import { build as buildFormula } from 'esformula';
 import type { Expression } from 'esformula';
 import type {
-  Context, PrimitiveExpressionType, ExpressionType, ExpressionTypeDictionary, DescribeSObjectResult,
+  Context, PrimitiveExpressionType, ExpressionType, ExpressionTypeDictionary, DescribeSObjectResult, Maybe,
 } from './types'; 
 import { parseFormula } from './formula';
 import { context as builtins, types as builtinTypeDict } from './builtin';
@@ -11,33 +10,33 @@ import { createFieldTypeDictionary } from './fieldType';
 import { traverse, validationError, invalidTypeError } from './traverse';
 import { isCastatibleType, castValue } from './cast';
 
-export type ReturnType = $PropertyType<PrimitiveExpressionType, 'type'>;
+export type FormulaReturnType = PrimitiveExpressionType['type'];
 
 export type Formula = {
   compiled: CompiledFormula,
-  returnType: ReturnType,
+  returnType: FormulaReturnType,
   evaluate(context?: Context): any
 };
 
 export type CompiledFormula = {
   expression: Expression,
   fields: string[],
-  returnType: ReturnType,
-  scale: ?number,
-  calculatedType: ReturnType,
+  returnType: FormulaReturnType,
+  scale: number | undefined,
+  calculatedType: FormulaReturnType,
 };
 
 export type SyncParseOptions = {
   fieldTypes?: ExpressionTypeDictionary,
-  returnType?: ReturnType,
+  returnType?: FormulaReturnType,
   scale?: number,
   blankAsZero?: boolean,
 };
 
 export type ParseOptions = {
   sobject: string,
-  describe: (string) => Promise<DescribeSObjectResult>,
-  returnType?: ReturnType,
+  describe: (sobject: string) => Promise<DescribeSObjectResult>,
+  returnType?: FormulaReturnType,
   scale?: number,
   blankAsZero?: boolean,
 };
@@ -51,14 +50,18 @@ export function create(compiled: CompiledFormula): Formula {
   return {
     compiled,
     returnType,
-    evaluate(context?: Context = {}) {
+    evaluate(context: Context = {}) {
       const value = esformula.evaluate({ ...context, ...builtins });
       return castValue(value, calculatedType, returnType, scale);
     },
   };
 }
 
-function traverseAndCreateFormula(expression, fieldTypes, fields, options) {
+function traverseAndCreateFormula(expression: Expression, fieldTypes: ExpressionTypeDictionary, fields: string[], options: {
+  returnType: FormulaReturnType | undefined;
+  scale: number | undefined;
+  blankAsZero: boolean;
+}) {
   const { returnType, scale, blankAsZero } = options;
   const { expression: expression_, returnType: calculatedType } =
     traverse(expression, { ...fieldTypes, ...builtinTypeDict }, blankAsZero);
@@ -100,7 +103,7 @@ export function parseSync(formula: string, options: SyncParseOptions = {}): Form
  */
 export async function parse(formula: string, options: ParseOptions): Promise<Formula> {
   const { returnType, scale, blankAsZero = false, ...describer } = options;
-  const expression = parseFormula(formula);
+  const expression: Expression = parseFormula(formula);
   const fields = extractFields(expression);
   const fieldTypes = await createFieldTypeDictionary(fields, describer);
   try {

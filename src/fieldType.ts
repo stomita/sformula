@@ -48,14 +48,14 @@ async function applyFieldTypePath(
   describer: Describer,
 ): Promise<ExpressionTypeDictionary> {
   const dict = { ...dictionary };
-  let target = dict;
+  let target: (typeof dict) | null = dict;
   for (const field of fieldPath) {
     if (!target) {
       throw new Error(`cannot access to field path ${fieldPath.join('.')}`);
     }
-    const fieldType = target[field] || await describeFieldType(field, describer);
+    const fieldType: ExpressionType = target[field] || await describeFieldType(field, describer);
     target[field] = fieldType;
-    if (fieldType.type === 'object') {
+    if (fieldType.type === 'object' && fieldType.sobject) {
       target = fieldType.properties;
       describer = { ...describer, sobject: fieldType.sobject };
     } else {
