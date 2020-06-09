@@ -1,4 +1,3 @@
-/* @flow */
 import path from 'path';
 import fs from 'fs-extra';
 import yaml from 'js-yaml';
@@ -7,7 +6,7 @@ import { getConnection } from './connection';
 
 export type Record = {
   Key__c: string,
-  Parent__r?: Object,
+  Parent__r?: { $ref?: string },
   [field: string]: any,
 };
 
@@ -18,8 +17,8 @@ function genKey() { return `${zeropad(keySeq++)}`; }
  * 
  */
 export function loadTestRecords(): Record[] {
-  const data = fs.readFileSync(path.join(__dirname, '../fixtures/test-records.yml'));
-  const records = yaml.safeLoad(data);
+  const data = fs.readFileSync(path.join(__dirname, '../fixtures/test-records.yml'), 'utf8');
+  const records: any[] = yaml.safeLoad(data);
   return records.map((rec, i) => ({
     Key__c: genKey(),
     ...rec
@@ -47,7 +46,7 @@ export async function insertTestRecords(sobject: string, records: Record[]) {
     const filterRecordEntry = (record: Record) => {
       const key = record.Key__c;
       if (record.Parent__r) {
-        const ref = record.Parent__r.$ref;
+        const ref = record.Parent__r?.$ref;
         record = { ...record };
         if (ref) {
           if (refIds[ref]) {
@@ -75,7 +74,7 @@ export async function insertTestRecords(sobject: string, records: Record[]) {
     for (let record of records) {
       filterRecordEntry(record);
     }
-    const rets = await conn.requestPost('/composite/sobjects', {
+    const rets: any[] = await conn.requestPost('/composite/sobjects', {
       records: insertings.map(record => {
         const { $ref, ...rec } = record;
         return {
@@ -105,7 +104,7 @@ export async function getExpectedRecords(sobject: string, testRecords: Record[])
   console.log('fetching expected record values');
   const conn = await getConnection();
   const recs = await conn.sobject(sobject).find({}, '*,Parent__r.*,Parent__r.Parent__r.*');
-  const keyMap = recs.reduce((map, rec) => ({ ...map, [rec.Key__c]: rec }), {});
+  const keyMap = recs.reduce((map, rec) => ({ ...map, [rec.Key__c]: rec }), {} as { [key: string]: Record });
   const expectedRecs = testRecords.map(rec => keyMap[rec.Key__c]);
   console.log('got expected record values from server');
   return expectedRecs;

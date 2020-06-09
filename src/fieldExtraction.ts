@@ -31,7 +31,7 @@ function extractFieldsFromExpression(expression: Expression): string[] {
           ...fields,
           ...extractFieldsFromExpression(arg),
         ];
-      }, []);
+      }, [] as string[]);
     case 'MemberExpression':
       return [
         extractFieldsFromMemberExpression(expression)

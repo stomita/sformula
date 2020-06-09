@@ -1,4 +1,3 @@
-/* @flow */
 import { DateTime } from 'luxon';
 import { applyScale } from '../cast';
 import type {
@@ -19,15 +18,15 @@ const builtins = {
   ...operatorBuiltins,
 };
 
-export type BuiltinFunctionName = $Keys<typeof builtins>;
+export type BuiltinFunctionName = keyof typeof builtins;
 
 const types: ExpressionTypeDictionary = Object.keys(builtins).reduce((types, name) => {
-  const type = builtins[name].type;
+  const type = builtins[name as BuiltinFunctionName].type;
   return { ...types, [name]: type }; 
 }, {});
 
 const context: Context = Object.keys(builtins).reduce((context, name) => {
-  const value = builtins[name].value;
+  const value = builtins[name as BuiltinFunctionName].value;
   return { ...context, [name]: value }; 
 }, {});
 

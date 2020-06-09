@@ -1,4 +1,3 @@
-/* @flow */
 import AdmZip from 'adm-zip';
 import metadata from 'salesforce-metadata-xml-builder';
 import { getConnection } from './connection';
@@ -10,9 +9,7 @@ import { zeropad, escapeXml } from '.';
  */
 export async function describe(sobject: string) {
   const conn = await getConnection();
-  return new Promise((resolve, reject) => {
-    conn.describe$(sobject, (err, ret) => err ? reject(err) : resolve(ret));
-  });
+  return conn.describe$(sobject);
 }
 
 /**
@@ -30,13 +27,13 @@ export async function resetFormulaSchema(sobject: string) {
     version: '42.0',
   });
   const zip = new AdmZip();
-  zip.addFile('src/package.xml', new Buffer(packageXml));
-  zip.addFile('src/destructiveChanges.xml', new Buffer(destructiveChangesXml));
-  const res = await conn.metadata.deploy(zip.toBuffer(), { purgeOnDelete: true }).complete({ details: true });
+  zip.addFile('src/package.xml', Buffer.from(packageXml));
+  zip.addFile('src/destructiveChanges.xml', Buffer.from(destructiveChangesXml));
+  const res = await conn.metadata.deploy(zip.toBuffer(), { purgeOnDelete: true }).complete(true);
   console.log('Deleted existing formula test schema');
 }
 
-export async function createFormulaObjectFields(sobject: string, fields: Object[]) {
+export async function createFormulaObjectFields(sobject: string, fields: Array<{ fullName: string }>) {
   const conn = await getConnection();
   const label = sobject.replace(/__c$/, '');
   const objectXml = metadata.CustomObject({
@@ -62,9 +59,9 @@ export async function createFormulaObjectFields(sobject: string, fields: Object[
     version: '42.0',
   });
   const zip = new AdmZip();
-  zip.addFile('src/package.xml', new Buffer(packageXml));
-  zip.addFile(`src/objects/${sobject}.object`, new Buffer(objectXml));
-  const res = await conn.metadata.deploy(zip.toBuffer()).complete({ details: true });
+  zip.addFile('src/package.xml', Buffer.from(packageXml));
+  zip.addFile(`src/objects/${sobject}.object`, Buffer.from(objectXml));
+  const res = await conn.metadata.deploy(zip.toBuffer()).complete(true);
   if (res.status !== 'Succeeded') {
     console.error(res.details);
     throw new Error('Schema creation failed');

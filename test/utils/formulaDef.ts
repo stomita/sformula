@@ -1,4 +1,3 @@
-/* @flow */
 import path from 'path';
 import fs from 'fs-extra';
 import yaml from 'js-yaml';
@@ -20,8 +19,8 @@ export type FormulaDef = {
 
 
 export function loadFormulaDefs(): FormulaDef[] {
-  const data = fs.readFileSync(path.join(__dirname, '../fixtures/formula-defs.yml'));
-  const defs = yaml.safeLoad(data);
+  const data = fs.readFileSync(path.join(__dirname, '../fixtures/formula-defs.yml'), 'utf8');
+  const defs: any[] = yaml.safeLoad(data);
   return defs.map((def, i) => ({
     name: `Formula${zeropad(i + 1)}__c`,
     ...def,

@@ -1,15 +1,14 @@
-/* @flow */
 import { DateTime } from 'luxon';
 import { applyScale } from '../cast';
 import { MSECS_IN_DAY, ISO8601_DATETIME_FORMAT } from './constants';
-import type { MaybeTypeAnnotated } from '../types';
+import type { MaybeTypeAnnotated, Maybe } from '../types';
 
 /**
  * 
  */
 export default {
   'ADDMONTHS': {
-    value: (d: ?string, n: ?number) => {
+    value: (d: Maybe<string>, n: Maybe<number>) => {
       if (d == null || n == null) {
         return null;
       }
@@ -29,7 +28,7 @@ export default {
     },
   },
   'DATE': {
-    value: (y: ?number, m: ?number, d: ?number) => {
+    value: (y: Maybe<number>, m: Maybe<number>, d: Maybe<number>) => {
       if (y == null || m == null || d == null || y > 9999) {
         return null;
       }
@@ -52,7 +51,7 @@ export default {
     },
   },
   'DATETIMEVALUE': {
-    value: (s: ?string) => {
+    value: (s: Maybe<string>) => {
       if (s == null || s === '') {
         return null;
       }
@@ -72,7 +71,7 @@ export default {
     },
   },
   'DATEVALUE': {
-    value: (s: ?string) => {
+    value: (s: Maybe<string>) => {
       if (s == null || s === '') {
         return null;
       }
@@ -89,7 +88,7 @@ export default {
     },
   },
   'YEAR': {
-    value: (s: ?string) => {
+    value: (s: Maybe<string>) => {
       if (s == null || s === '') {
         return null;
       }
@@ -106,7 +105,7 @@ export default {
     },
   },
   'MONTH': {
-    value: (s: ?string) => {
+    value: (s: Maybe<string>) => {
       if (s == null || s === '') {
         return null;
       }
@@ -123,7 +122,7 @@ export default {
     },
   },
   'DAY': {
-    value: (s: ?string) => {
+    value: (s: Maybe<string>) => {
       if (s == null || s === '') {
         return null;
       }

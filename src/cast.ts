@@ -1,5 +1,6 @@
 /* @flow */
 import { DateTime } from 'luxon';
+import { Maybe } from './types';
 
 /**
  * 
@@ -25,7 +26,7 @@ export function applyScale(n: number, scale: number) {
 /**
  * 
  */
-export function castValue(value: any, srcType: string, dstType: string, scale: ?number) {
+export function castValue(value: any, srcType: string, dstType: string, scale: Maybe<number>) {
   if (dstType === 'boolean') {
     return !!value;
   }

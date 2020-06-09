@@ -1,13 +1,13 @@
 /* @flow */
-import type { MaybeTypeAnnotated } from '../types';
+import type { MaybeTypeAnnotated, Maybe } from '../types';
 
 /**
  * 
  */
 export default {
   'AND': {
-    value: (...conds: Array<?boolean>) => {
-      let ret = true;
+    value: (...conds: Array<boolean | null | undefined>) => {
+      let ret: boolean | null = true;
       for (const c of conds) {
         if (c === false) {
           return false;
@@ -26,8 +26,8 @@ export default {
     },
   },
   'OR': {
-    value: (...conds: Array<?boolean>) => {
-      let ret = false;
+    value: (...conds: Array<boolean | null | undefined>) => {
+      let ret: boolean | null = false;
       for (const c of conds) {
         if (c === true) {
           return true;
@@ -46,7 +46,7 @@ export default {
     },
   },
   'NOT': {
-    value: (v: ?boolean) => {
+    value: (v: boolean | null | undefined) => {
       if (v == null) { return null; }
       return !v;
     },
@@ -60,7 +60,7 @@ export default {
     },
   },
   'CASE': {
-    value: (...args: Array<?any>) => {
+    value: (...args: Array<any>) => {
       const value = args[0] == null ? '' : args[0];
       for (let i = 1; i < args.length - 1; i += 2) {
         const match = args[i] == null ? '' : args[i];
@@ -80,7 +80,7 @@ export default {
             argument: { type: 'template', ref: 'T' },
             optional: false,
           },
-          ...Array.from({ length: repeatCnt }).reduce((cases) => [
+          ...Array.from({ length: repeatCnt }).reduce((cases: any[]) => [
             ...cases,
             {
               argument: { type: 'template', ref: 'T' }, // T || S
@@ -145,7 +145,7 @@ export default {
     },
   },
   'ISNUMBER': {
-    value: (value: ?string) => {
+    value: (value: Maybe<string>) => {
       if (!value) { return null; }
       if (/^\-?0[box]/i.test(value)) { return false; }
       const n = Number(value);
