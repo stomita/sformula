@@ -14,6 +14,10 @@ jobs:
           name: Build
           command: yarn build
       - run:
+          name: Lint
+          command: yarn lint
+ 
+      - run:
           name: Typecheck
           command: yarn typecheck
       - run:
