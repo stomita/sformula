@@ -1,9 +1,39 @@
 import { DateTime } from "luxon";
 import {
+  ISO8601_DATE_FORMAT,
   ISO8601_DATETIME_FORMAT,
-  SALESFORCE_TIME_OUTPUT_FORMAT,
+  SALESFORCE_DATETIME_INPUT_FORMAT,
+  SALESFORCE_TIME_FORMAT,
+  SALESFORCE_TIME_INPUT_FORMAT,
 } from "./constants";
 import type { Maybe } from "../types";
+
+/**
+ *
+ */
+function parseDate(s: string) {
+  return DateTime.fromFormat(s, ISO8601_DATE_FORMAT);
+}
+
+function parseDateOrDatetime(s: string) {
+  let dt = DateTime.fromFormat(s, ISO8601_DATE_FORMAT);
+  if (!dt.isValid) {
+    dt = DateTime.fromFormat(s, ISO8601_DATETIME_FORMAT, { zone: "utc" });
+  }
+  return dt;
+}
+
+function parseDatetimeOrTime(s: string) {
+  let dt = DateTime.fromFormat(s, ISO8601_DATETIME_FORMAT, { zone: "utc" });
+  if (!dt.isValid) {
+    dt = DateTime.fromFormat(s, SALESFORCE_TIME_FORMAT, { zone: "utc" });
+  }
+  return dt;
+}
+
+function parseTime(s: string) {
+  return DateTime.fromFormat(s, SALESFORCE_TIME_FORMAT, { zone: "utc" });
+}
 
 /**
  *
@@ -14,7 +44,7 @@ export default {
       if (d == null || n == null) {
         return null;
       }
-      const dt = DateTime.fromISO(d);
+      const dt = parseDate(d);
       return dt.isValid ? dt.plus({ months: n }).toISODate() : null;
     },
     type: {
@@ -64,9 +94,11 @@ export default {
       if (s == null || s === "") {
         return null;
       }
-      let dt = DateTime.fromISO(s, { zone: "utc" });
+      let dt = parseDateOrDatetime(s);
       if (!dt.isValid) {
-        dt = DateTime.fromFormat(s, "yyyy-MM-dd HH:mm:ss", { zone: "utc" });
+        dt = DateTime.fromFormat(s, SALESFORCE_DATETIME_INPUT_FORMAT, {
+          zone: "utc",
+        });
       }
       return dt.isValid ? dt.toUTC().toFormat(ISO8601_DATETIME_FORMAT) : null;
     },
@@ -86,29 +118,8 @@ export default {
       if (s == null || s === "") {
         return null;
       }
-      const dt = DateTime.fromISO(s);
+      const dt = parseDateOrDatetime(s);
       return dt.isValid ? dt.toISODate() : null;
-    },
-    type: {
-      type: "function",
-      arguments: [
-        {
-          argument: { type: "any" },
-          optional: false,
-        },
-      ],
-      returns: { type: "time" },
-    },
-  },
-  TIMEVALUE: {
-    value: (s: Maybe<string>) => {
-      if (s == null || s === "") {
-        return null;
-      }
-      const dt = DateTime.fromISO(s, { zone: "utc" });
-      return dt.isValid
-        ? dt.toUTC().toFormat(SALESFORCE_TIME_OUTPUT_FORMAT)
-        : null;
     },
     type: {
       type: "function",
@@ -121,12 +132,36 @@ export default {
       returns: { type: "date" },
     },
   },
+  TIMEVALUE: {
+    value: (s: Maybe<string>) => {
+      if (s == null || s === "") {
+        return null;
+      }
+      let dt = parseDatetimeOrTime(s);
+      if (!dt.isValid) {
+        dt = DateTime.fromFormat(s, SALESFORCE_TIME_INPUT_FORMAT, {
+          zone: "utc",
+        });
+      }
+      return dt.isValid ? dt.toUTC().toFormat(SALESFORCE_TIME_FORMAT) : null;
+    },
+    type: {
+      type: "function",
+      arguments: [
+        {
+          argument: { type: "any" },
+          optional: false,
+        },
+      ],
+      returns: { type: "time" },
+    },
+  },
   YEAR: {
     value: (s: Maybe<string>) => {
       if (s == null || s === "") {
         return null;
       }
-      const dt = DateTime.fromISO(s);
+      const dt = parseDate(s);
       return dt.isValid ? dt.year : null;
     },
     type: {
@@ -145,7 +180,7 @@ export default {
       if (s == null || s === "") {
         return null;
       }
-      const dt = DateTime.fromISO(s);
+      const dt = parseDate(s);
       return dt.isValid ? dt.month : null;
     },
     type: {
@@ -164,7 +199,7 @@ export default {
       if (s == null || s === "") {
         return null;
       }
-      const dt = DateTime.fromISO(s);
+      const dt = parseDate(s);
       return dt.isValid ? dt.day : null;
     },
     type: {
@@ -183,7 +218,7 @@ export default {
       if (s == null || s === "") {
         return null;
       }
-      const dt = DateTime.fromISO(s);
+      const dt = parseDate(s);
       return dt.isValid ? (dt.weekday % 7) - 1 : null;
     },
     type: {
@@ -202,14 +237,14 @@ export default {
       if (s == null || s === "") {
         return null;
       }
-      const dt = DateTime.fromISO(s);
+      const dt = parseTime(s);
       return dt.isValid ? dt.hour : null;
     },
     type: {
       type: "function",
       arguments: [
         {
-          argument: { type: "datetime" },
+          argument: { type: "time" },
           optional: false,
         },
       ],
@@ -221,14 +256,14 @@ export default {
       if (s == null || s === "") {
         return null;
       }
-      const dt = DateTime.fromISO(s);
+      const dt = parseTime(s);
       return dt.isValid ? dt.minute : null;
     },
     type: {
       type: "function",
       arguments: [
         {
-          argument: { type: "datetime" },
+          argument: { type: "time" },
           optional: false,
         },
       ],
@@ -240,14 +275,14 @@ export default {
       if (s == null || s === "") {
         return null;
       }
-      const dt = DateTime.fromISO(s);
+      const dt = parseTime(s);
       return dt.isValid ? dt.second : null;
     },
     type: {
       type: "function",
       arguments: [
         {
-          argument: { type: "datetime" },
+          argument: { type: "time" },
           optional: false,
         },
       ],
@@ -259,14 +294,14 @@ export default {
       if (s == null || s === "") {
         return null;
       }
-      const dt = DateTime.fromISO(s);
+      const dt = parseTime(s);
       return dt.isValid ? dt.millisecond : null;
     },
     type: {
       type: "function",
       arguments: [
         {
-          argument: { type: "datetime" },
+          argument: { type: "time" },
           optional: false,
         },
       ],
@@ -295,7 +330,7 @@ export default {
   },
   TIMENOW: {
     value: () => {
-      return DateTime.utc().toFormat(SALESFORCE_TIME_OUTPUT_FORMAT);
+      return DateTime.utc().toFormat(SALESFORCE_TIME_FORMAT);
     },
     type: {
       type: "function",
