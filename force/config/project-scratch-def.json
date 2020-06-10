@@ -1,0 +1,16 @@
+{
+  "orgName": "EnterpriseOrg",
+  "country": "US",
+  "edition": "Enterprise",
+  "hasSampleData": false,
+  "features": [],
+  "settings": {
+    "lightningExperienceSettings": {
+       "enableS1DesktopEnabled": true
+    },
+    "chatterSettings": {
+      "enableChatter": true
+    }
+  }
+}
+

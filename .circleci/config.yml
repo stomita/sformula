@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
   node: circleci/node@3.0.0
+  sfdx: circleci/salesforce-sfdx@2.0.0
 jobs:
   build-and-test:
     executor:
@@ -8,6 +9,12 @@ jobs:
       tag: '12.16'
     steps:
       - checkout
+      - sfdx/install
+      - sfdx/auth:
+          defaultusername: $SF_DEVHUB_USERNAME
+      - sfdx/scratch-create:
+          scratch-alias: circleci
+          scratch-config: ./force/config/project-scratch-def.json
       - node/install-packages:
           pkg-manager: yarn
       - run:
@@ -23,6 +30,9 @@ jobs:
       - run:
           name: Test 
           command: yarn test
+      - sfdx/scratch-delete:
+          scratch-alias: circleci
+ 
 workflows:
     build-and-test:
       jobs:
