@@ -578,3 +578,22 @@
   type: Time
   formula: TIMENOW()
   fluctuation: 10000
+-
+  type: Time
+  formula: TIMEVALUE(Datetime01__c)
+-
+  type: Time
+  formula: TIMEVALUE(Text01__c)
+-
+  type: Time
+  formula: TIMEVALUE("13:04:06.012")
+-
+  type: Number
+  formula: HOUR(TIMEVALUE(Text01__c)) + MINUTE(TIMEVALUE(Datetime02__c))
+  precision: 18
+  scale: 0
+-
+  type: Number
+  formula: SECOND(Time01__c) + MILLISECOND(TIMEVALUE(Time02__c))
+  precision: 18
+  scale: 0

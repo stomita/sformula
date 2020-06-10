@@ -310,6 +310,22 @@ export async function createFormulaSchema(
       type: "DateTime",
     },
     {
+      fullName: "Time01__c",
+      externalId: false,
+      label: "Time #01",
+      required: false,
+      trackTrending: false,
+      type: "Time",
+    },
+    {
+      fullName: "Time02__c",
+      externalId: false,
+      label: "Time #02",
+      required: false,
+      trackTrending: false,
+      type: "Time",
+    },
+    {
       fullName: "Parent__c",
       externalId: false,
       label: "Parent",
