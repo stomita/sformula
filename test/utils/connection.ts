@@ -17,7 +17,7 @@ export async function getConnection() {
   }
   const conn = await _conn;
   conn.metadata.pollInterval = 5000;
-  conn.metadata.pollTimeout = 60000;
+  conn.metadata.pollTimeout = 120000;
   if (!_loggedIn) {
     if (process.env.SF_USERNAME && process.env.SF_PASSWORD) {
       _loggedIn = conn.login(process.env.SF_USERNAME, process.env.SF_PASSWORD);
