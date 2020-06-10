@@ -11,4 +11,9 @@ module.exports = {
     ],
     "@babel/typescript",
   ],
+  env: {
+    test: {
+      presets: ["power-assert"],
+    },
+  },
 };
