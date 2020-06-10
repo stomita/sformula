@@ -18,7 +18,7 @@
     "build:lib": "BUILD_TARGET=lib babel --extensions '.ts' --source-maps -d lib src",
     "build:module": "BUILD_TARGET=module babel --extensions '.ts' --source-maps -d module src",
     "build:typedef": "tsc --project ./src/tsconfig.json --declaration --emitDeclarationOnly --outDir types --rootDir src",
-    "build:bundle": "webpack lib/index.js dist/sformula.js --output-library sformula",
+    "build:bundle": "webpack",
     "lint": "eslint src test --ext .ts",
     "typecheck": "tsc --noEmit",
     "test": "jest",
@@ -71,6 +71,7 @@
     "rimraf": "^3.0.2",
     "salesforce-metadata-xml-builder": "^0.4.0",
     "typescript": "^3.9.5",
-    "webpack": "^3.10.0"
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11"
   }
 }
