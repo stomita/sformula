@@ -122,6 +122,9 @@ for (const [i, formulaDef] of formulaDefs.entries()) {
   test(`formula#${zeropad(i + 1)}: ${formula}${
     blankAsZero ? " (blank as zero) " : ""
   }`, async () => {
+    if (expectedRecords?.length !== testRecords?.length) {
+      throw new Error("test records and expected records size does not match.");
+    }
     const returnType = toReturnType(type);
     const fml = await parse(formula, {
       ...describer,

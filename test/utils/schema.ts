@@ -32,9 +32,16 @@ export async function resetFormulaSchema(sobject: string) {
   const zip = new AdmZip();
   zip.addFile("src/package.xml", Buffer.from(packageXml));
   zip.addFile("src/destructiveChanges.xml", Buffer.from(destructiveChangesXml));
-  await conn.metadata
+  const res = await conn.metadata
     .deploy(zip.toBuffer(), { purgeOnDelete: true })
     .complete(true);
+  if (res.status !== "Succeeded") {
+    const msg = res.details.componentFailures.map((f) => f.problem).join("; ");
+    if (msg.indexOf("No CustomObject") < 0) {
+      console.error(res, res.details.componentFailures);
+      throw new Error("Reset schema failed.\n" + JSON.stringify(res));
+    }
+  }
   console.log("Deleted existing formula test schema");
 }
 
@@ -75,8 +82,11 @@ export async function createFormulaObjectFields(
   zip.addFile(`src/objects/${sobject}.object`, Buffer.from(objectXml));
   const res = await conn.metadata.deploy(zip.toBuffer()).complete(true);
   if (res.status !== "Succeeded") {
-    console.error(res.details);
-    throw new Error("Schema creation failed");
+    console.error(res, res.details.componentFailures);
+    const msg = res.details.componentFailures
+      .map((f) => `- ${f.fileName}: ${f.problem}`)
+      .join("\n");
+    throw new Error("Schema creation failed.\n" + msg);
   }
 }
 
