@@ -5,7 +5,7 @@ import { Maybe } from "./types";
 /**
  *
  */
-export function isCastatibleType(srcType: string, dstType: string) {
+export function isCastableType(srcType: string, dstType: string) {
   return (
     srcType === dstType ||
     srcType === "any" ||
