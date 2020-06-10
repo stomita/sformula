@@ -1,5 +1,8 @@
 import { DateTime } from "luxon";
-import { ISO8601_DATETIME_FORMAT } from "./constants";
+import {
+  ISO8601_DATETIME_FORMAT,
+  SALESFORCE_TIME_OUTPUT_FORMAT,
+} from "./constants";
 import type { Maybe } from "../types";
 
 /**
@@ -94,6 +97,27 @@ export default {
           optional: false,
         },
       ],
+      returns: { type: "time" },
+    },
+  },
+  TIMEVALUE: {
+    value: (s: Maybe<string>) => {
+      if (s == null || s === "") {
+        return null;
+      }
+      const dt = DateTime.fromISO(s, { zone: "utc" });
+      return dt.isValid
+        ? dt.toUTC().toFormat(SALESFORCE_TIME_OUTPUT_FORMAT)
+        : null;
+    },
+    type: {
+      type: "function",
+      arguments: [
+        {
+          argument: { type: "any" },
+          optional: false,
+        },
+      ],
       returns: { type: "date" },
     },
   },
@@ -154,6 +178,101 @@ export default {
       returns: { type: "number" },
     },
   },
+  WEEKDAY: {
+    value: (s: Maybe<string>) => {
+      if (s == null || s === "") {
+        return null;
+      }
+      const dt = DateTime.fromISO(s);
+      return dt.isValid ? (dt.weekday % 7) - 1 : null;
+    },
+    type: {
+      type: "function",
+      arguments: [
+        {
+          argument: { type: "date" },
+          optional: false,
+        },
+      ],
+      returns: { type: "number" },
+    },
+  },
+  HOUR: {
+    value: (s: Maybe<string>) => {
+      if (s == null || s === "") {
+        return null;
+      }
+      const dt = DateTime.fromISO(s);
+      return dt.isValid ? dt.hour : null;
+    },
+    type: {
+      type: "function",
+      arguments: [
+        {
+          argument: { type: "datetime" },
+          optional: false,
+        },
+      ],
+      returns: { type: "number" },
+    },
+  },
+  MINUTE: {
+    value: (s: Maybe<string>) => {
+      if (s == null || s === "") {
+        return null;
+      }
+      const dt = DateTime.fromISO(s);
+      return dt.isValid ? dt.minute : null;
+    },
+    type: {
+      type: "function",
+      arguments: [
+        {
+          argument: { type: "datetime" },
+          optional: false,
+        },
+      ],
+      returns: { type: "number" },
+    },
+  },
+  SECOND: {
+    value: (s: Maybe<string>) => {
+      if (s == null || s === "") {
+        return null;
+      }
+      const dt = DateTime.fromISO(s);
+      return dt.isValid ? dt.second : null;
+    },
+    type: {
+      type: "function",
+      arguments: [
+        {
+          argument: { type: "datetime" },
+          optional: false,
+        },
+      ],
+      returns: { type: "number" },
+    },
+  },
+  MILLISECOND: {
+    value: (s: Maybe<string>) => {
+      if (s == null || s === "") {
+        return null;
+      }
+      const dt = DateTime.fromISO(s);
+      return dt.isValid ? dt.millisecond : null;
+    },
+    type: {
+      type: "function",
+      arguments: [
+        {
+          argument: { type: "datetime" },
+          optional: false,
+        },
+      ],
+      returns: { type: "number" },
+    },
+  },
   TODAY: {
     value: () => {
       return DateTime.local().toISODate();
@@ -172,6 +291,16 @@ export default {
       type: "function",
       arguments: [],
       returns: { type: "datetime" },
+    },
+  },
+  TIMENOW: {
+    value: () => {
+      return DateTime.utc().toFormat(SALESFORCE_TIME_OUTPUT_FORMAT);
+    },
+    type: {
+      type: "function",
+      arguments: [],
+      returns: { type: "time" },
     },
   },
 };
