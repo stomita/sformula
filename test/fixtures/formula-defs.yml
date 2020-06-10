@@ -574,3 +574,7 @@
   formula: VALUE(Text01__c)
   precision: 18
   scale: 6
+-
+  type: Time
+  formula: TIMENOW()
+  fluctuation: 10000

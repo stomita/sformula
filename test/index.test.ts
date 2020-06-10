@@ -29,6 +29,8 @@ function toReturnType(type: string): FormulaReturnType {
 
 const ISO8601_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZZZ";
 
+const SALESFORCE_TIME_OUTPUT_FORMAT = "HH:mm:ss.SSS'Z'";
+
 function calcFluctuatedValue(
   value: string | number | null,
   fluctuation: number,
@@ -47,6 +49,13 @@ function calcFluctuatedValue(
     return [
       dt.plus(-fluctuation).toUTC().toFormat(ISO8601_DATETIME_FORMAT),
       dt.plus(fluctuation).toUTC().toFormat(ISO8601_DATETIME_FORMAT),
+    ] as [string, string];
+  }
+  if (returnType === "time" && typeof value === "string") {
+    const dt = DateTime.fromISO(value);
+    return [
+      dt.plus(-fluctuation).toUTC().toFormat(SALESFORCE_TIME_OUTPUT_FORMAT),
+      dt.plus(fluctuation).toUTC().toFormat(SALESFORCE_TIME_OUTPUT_FORMAT),
     ] as [string, string];
   }
   return [value, value] as [typeof value, typeof value];
