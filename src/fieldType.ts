@@ -36,6 +36,8 @@ async function describeFieldType(
       return { type: "date" };
     case "datetime":
       return { type: "datetime" };
+    case "time":
+      return { type: "time" };
     case "percent":
       return {
         type: "percent",

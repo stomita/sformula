@@ -33,6 +33,9 @@ export type PrimitiveExpressionType =
       type: "datetime";
     }
   | {
+      type: "time";
+    }
+  | {
       type: "any";
     };
 

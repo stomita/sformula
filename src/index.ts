@@ -11,7 +11,7 @@ import { context as builtins, types as builtinTypeDict } from "./builtin";
 import { extractFields } from "./fieldExtraction";
 import { createFieldTypeDictionary } from "./fieldType";
 import { traverse, invalidTypeError } from "./traverse";
-import { isCastatibleType, castValue } from "./cast";
+import { isCastableType, castValue } from "./cast";
 
 export type FormulaReturnType = PrimitiveExpressionType["type"];
 
@@ -92,7 +92,7 @@ function traverseAndCreateFormula(
       "boolean",
     ]);
   }
-  if (returnType && !isCastatibleType(calculatedType.type, returnType)) {
+  if (returnType && !isCastableType(calculatedType.type, returnType)) {
     throw invalidTypeError(expression, calculatedType.type, [returnType]);
   }
   return create({
