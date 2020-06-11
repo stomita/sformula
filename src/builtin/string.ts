@@ -1,6 +1,11 @@
 import { DateTime } from "luxon";
 import { applyScale } from "../cast";
 import type { MaybeTypeAnnotated, Maybe } from "../types";
+import {
+  SALESFORCE_DATETIME_TEXT_FORMAT_Z,
+  SALESFORCE_TIME_FORMAT,
+  SALESFORCE_TIME_TEXT_FORMAT,
+} from "./constants";
 
 /**
  *
@@ -372,7 +377,22 @@ export default {
         if (!dt.isValid) {
           return null;
         }
-        return dt.toUTC().toFormat("yyyy-MM-dd HH:mm:ss'Z'");
+        return dt.toUTC().toFormat(SALESFORCE_DATETIME_TEXT_FORMAT_Z);
+      }
+      if (vType === "time") {
+        if (v == null) {
+          return null;
+        }
+        if (typeof v !== "string") {
+          v = String(v);
+        }
+        const dt = DateTime.fromFormat(v, SALESFORCE_TIME_FORMAT, {
+          zone: "utc",
+        });
+        if (!dt.isValid) {
+          return null;
+        }
+        return dt.toFormat(SALESFORCE_TIME_TEXT_FORMAT);
       }
       if (v == null) {
         return null;
@@ -423,6 +443,9 @@ export default {
               },
               {
                 type: "datetime",
+              },
+              {
+                type: "time",
               },
               {
                 type: "picklist",

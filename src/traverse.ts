@@ -528,6 +528,73 @@ function traverseDatetimeBinaryExpression(
   }
 }
 
+function traverseTimeBinaryExpression(
+  expression: BinaryExpression,
+  left: TraverseResult,
+  right: TraverseResult
+): TraverseResult {
+  const { type, operator, ...rexpression } = expression;
+  const rightType = right.returnType.type;
+  switch (operator) {
+    case "+":
+      if (rightType !== "number" && rightType !== "any") {
+        throw invalidTypeError(expression.right, rightType, ["number"]);
+      }
+      return {
+        expression: createCallExpression("$$ADD_TIME$$", [
+          left.expression,
+          right.expression,
+        ]),
+        returnType: { type: "time" },
+      };
+    case "-":
+      if (rightType === "number") {
+        return {
+          expression: createCallExpression("$$SUBTRACT_TIME$$", [
+            left.expression,
+            right.expression,
+          ]),
+          returnType: { type: "time" },
+        };
+      } else if (rightType === "time") {
+        return {
+          expression: createCallExpression("$$DIFF_TIME$$", [
+            left.expression,
+            right.expression,
+          ]),
+          returnType: { type: "number" },
+        };
+      } else {
+        throw invalidTypeError(expression.right, rightType, [
+          "number",
+          "datetime",
+        ]);
+      }
+    case "<":
+    case ">":
+    case ">=":
+    case "<=":
+    case "===":
+    case "!==":
+      return {
+        expression: {
+          type: "BinaryExpression",
+          operator,
+          ...rexpression,
+          left: left.expression,
+          right: right.expression,
+        },
+        returnType: { type: "boolean" },
+      };
+    default:
+      throw invalidOperatorError(
+        expression.left,
+        left.returnType.type,
+        operator
+      );
+  }
+}
+
 function traverseBinaryExpression(
   expression: BinaryExpression,
   typeDict: ExpressionTypeDictionary,
@@ -548,6 +615,8 @@ function traverseBinaryExpression(
       return traverseDateBinaryExpression(expression, left, right);
     case "datetime":
       return traverseDatetimeBinaryExpression(expression, left, right);
+    case "time":
+      return traverseTimeBinaryExpression(expression, left, right);
     default:
       throw invalidTypeError(expression.left, leftType, [
         "string",

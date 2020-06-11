@@ -146,6 +146,9 @@
   type: Date
   formula: Datetime01__c - 0.5
 -
+  type: Time
+  formula: Time01__c + 24000
+-
   type: Number
   formula: Percent01__c * Number01__c
   precision: 18
@@ -252,6 +255,9 @@
 -
   type: Text
   formula: TEXT(Datetime01__c)
+-
+  type: Text
+  formula: TEXT(Time01__c)
 -
   type: Text
   formula: TEXT(Picklist01__c)
