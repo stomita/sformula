@@ -17,12 +17,13 @@ async function describeFieldType(
     throw new Error(`cannot describe field ${field} on ${describer.sobject}`);
   }
   switch (fieldDef.type) {
-    case "id":
     case "string":
     case "textarea":
     case "url":
     case "phone":
       return { type: "string" };
+    case "id":
+      return { type: "id" };
     case "int":
     case "integer":
     case "double":
@@ -58,7 +59,7 @@ async function describeFieldType(
       };
     case "reference":
       return fieldDef.name === field
-        ? { type: "string" }
+        ? { type: "id" }
         : fieldDef.relationshipName === field &&
           fieldDef.referenceTo &&
           fieldDef.referenceTo.length === 1
