@@ -36,19 +36,27 @@ export type PrimitiveExpressionType =
       type: "time";
     }
   | {
-      type: "id";
-    }
-  | {
       type: "any";
     };
 
-export type AdditionalPrimitiveExpressionType = {
-  type: "picklist";
-  picklistValues?: Array<{
-    label: string;
-    value: string;
-  }>;
-};
+export type AdditionalPrimitiveExpressionType =
+  | {
+      type: "id";
+    }
+  | {
+      type: "picklist";
+      picklistValues?: Array<{
+        label: string;
+        value: string;
+      }>;
+    }
+  | {
+      type: "multipicklist";
+      picklistValues?: Array<{
+        label: string;
+        value: string;
+      }>;
+    };
 
 export type FunctionArgType = {
   argument: ExpressionType;
