@@ -1,7 +1,7 @@
 {
   "name": "sformula",
   "description": "Library for parsing / evaluating Salesforce formula in client-side JavaScript",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "main": "lib/index.js",
   "module": "module/index.js",
   "types": "types/index.d.ts",
