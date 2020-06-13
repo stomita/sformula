@@ -126,18 +126,18 @@ parse('IF(CONTAINS(Owner.Title, "Engineer"), Number01__c + 2.5, Number02__c * 0.
 - [x] DATE
 - [x] DATEVALUE
 - [x] DATETIMEVALUE
-- [ ] TIMEVALUE
+- [x] TIMEVALUE
 - [x] YEAR
 - [x] MONTH
 - [x] DAY
-- [ ] WEEKDAY
-- [ ] HOUR
-- [ ] MINUTE
-- [ ] SECOND
-- [ ] MILLISECOND
+- [x] WEEKDAY
+- [x] HOUR
+- [x] MINUTE
+- [x] SECOND
+- [x] MILLISECOND
 - [x] TODAY
 - [x] NOW
-- [ ] TIMENOW
+- [x] TIMENOW
 
 ### Logical Functions
 
@@ -174,7 +174,7 @@ parse('IF(CONTAINS(Owner.Title, "Engineer"), Number01__c + 2.5, Number02__c * 0.
 
 - [x] BEGINS
 - [x] CONTAINS
-- [ ] INCLUDES
+- [x] INCLUDES
 - [x] ISPICKVAL
 - [x] FIND
 - [x] LEFT
@@ -189,7 +189,7 @@ parse('IF(CONTAINS(Owner.Title, "Engineer"), Number01__c + 2.5, Number02__c * 0.
 - [x] LEN
 - [x] TEXT 
 - [x] VALUE
-- [ ] CASESAFEID
+- [x] CASESAFEID
 - [ ] ~~BR~~ *(will not be supported)*
 - [ ] ~~GETSESSIONID~~ *(will not be supported)*
 - [ ] ~~HYPERLINK~~ *(will not be supported)*
