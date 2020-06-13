@@ -143,6 +143,13 @@ function injectCallExpression(
   return expression;
 }
 
+function idValue(expression: Expression): TraverseResult {
+  return {
+    expression: createCallExpression("$$CASEUNSAFEID$$", [expression]),
+    returnType: { type: "string" },
+  };
+}
+
 function nullValue(result: TraverseResult, blankAsZero: boolean) {
   const { expression, returnType } = result;
   let altValue: Literal | ObjectExpression | null = null;
@@ -825,6 +832,9 @@ function traverseIdentifier(
     throw new Error(
       `identifier type information is not found: ${expression.name}`
     );
+  }
+  if (returnType.type === "id") {
+    return idValue(expression);
   }
   return nullValue({ expression, returnType }, blankAsZero);
 }

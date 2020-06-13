@@ -249,3 +249,12 @@
 -
   Text01__c: '12:34:56.789'
   Text02__c: '12:34:56.789'
+-
+  Text01__c: '0053h000001aRXZ'
+  Text02__c: '0053h000001aRXZAA2'
+-
+  Text01__c: '00D3h000002sxWVEAY'
+  Text02__c: '00D3h000002sxWVEAY'
+-
+  Text01__c: ABC
+  Text02__c: abc

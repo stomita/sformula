@@ -6,6 +6,7 @@ import {
   SALESFORCE_TIME_FORMAT,
   SALESFORCE_TIME_TEXT_FORMAT,
 } from "./constants";
+import { convertIdFrom15To18, convertIdFrom18To15 } from "./common";
 
 /**
  *
@@ -475,6 +476,42 @@ export default {
         },
       ],
       returns: { type: "number" },
+    },
+  },
+  CASESAFEID: {
+    value: (str: Maybe<string>) => {
+      if (str == null) {
+        return null;
+      }
+      return convertIdFrom15To18(str);
+    },
+    type: {
+      type: "function",
+      arguments: [
+        {
+          argument: { type: "string" },
+          optional: false,
+        },
+      ],
+      returns: { type: "string" },
+    },
+  },
+  $$CASEUNSAFEID$$: {
+    value: (str: Maybe<string>) => {
+      if (str == null) {
+        return null;
+      }
+      return convertIdFrom18To15(str);
+    },
+    type: {
+      type: "function",
+      arguments: [
+        {
+          argument: { type: "string" },
+          optional: false,
+        },
+      ],
+      returns: { type: "string" },
     },
   },
 };

@@ -13,7 +13,9 @@ import { createFieldTypeDictionary } from "./fieldType";
 import { traverse, invalidTypeError } from "./traverse";
 import { isCastableType, castValue } from "./cast";
 
-export type FormulaReturnType = PrimitiveExpressionType["type"];
+export type CalculatedType = PrimitiveExpressionType["type"];
+
+export type FormulaReturnType = Exclude<CalculatedType, "id">;
 
 export type Formula = {
   compiled: CompiledFormula;
@@ -26,7 +28,7 @@ export type CompiledFormula = {
   fields: string[];
   returnType: FormulaReturnType;
   scale: number | undefined;
-  calculatedType: FormulaReturnType;
+  calculatedType: CalculatedType;
 };
 
 export type SyncParseOptions = {
@@ -99,7 +101,11 @@ function traverseAndCreateFormula(
     expression: expression_,
     fields,
     returnType:
-      returnType && returnType !== "any" ? returnType : calculatedType.type,
+      returnType && returnType !== "any"
+        ? returnType
+        : calculatedType.type === "id"
+        ? "string"
+        : calculatedType.type,
     scale,
     calculatedType: calculatedType.type,
   });

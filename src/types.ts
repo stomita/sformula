@@ -36,6 +36,9 @@ export type PrimitiveExpressionType =
       type: "time";
     }
   | {
+      type: "id";
+    }
+  | {
       type: "any";
     };
 

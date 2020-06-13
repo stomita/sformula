@@ -132,8 +132,10 @@ for (const [i, formulaDef] of formulaDefs.entries()) {
       scale,
       blankAsZero,
     });
-    for (const [i, record] of testRecords.entries()) {
-      const expected = expectedRecords[i][name];
+    for (const [i, rec] of testRecords.entries()) {
+      const fetchedRecord = expectedRecords[i];
+      const { Id, Parent__c, [name]: expected } = fetchedRecord;
+      const record = { ...rec, Id, Parent__c };
       // Test result may differ from expected if relative datetime values are included in the formula (e.g. "NOW()").
       // So applying fluctuation value to the expected value and assert the result is in the range.
       if (fluctuation > 0) {

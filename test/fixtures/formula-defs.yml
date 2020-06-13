@@ -633,3 +633,13 @@
 -
   type: Checkbox 
   formula: TIMEVALUE(Text01__c) == TIMEVALUE(Text02__c)
+-
+  type: Text
+  formula: CASESAFEID(Id)
+-
+  type: Checkbox 
+  formula: CASESAFEID(Text01__c) == Text02__c
+-
+  type: Text
+  formula: Id & '; ' & Parent__c
+
