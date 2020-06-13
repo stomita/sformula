@@ -288,6 +288,80 @@ export async function createFormulaSchema(
       },
     },
     {
+      fullName: "MultiPicklist01__c",
+      externalId: false,
+      label: "Multiselect Picklist #01",
+      required: false,
+      trackTrending: false,
+      type: "MultiselectPicklist",
+      valueSet: {
+        restricted: false,
+        valueSetDefinition: {
+          sorted: false,
+          value: [
+            {
+              fullName: "S",
+              default: false,
+              label: "Small",
+            },
+            {
+              fullName: "M",
+              default: false,
+              label: "Medium",
+            },
+            {
+              fullName: "L",
+              default: false,
+              label: "Large",
+            },
+            {
+              fullName: "XL",
+              default: false,
+              label: "XLarge",
+            },
+          ],
+        },
+      },
+      visibleLines: 4,
+    },
+    {
+      fullName: "MultiPicklist02__c",
+      externalId: false,
+      label: "Multiselect Picklist #02",
+      required: false,
+      trackTrending: false,
+      type: "MultiselectPicklist",
+      valueSet: {
+        restricted: false,
+        valueSetDefinition: {
+          sorted: false,
+          value: [
+            {
+              fullName: "A",
+              default: false,
+              label: "A - AAA",
+            },
+            {
+              fullName: "B",
+              default: false,
+              label: "B - BBB",
+            },
+            {
+              fullName: "C",
+              default: false,
+              label: "C - CCC",
+            },
+            {
+              fullName: "D",
+              default: false,
+              label: "D - DDD",
+            },
+          ],
+        },
+      },
+      visibleLines: 4,
+    },
+    {
       fullName: "Date01__c",
       externalId: false,
       label: "Date #01",
