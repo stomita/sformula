@@ -46,3 +46,28 @@ export function parseDatetimeOrTime(s: string) {
   }
   return dt;
 }
+
+const ID_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ012345";
+
+export function convertIdFrom15To18(s: string) {
+  if (s.length == 15) {
+    let suffix = "";
+    for (let block = 0; block < 3; block++) {
+      let sum = 0;
+      for (let position = 0; position < 5; position++) {
+        const c = s.charAt(block * 5 + position);
+        if (c >= "A" && c <= "Z") sum += 1 << position;
+      }
+      suffix += ID_CHARS.charAt(sum);
+    }
+    return s + suffix;
+  }
+  return s;
+}
+
+export function convertIdFrom18To15(s: string) {
+  if (s.length == 18) {
+    return s.substring(0, 15);
+  }
+  return s;
+}

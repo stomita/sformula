@@ -17,6 +17,7 @@ async function describeFieldType(
     throw new Error(`cannot describe field ${field} on ${describer.sobject}`);
   }
   switch (fieldDef.type) {
+    case "id":
     case "string":
     case "textarea":
     case "url":
