@@ -1,6 +1,11 @@
 import { DateTime } from "luxon";
-import { MSECS_IN_DAY, ISO8601_DATETIME_FORMAT } from "./constants";
+import {
+  MSECS_IN_DAY,
+  ISO8601_DATETIME_FORMAT,
+  SALESFORCE_TIME_FORMAT,
+} from "./constants";
 import type { Maybe } from "../types";
+import { parseTime } from "./common";
 
 /**
  *
@@ -866,6 +871,268 @@ export default {
         },
         {
           argument: { type: "datetime" },
+          optional: false,
+        },
+      ],
+      returns: { type: "boolean" },
+    },
+  },
+  $$ADD_TIME$$: {
+    value: (d: Maybe<string>, n: Maybe<number>) => {
+      if (d == null || n == null) {
+        return null;
+      }
+      const dt = parseTime(d);
+      if (!dt.isValid) {
+        return null;
+      }
+      return dt.plus({ milliseconds: n }).toFormat(SALESFORCE_TIME_FORMAT);
+    },
+    type: {
+      type: "function",
+      arguments: [
+        {
+          argument: { type: "time" },
+          optional: false,
+        },
+        {
+          argument: { type: "number" },
+          optional: false,
+        },
+      ],
+      returns: { type: "time" },
+    },
+  },
+  $$SUBTRACT_TIME$$: {
+    value: (d: Maybe<string>, n: Maybe<number>) => {
+      if (d == null || n == null) {
+        return null;
+      }
+      const dt = parseTime(d);
+      if (!dt.isValid) {
+        return null;
+      }
+      return dt.plus({ milliseconds: -n }).toFormat(SALESFORCE_TIME_FORMAT);
+    },
+    type: {
+      type: "function",
+      arguments: [
+        {
+          argument: { type: "time" },
+          optional: false,
+        },
+        {
+          argument: { type: "number" },
+          optional: false,
+        },
+      ],
+      returns: { type: "time" },
+    },
+  },
+  $$DIFF_TIME$$: {
+    value: (d1: Maybe<string>, d2: Maybe<string>) => {
+      if (d1 == null || d2 == null) {
+        return null;
+      }
+      const dt1 = parseTime(d1);
+      if (!dt1.isValid) {
+        return null;
+      }
+      const dt2 = parseTime(d2);
+      if (!dt2.isValid) {
+        return null;
+      }
+      return dt1.diff(dt2, "milliseconds").as("milliseconds");
+    },
+    type: {
+      type: "function",
+      arguments: [
+        {
+          argument: { type: "time" },
+          optional: false,
+        },
+        {
+          argument: { type: "time" },
+          optional: false,
+        },
+      ],
+      returns: { type: "number" },
+    },
+  },
+  $$LT_TIME$$: {
+    value: (d1: Maybe<string>, d2: Maybe<string>) => {
+      if (d1 == null || d2 == null) {
+        return null;
+      }
+      const dt1 = parseTime(d1);
+      if (!dt1.isValid) {
+        return null;
+      }
+      const dt2 = parseTime(d2);
+      if (!dt2.isValid) {
+        return null;
+      }
+      return dt1.valueOf() < dt2.valueOf();
+    },
+    type: {
+      type: "function",
+      arguments: [
+        {
+          argument: { type: "time" },
+          optional: false,
+        },
+        {
+          argument: { type: "time" },
+          optional: false,
+        },
+      ],
+      returns: { type: "boolean" },
+    },
+  },
+  $$LTE_TIME$$: {
+    value: (d1: string, d2: string) => {
+      if (d1 == null || d2 == null) {
+        return null;
+      }
+      const dt1 = parseTime(d1);
+      if (!dt1.isValid) {
+        return null;
+      }
+      const dt2 = parseTime(d2);
+      if (!dt2.isValid) {
+        return null;
+      }
+      return dt1.valueOf() <= dt2.valueOf();
+    },
+    type: {
+      type: "function",
+      arguments: [
+        {
+          argument: { type: "time" },
+          optional: false,
+        },
+        {
+          argument: { type: "time" },
+          optional: false,
+        },
+      ],
+      returns: { type: "boolean" },
+    },
+  },
+  $$GT_TIME$$: {
+    value: (d1: string, d2: string) => {
+      if (d1 == null || d2 == null) {
+        return null;
+      }
+      const dt1 = parseTime(d1);
+      if (!dt1.isValid) {
+        return null;
+      }
+      const dt2 = parseTime(d2);
+      if (!dt2.isValid) {
+        return null;
+      }
+      return dt1.valueOf() > dt2.valueOf();
+    },
+    type: {
+      type: "function",
+      arguments: [
+        {
+          argument: { type: "time" },
+          optional: false,
+        },
+        {
+          argument: { type: "time" },
+          optional: false,
+        },
+      ],
+      returns: { type: "boolean" },
+    },
+  },
+  $$GTE_TIME$$: {
+    value: (d1: string, d2: string) => {
+      if (d1 == null || d2 == null) {
+        return null;
+      }
+      const dt1 = parseTime(d1);
+      if (!dt1.isValid) {
+        return null;
+      }
+      const dt2 = parseTime(d2);
+      if (!dt2.isValid) {
+        return null;
+      }
+      return dt1.valueOf() >= dt2.valueOf();
+    },
+    type: {
+      type: "function",
+      arguments: [
+        {
+          argument: { type: "time" },
+          optional: false,
+        },
+        {
+          argument: { type: "time" },
+          optional: false,
+        },
+      ],
+      returns: { type: "boolean" },
+    },
+  },
+  $$EQ_TIME$$: {
+    value: (d1: string, d2: string) => {
+      if (d1 == null || d2 == null) {
+        return null;
+      }
+      const dt1 = parseTime(d1);
+      if (!dt1.isValid) {
+        return null;
+      }
+      const dt2 = parseTime(d2);
+      if (!dt2.isValid) {
+        return null;
+      }
+      return dt1.hasSame(dt2, "millisecond");
+    },
+    type: {
+      type: "function",
+      arguments: [
+        {
+          argument: { type: "time" },
+          optional: false,
+        },
+        {
+          argument: { type: "time" },
+          optional: false,
+        },
+      ],
+      returns: { type: "boolean" },
+    },
+  },
+  $$NEQ_TIME$$: {
+    value: (d1: string, d2: string) => {
+      if (d1 == null || d2 == null) {
+        return null;
+      }
+      const dt1 = parseTime(d1);
+      if (!dt1.isValid) {
+        return null;
+      }
+      const dt2 = parseTime(d2);
+      if (!dt2.isValid) {
+        return null;
+      }
+      return !dt1.hasSame(dt2, "millisecond");
+    },
+    type: {
+      type: "function",
+      arguments: [
+        {
+          argument: { type: "time" },
+          optional: false,
+        },
+        {
+          argument: { type: "time" },
           optional: false,
         },
       ],

@@ -64,7 +64,7 @@
     "fs-extra": "^9.0.1",
     "jest": "^26.0.1",
     "js-yaml": "^3.14.0",
-    "jsforce": "^2.0.0-alpha.11",
+    "jsforce": "^2.0.0-alpha.12",
     "json5": "^0.5.1",
     "npm-run-all": "^4.1.2",
     "pegjs": "^0.10.0",

@@ -146,6 +146,36 @@
   type: Date
   formula: Datetime01__c - 0.5
 -
+  type: Checkbox
+  formula: Datetime01__c != Datetime02__c
+-
+  type: Checkbox
+  formula: Datetime01__c < Datetime02__c + 0.5
+-
+  type: Checkbox
+  formula: Datetime01__c = Datetime02__c
+-
+  type: Checkbox
+  formula: Datetime01__c != Datetime02__c
+-
+  type: Checkbox
+  formula: Datetime01__c > Datetime02__c - 1.5
+-
+  type: Time
+  formula: Time01__c + 24000
+-
+  type: Checkbox
+  formula: Time01__c = Time02__c
+-
+  type: Checkbox
+  formula: Time01__c != Time02__c
+-
+  type: Checkbox
+  formula: Time01__c < Time02__c + 5 * 60 * 60 * 1000
+-
+  type: Checkbox
+  formula: Time01__c > Time02__c - 10 * 60 * 60 * 1000
+-
   type: Number
   formula: Percent01__c * Number01__c
   precision: 18
@@ -252,6 +282,9 @@
 -
   type: Text
   formula: TEXT(Datetime01__c)
+-
+  type: Text
+  formula: TEXT(Time01__c)
 -
   type: Text
   formula: TEXT(Picklist01__c)
@@ -597,3 +630,6 @@
   formula: SECOND(Time01__c) + MILLISECOND(TIMEVALUE(Time02__c))
   precision: 18
   scale: 0
+-
+  type: Checkbox 
+  formula: TIMEVALUE(Text01__c) == TIMEVALUE(Text02__c)

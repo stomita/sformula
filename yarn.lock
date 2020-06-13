@@ -4393,10 +4393,10 @@ jsesc@~0.5.0:
   resolved "https://registry.yarnpkg.com/jsesc/-/jsesc-0.5.0.tgz#e7dee66e35d6fc16f710fe91d5cf69f70f08911d"
   integrity sha1-597mbjXW/Bb3EP6R1c9p9w8IkR0=
 
-jsforce@^2.0.0-alpha.11:
-  version "2.0.0-alpha.11"
-  resolved "https://registry.yarnpkg.com/jsforce/-/jsforce-2.0.0-alpha.11.tgz#420345b296d58667496e881d39653469ff8c6fa4"
-  integrity sha512-PrQj46Ewl15eU3yIQr9/o+YU91BBTmSyezB0ixzmBh4dLRYGfM8GxgwY8skVCfkuc1muokaHoq+ItcCGHEAQfQ==
+jsforce@^2.0.0-alpha.12:
+  version "2.0.0-alpha.12"
+  resolved "https://registry.yarnpkg.com/jsforce/-/jsforce-2.0.0-alpha.12.tgz#6bfcf639eb15304d3cb3c5c0ed5a2050d244ae26"
+  integrity sha512-5KhRl5sT/ZU/mqR37J7HScxHNt4qiA/NQhB5K2mImAuPFpEKId+Y3UcG9XWFh0+qe2A+R4KYq2pLzgC/Uxomsg==
   dependencies:
     "@babel/runtime" "^7.8.3"
     "@babel/runtime-corejs3" "^7.8.3"

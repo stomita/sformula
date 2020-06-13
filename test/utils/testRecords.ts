@@ -110,9 +110,7 @@ export async function getExpectedRecords(
 ) {
   console.log("fetching expected record values");
   const conn = await getConnection();
-  const recs = await conn
-    .sobject(sobject)
-    .find({}, "*,Parent__r.*,Parent__r.Parent__r.*");
+  const recs = await conn.sobject(sobject).find({}, "*,Parent__r.*");
   const keyMap = recs.reduce(
     (map, rec) => ({ ...map, [rec.Key__c]: rec }),
     {} as { [key: string]: Record }
