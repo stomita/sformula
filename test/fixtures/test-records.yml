@@ -183,6 +183,15 @@
   Picklist01__c: null
   Picklist02__c: null
 -
+  MultiPicklist01__c: 'M;XL'
+  MultiPicklist02__c: 'A'
+-
+  MultiPicklist01__c: 'S;M'
+  MultiPicklist02__c: 'A;B;D'
+-
+  MultiPicklist01__c: null
+  MultiPicklist02__c: null
+-
   Text01__c: 'abcABCde'
   Text02__c: 'bcA'
 -

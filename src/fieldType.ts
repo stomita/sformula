@@ -57,6 +57,11 @@ async function describeFieldType(
         type: "picklist",
         picklistValues: fieldDef.picklistValues ?? undefined,
       };
+    case "multipicklist":
+      return {
+        type: "multipicklist",
+        picklistValues: fieldDef.picklistValues ?? undefined,
+      };
     case "reference":
       return fieldDef.name === field
         ? { type: "id" }

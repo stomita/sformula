@@ -56,6 +56,29 @@ export default {
       returns: { type: "boolean" },
     },
   },
+  INCLUDES: {
+    value: (v: Maybe<string>, s: Maybe<string>) => {
+      if (v == null || s == null) {
+        return false;
+      }
+      const vs = v.split(";");
+      return vs.indexOf(s) >= 0;
+    },
+    type: {
+      type: "function",
+      arguments: [
+        {
+          argument: { type: "multipicklist" },
+          optional: false,
+        },
+        {
+          argument: { type: "string" },
+          optional: false,
+        },
+      ],
+      returns: { type: "boolean" },
+    },
+  },
   ISPICKVAL: {
     value: (v: Maybe<string>, s: Maybe<string>) => {
       if (v == null || s == null) {

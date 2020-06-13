@@ -101,6 +101,12 @@
   type: Checkbox
   formula: ISPICKVAL(Picklist01__c, "1")
 -
+  type: Checkbox
+  formula: INCLUDES(MultiPicklist01__c, "S")
+-
+  type: Checkbox
+  formula: INCLUDES(MultiPicklist02__c, "B")
+-
   type: Text
   formula: IF(Number01__c < 5, Text01__c, Text02__c)
 -

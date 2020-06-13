@@ -13,9 +13,7 @@ import { createFieldTypeDictionary } from "./fieldType";
 import { traverse, invalidTypeError } from "./traverse";
 import { isCastableType, castValue } from "./cast";
 
-export type CalculatedType = PrimitiveExpressionType["type"];
-
-export type FormulaReturnType = Exclude<CalculatedType, "id">;
+export type FormulaReturnType = PrimitiveExpressionType["type"];
 
 export type Formula = {
   compiled: CompiledFormula;
@@ -28,7 +26,7 @@ export type CompiledFormula = {
   fields: string[];
   returnType: FormulaReturnType;
   scale: number | undefined;
-  calculatedType: CalculatedType;
+  calculatedType: FormulaReturnType;
 };
 
 export type SyncParseOptions = {
@@ -79,7 +77,9 @@ function traverseAndCreateFormula(
     blankAsZero
   );
   if (
+    calculatedType.type === "id" ||
     calculatedType.type === "picklist" ||
+    calculatedType.type === "multipicklist" ||
     calculatedType.type === "object" ||
     calculatedType.type === "function" ||
     calculatedType.type === "template"
@@ -91,6 +91,7 @@ function traverseAndCreateFormula(
       "percent",
       "date",
       "datetime",
+      "time",
       "boolean",
     ]);
   }
@@ -101,11 +102,7 @@ function traverseAndCreateFormula(
     expression: expression_,
     fields,
     returnType:
-      returnType && returnType !== "any"
-        ? returnType
-        : calculatedType.type === "id"
-        ? "string"
-        : calculatedType.type,
+      returnType && returnType !== "any" ? returnType : calculatedType.type,
     scale,
     calculatedType: calculatedType.type,
   });
