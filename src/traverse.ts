@@ -461,12 +461,23 @@ function traverseDateBinaryExpression(
   }
 }
 
+const DATETIME_OPERATOR_FN = {
+  "<": "$$LT_DATETIME$$",
+  "<=": "$$LTE_DATETIME$$",
+  ">": "$$GT_DATETIME$$",
+  ">=": "$$GTE_DATETIME$$",
+  "==": "$$EQ_DATETIME$$",
+  "!=": "$$NEQ_DATETIME$$",
+  "===": "$$EQ_DATETIME$$",
+  "!==": "$$NEQ_DATETIME$$",
+};
+
 function traverseDatetimeBinaryExpression(
   expression: BinaryExpression,
   left: TraverseResult,
   right: TraverseResult
 ): TraverseResult {
-  const { type, operator, ...rexpression } = expression;
+  const { operator } = expression;
   const rightType = right.returnType.type;
   switch (operator) {
     case "+":
@@ -507,18 +518,22 @@ function traverseDatetimeBinaryExpression(
     case ">":
     case ">=":
     case "<=":
+    case "==":
+    case "!=":
     case "===":
-    case "!==":
+    case "!==": {
+      if (rightType !== "datetime") {
+        throw invalidTypeError(expression.right, rightType, ["datetime"]);
+      }
+      const name = DATETIME_OPERATOR_FN[operator];
       return {
-        expression: {
-          type: "BinaryExpression",
-          operator,
-          ...rexpression,
-          left: left.expression,
-          right: right.expression,
-        },
+        expression: createCallExpression(name, [
+          left.expression,
+          right.expression,
+        ]),
         returnType: { type: "boolean" },
       };
+    }
     default:
       throw invalidOperatorError(
         expression.left,
@@ -528,12 +543,23 @@ function traverseDatetimeBinaryExpression(
   }
 }
 
+const TIME_OPERATOR_FN = {
+  "<": "$$LT_TIME$$",
+  "<=": "$$LTE_TIME$$",
+  ">": "$$GT_TIME$$",
+  ">=": "$$GTE_TIME$$",
+  "==": "$$EQ_TIME$$",
+  "!=": "$$NEQ_TIME$$",
+  "===": "$$EQ_TIME$$",
+  "!==": "$$NEQ_TIME$$",
+};
+
 function traverseTimeBinaryExpression(
   expression: BinaryExpression,
   left: TraverseResult,
   right: TraverseResult
 ): TraverseResult {
-  const { type, operator, ...rexpression } = expression;
+  const { operator } = expression;
   const rightType = right.returnType.type;
   switch (operator) {
     case "+":
@@ -565,27 +591,28 @@ function traverseTimeBinaryExpression(
           returnType: { type: "number" },
         };
       } else {
-        throw invalidTypeError(expression.right, rightType, [
-          "number",
-          "datetime",
-        ]);
+        throw invalidTypeError(expression.right, rightType, ["number", "time"]);
       }
     case "<":
     case ">":
     case ">=":
     case "<=":
+    case "==":
+    case "!=":
     case "===":
-    case "!==":
+    case "!==": {
+      if (rightType !== "time") {
+        throw invalidTypeError(expression.right, rightType, ["time"]);
+      }
+      const name = TIME_OPERATOR_FN[operator];
       return {
-        expression: {
-          type: "BinaryExpression",
-          operator,
-          ...rexpression,
-          left: left.expression,
-          right: right.expression,
-        },
+        expression: createCallExpression(name, [
+          left.expression,
+          right.expression,
+        ]),
         returnType: { type: "boolean" },
       };
+    }
     default:
       throw invalidOperatorError(
         expression.left,

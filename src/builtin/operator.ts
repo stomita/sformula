@@ -2,7 +2,6 @@ import { DateTime } from "luxon";
 import {
   MSECS_IN_DAY,
   ISO8601_DATETIME_FORMAT,
-  SALESFORCE_TIME_TEXT_FORMAT,
   SALESFORCE_TIME_FORMAT,
 } from "./constants";
 import type { Maybe } from "../types";
@@ -958,6 +957,186 @@ export default {
         },
       ],
       returns: { type: "number" },
+    },
+  },
+  $$LT_TIME$$: {
+    value: (d1: Maybe<string>, d2: Maybe<string>) => {
+      if (d1 == null || d2 == null) {
+        return null;
+      }
+      const dt1 = parseTime(d1);
+      if (!dt1.isValid) {
+        return null;
+      }
+      const dt2 = parseTime(d2);
+      if (!dt2.isValid) {
+        return null;
+      }
+      return dt1.valueOf() < dt2.valueOf();
+    },
+    type: {
+      type: "function",
+      arguments: [
+        {
+          argument: { type: "time" },
+          optional: false,
+        },
+        {
+          argument: { type: "time" },
+          optional: false,
+        },
+      ],
+      returns: { type: "boolean" },
+    },
+  },
+  $$LTE_TIME$$: {
+    value: (d1: string, d2: string) => {
+      if (d1 == null || d2 == null) {
+        return null;
+      }
+      const dt1 = parseTime(d1);
+      if (!dt1.isValid) {
+        return null;
+      }
+      const dt2 = parseTime(d2);
+      if (!dt2.isValid) {
+        return null;
+      }
+      return dt1.valueOf() <= dt2.valueOf();
+    },
+    type: {
+      type: "function",
+      arguments: [
+        {
+          argument: { type: "time" },
+          optional: false,
+        },
+        {
+          argument: { type: "time" },
+          optional: false,
+        },
+      ],
+      returns: { type: "boolean" },
+    },
+  },
+  $$GT_TIME$$: {
+    value: (d1: string, d2: string) => {
+      if (d1 == null || d2 == null) {
+        return null;
+      }
+      const dt1 = parseTime(d1);
+      if (!dt1.isValid) {
+        return null;
+      }
+      const dt2 = parseTime(d2);
+      if (!dt2.isValid) {
+        return null;
+      }
+      return dt1.valueOf() > dt2.valueOf();
+    },
+    type: {
+      type: "function",
+      arguments: [
+        {
+          argument: { type: "time" },
+          optional: false,
+        },
+        {
+          argument: { type: "time" },
+          optional: false,
+        },
+      ],
+      returns: { type: "boolean" },
+    },
+  },
+  $$GTE_TIME$$: {
+    value: (d1: string, d2: string) => {
+      if (d1 == null || d2 == null) {
+        return null;
+      }
+      const dt1 = parseTime(d1);
+      if (!dt1.isValid) {
+        return null;
+      }
+      const dt2 = parseTime(d2);
+      if (!dt2.isValid) {
+        return null;
+      }
+      return dt1.valueOf() >= dt2.valueOf();
+    },
+    type: {
+      type: "function",
+      arguments: [
+        {
+          argument: { type: "time" },
+          optional: false,
+        },
+        {
+          argument: { type: "time" },
+          optional: false,
+        },
+      ],
+      returns: { type: "boolean" },
+    },
+  },
+  $$EQ_TIME$$: {
+    value: (d1: string, d2: string) => {
+      if (d1 == null || d2 == null) {
+        return null;
+      }
+      const dt1 = parseTime(d1);
+      if (!dt1.isValid) {
+        return null;
+      }
+      const dt2 = parseTime(d2);
+      if (!dt2.isValid) {
+        return null;
+      }
+      return dt1.hasSame(dt2, "millisecond");
+    },
+    type: {
+      type: "function",
+      arguments: [
+        {
+          argument: { type: "time" },
+          optional: false,
+        },
+        {
+          argument: { type: "time" },
+          optional: false,
+        },
+      ],
+      returns: { type: "boolean" },
+    },
+  },
+  $$NEQ_TIME$$: {
+    value: (d1: string, d2: string) => {
+      if (d1 == null || d2 == null) {
+        return null;
+      }
+      const dt1 = parseTime(d1);
+      if (!dt1.isValid) {
+        return null;
+      }
+      const dt2 = parseTime(d2);
+      if (!dt2.isValid) {
+        return null;
+      }
+      return !dt1.hasSame(dt2, "millisecond");
+    },
+    type: {
+      type: "function",
+      arguments: [
+        {
+          argument: { type: "time" },
+          optional: false,
+        },
+        {
+          argument: { type: "time" },
+          optional: false,
+        },
+      ],
+      returns: { type: "boolean" },
     },
   },
 };
