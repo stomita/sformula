@@ -13,7 +13,7 @@
   "scripts": {
     "clean": "rimraf dist/* lib/* module/* types/*",
     "build": "run-s build:parser build:src build:bundle",
-    "build:parser": "pegjs -o lib/parser.js src/parser.pegjs",
+    "build:parser": "pegjs -o lib/parser.js src/parser.pegjs && cp lib/parser.js module/parser.js",
     "build:src": "run-p build:lib build:module build:typedef",
     "build:lib": "BUILD_TARGET=lib babel --extensions '.ts' --source-maps -d lib src",
     "build:module": "BUILD_TARGET=module babel --extensions '.ts' --source-maps -d module src",
