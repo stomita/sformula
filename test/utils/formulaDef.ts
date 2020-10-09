@@ -22,7 +22,7 @@ export function loadFormulaDefs(): FormulaDef[] {
     path.join(__dirname, "../fixtures/formula-defs.yml"),
     "utf8"
   );
-  const defs: any[] = yaml.safeLoad(data);
+  const defs: any[] = yaml.safeLoad(data) as any;
   return defs.map((def, i) => ({
     name: `Formula${zeropad(i + 1)}__c`,
     ...def,

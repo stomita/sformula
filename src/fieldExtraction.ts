@@ -1,4 +1,3 @@
-/* @flow */
 import type { Expression, MemberExpression } from "esformula";
 
 function extractFieldsFromMemberExpression(
