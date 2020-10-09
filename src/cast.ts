@@ -1,4 +1,3 @@
-/* @flow */
 import { DateTime } from "luxon";
 import { Maybe } from "./types";
 
