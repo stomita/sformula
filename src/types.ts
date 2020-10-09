@@ -46,14 +46,14 @@ export type AdditionalPrimitiveExpressionType =
   | {
       type: "picklist";
       picklistValues?: Array<{
-        label: string;
+        label: Maybe<string>;
         value: string;
       }>;
     }
   | {
       type: "multipicklist";
       picklistValues?: Array<{
-        label: string;
+        label: Maybe<string>;
         value: string;
       }>;
     };
@@ -99,7 +99,7 @@ export type DescribeFieldResult = {
   picklistValues: Maybe<
     Array<{
       value: string;
-      label: string;
+      label: Maybe<string>;
     }>
   >;
   relationshipName: Maybe<string>;
