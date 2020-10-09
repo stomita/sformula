@@ -23,7 +23,7 @@ export function loadTestRecords(): Record[] {
     path.join(__dirname, "../fixtures/test-records.yml"),
     "utf8"
   );
-  const records: any[] = yaml.safeLoad(data);
+  const records: any[] = yaml.safeLoad(data) as any;
   return records.map((rec) => ({
     Key__c: genKey(),
     ...rec,

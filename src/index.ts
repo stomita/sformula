@@ -7,7 +7,7 @@ import type {
   DescribeSObjectResult,
 } from "./types";
 import { parseFormula } from "./formula";
-import { context as builtins, types as builtinTypeDict } from "./builtin";
+import { context as builtins, types as builtinTypes } from "./builtin";
 import { extractFields } from "./fieldExtraction";
 import { createFieldTypeDictionary } from "./fieldType";
 import { traverse, invalidTypeError } from "./traverse";
@@ -30,6 +30,8 @@ export type CompiledFormula = {
 };
 
 export type SyncParseOptions = {
+  inputTypes?: ExpressionTypeDictionary;
+  /** @deprecated */
   fieldTypes?: ExpressionTypeDictionary;
   returnType?: FormulaReturnType;
   scale?: number;
@@ -38,6 +40,7 @@ export type SyncParseOptions = {
 
 export type ParseOptions = {
   sobject: string;
+  inputTypes?: ExpressionTypeDictionary;
   describe: (sobject: string) => Promise<DescribeSObjectResult>;
   returnType?: FormulaReturnType;
   scale?: number;
@@ -62,7 +65,7 @@ export function create(compiled: CompiledFormula): Formula {
 
 function traverseAndCreateFormula(
   expression: Expression,
-  fieldTypes: ExpressionTypeDictionary,
+  inputTypes: ExpressionTypeDictionary,
   fields: string[],
   options: {
     returnType: FormulaReturnType | undefined;
@@ -73,7 +76,7 @@ function traverseAndCreateFormula(
   const { returnType, scale, blankAsZero } = options;
   const { expression: expression_, returnType: calculatedType } = traverse(
     expression,
-    { ...fieldTypes, ...builtinTypeDict },
+    { ...inputTypes, ...builtinTypes },
     blankAsZero
   );
   if (
@@ -117,9 +120,15 @@ export function parseSync(
 ): Formula {
   const expression = parseFormula(formula);
   const fields = extractFields(expression);
-  const { returnType, fieldTypes = {}, scale, blankAsZero = false } = options;
+  const {
+    returnType,
+    inputTypes: types = options.fieldTypes ?? {},
+    scale,
+    blankAsZero = false,
+  } = options;
+
   try {
-    return traverseAndCreateFormula(expression, fieldTypes, fields, {
+    return traverseAndCreateFormula(expression, types, fields, {
       returnType,
       scale,
       blankAsZero,
@@ -139,16 +148,27 @@ export async function parse(
   formula: string,
   options: ParseOptions
 ): Promise<Formula> {
-  const { returnType, scale, blankAsZero = false, ...describer } = options;
+  const {
+    inputTypes = {},
+    returnType,
+    scale,
+    blankAsZero = false,
+    ...describer
+  } = options;
   const expression: Expression = parseFormula(formula);
   const fields = extractFields(expression);
   const fieldTypes = await createFieldTypeDictionary(fields, describer);
   try {
-    return traverseAndCreateFormula(expression, fieldTypes, fields, {
-      returnType,
-      scale,
-      blankAsZero,
-    });
+    return traverseAndCreateFormula(
+      expression,
+      { ...inputTypes, ...fieldTypes },
+      fields,
+      {
+        returnType,
+        scale,
+        blankAsZero,
+      }
+    );
   } catch (e) {
     console.log(e.stack);
     console.log({ returnType });

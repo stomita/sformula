@@ -27,13 +27,13 @@ The `Field01__c` and `Field02__c` fields might be both Number fields, or they mi
 Another possible case is `Field01__c` is Date/Datetime and `Field02__c` is Number.
 
 So we need to add type annotation correctly when parsing the formula.
-To parse the formula with field references, add `fieldTypes` option to annotate field types.
+To compile the formula with field references, add `inputTypes` option to annotate field types.
 
 ```javascript
 import { parseSync } from 'sformula';
 
 const fml = parseSync('FirstName__c & " " & LastName__c', {
-  fieldTypes: {
+  inputTypes: {
     FirstName__c: { type: 'string' },
     LastName__c: { type: 'string' },
   },
@@ -50,7 +50,7 @@ To add type annotation to the fields through relatinoship, write like below:
 import { parseSync } from 'sformula';
 
 const fml = parseSync('Account__r.Name & " - " & Name', {
-  fieldTypes: {
+  inputTypes: {
     Account__r: {
       type: 'object',
       properties: {
@@ -71,7 +71,7 @@ Also, you can pass `blankAsZero` option when you want to regard the null value a
 import { parseSync } from 'sformula';
 
 const fml = parseSync('CreatedDate - Offset__c', {
-  fieldTypes: {
+  inputTypes: {
     CreatedDate: { type: 'datetime' },
     Offset__c: { type: 'number', precision: 18, scale: 2 },
   },
@@ -85,7 +85,7 @@ console.log(ret2); // '2018-01-01'
 ```
 
 Are you tired to add type annotation by yourself ? OK, now it's time to tell the asynchronous `parse()` function and describer option.
-In `parse()` you can pass an asynchronous function to describe field types, and the parser will detect the field types if it has entry in the described result. As a describer function you can simply use [JSforce](https://jsforce.github.io) describe method, but not limited to.
+In `parse()` you can pass an asynchronous function to describe the field types, and the parser will detect the types if it has entry in the described result. As a describer function you can simply use [JSforce](https://jsforce.github.io) describe method, but not limited to.
 
 ```javascript
 import { parse } from 'sformula';
@@ -96,25 +96,24 @@ conn.login('username@domain.org', 'password123');
 
 // ...
 
-parse('IF(CONTAINS(Owner.Title, "Engineer"), Number01__c + 2.5, Number02__c * 0.5)', {
+const fml = await parse('IF(CONTAINS(Owner.Title, "Engineer"), Number01__c + 2.5, Number02__c * 0.5)', {
   sobject: 'CustomObject01__c', // root object name
   describe: (sobject) => conn.describe(sobject), // (sobject: string) => Promise<DescribeSObjectResult>
   blankAsZero: true,
   returnType: 'number',
   scale: 2
-}).then((fml) => {
-  const ret1 = fml.evaluate({
-    Owner: { Id: '0057F000002wf0WQAQ', Name: 'John Due', Title: 'Software Engineer' },
-    Number02__c: 7,
-  });
-  console.log(ret1); // 2.5
-  const ret2 = fml.evaluate({
-    Owner: { Id: '00528000002J6BkAAK', Name: 'Jane Due', Title: 'Accountant' },
-    Number01__c: 11.5,
-    Number02__c: 7,
-  });
-  console.log(ret2); // 3.5
 });
+const ret1 = fml.evaluate({
+  Owner: { Id: '0057F000002wf0WQAQ', Name: 'John Due', Title: 'Software Engineer' },
+  Number02__c: 7,
+});
+console.log(ret1); // 2.5
+const ret2 = fml.evaluate({
+  Owner: { Id: '00528000002J6BkAAK', Name: 'Jane Due', Title: 'Accountant' },
+  Number01__c: 11.5,
+  Number02__c: 7,
+});
+console.log(ret2); // 3.5
 
 ```
 
@@ -204,4 +203,4 @@ parse('IF(CONTAINS(Owner.Title, "Engineer"), Number01__c + 2.5, Number02__c * 0.
 
 * Salesforce formula is "case-insensitive". For example, when `IF(Field01__c > Field02__c, Owner.LastName, "-")` is valid `if(FIELD01__c > field02__c, owner.lastName, "-")` is also a valid formula and yields same result. For implementation reason, sformula treats formula as "case-sensitive", which always requires functions to be written in UPPERCASE chars, fields to be written as same as which is defined in the API reference name.
 
-* Global field references (fields under "$-prefixed" objects like `$Label`, `$User`, ...) are not currently supported.
+* Global field references (fields under "$-prefixed" objects like `$Label`, `$User`, ...) are not supported in built-in, but you can pass them as context if you like.
