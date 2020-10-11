@@ -1,5 +1,4 @@
 import { DateTime } from "luxon";
-import { applyScale } from "../cast";
 import type { MaybeTypeAnnotated, Maybe } from "../types";
 import {
   SALESFORCE_DATETIME_TEXT_FORMAT_Z,
@@ -384,9 +383,9 @@ export default {
   },
   TEXT: {
     value: (value: MaybeTypeAnnotated<string | number | boolean | null>) => {
-      let v, vType, scale;
+      let v, vType;
       if (Array.isArray(value)) {
-        [v, vType, , scale] = value;
+        [v, vType] = value;
       } else {
         v = value;
       }
