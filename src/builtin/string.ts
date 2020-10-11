@@ -423,20 +423,19 @@ export default {
       }
       if (typeof v === "number") {
         if (vType === "percent") {
-          v = v * 0.01;
-        }
-        if (
-          typeof scale === "number" &&
-          (vType === "number" || vType === "currency" || vType === "percent")
-        ) {
-          v = applyScale(v, scale);
-        }
-        if (vType === "percent") {
           const sign = v >= 0 ? 1 : -1;
-          const vstr = String(v * sign);
+          const absvstr = String(v * sign);
+          const zpadded = "00" + absvstr;
+          const dotIndex = zpadded.indexOf(".");
+          const newDotIndex = dotIndex < 0 ? zpadded.length - 2 : dotIndex - 2;
           return (
             (sign === 1 ? "" : "-") +
-            (vstr[0] === "0" && vstr[1] === "." ? vstr.substring(1) : vstr)
+            [
+              zpadded.substring(0, newDotIndex),
+              zpadded.substring(newDotIndex).replace(".", ""),
+            ]
+              .join(".")
+              .replace(/(^0+|\.0*$)/g, "")
           );
         }
       }
