@@ -422,7 +422,10 @@ export default {
       }
       if (typeof v === "number") {
         if (vType === "percent") {
-          const sign = v >= 0 ? 1 : -1;
+          if (v === 0) {
+            return "0";
+          }
+          const sign = v > 0 ? 1 : -1;
           const absvstr = String(v * sign);
           const zpadded = "00" + absvstr;
           const dotIndex = zpadded.indexOf(".");
