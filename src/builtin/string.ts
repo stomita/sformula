@@ -434,7 +434,8 @@ export default {
               zpadded.substring(newDotIndex).replace(".", ""),
             ]
               .join(".")
-              .replace(/(^0+|\.0*$)/g, "")
+              .replace(/^0+|0+$/g, "")
+              .replace(/\.$/g, "")
           );
         }
       }
