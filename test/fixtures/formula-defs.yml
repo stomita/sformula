@@ -43,6 +43,10 @@
   scale: 0
 -
   type: Text
+  formula: TEXT(Percent01__c) & "%"
+  blankAsZero: true
+-
+  type: Text
   formula: "''"
 -
   type: Text
