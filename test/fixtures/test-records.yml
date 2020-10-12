@@ -1,5 +1,11 @@
 - {}
 -
+  Checkbox01__c: true
+  Number01__c: 0.65
+  Percent01__c: 45
+-
+  Percent01__c: 145
+-
   Number01__c: 1
 - 
   Number02__c: 2
@@ -125,7 +131,6 @@
   Number02__c: -1.0981
   Percent02__c: -130.41
   Currency02__c: -501.12
-
 -
   Text01__c: ''
 -

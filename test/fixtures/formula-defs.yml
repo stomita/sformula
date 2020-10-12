@@ -216,6 +216,14 @@
   precision: 18
   scale: 2
 -
+  type: Text 
+  formula: TEXT(IF(Checkbox01__c, Percent01__c, Number01__c)) & "; Percent=" & TEXT(Percent01__c) & "; Num=" & TEXT(Number01__c)
+-
+  type: Percent
+  formula: IF(Percent01__c > 1, Percent01__c, 1)
+  precision: 18
+  scale: 4
+-
   type: Number
   formula: Datetime01__c - Datetime02__c
   precision: 18
