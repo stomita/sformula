@@ -80,6 +80,10 @@
   Currency01__c: 1215
   Number02__c: 1.08
 -
+  Currency02__c: -0.25
+  Number02__c: -0.15
+  Percent02__c: -45.5
+-
   Percent01__c: 89.4
   Number01__c: 250
 -

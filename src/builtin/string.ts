@@ -421,26 +421,30 @@ export default {
         return null;
       }
       if (typeof v === "number") {
+        if (v === 0) {
+          return "0";
+        }
+        const sign = v > 0 ? 1 : -1;
+        let absVstr = String(v * sign);
+
         if (vType === "percent") {
-          if (v === 0) {
-            return "0";
-          }
-          const sign = v > 0 ? 1 : -1;
-          const absvstr = String(v * sign);
-          const zpadded = "00" + absvstr;
-          const dotIndex = zpadded.indexOf(".");
-          const newDotIndex = dotIndex < 0 ? zpadded.length - 2 : dotIndex - 2;
-          return (
-            (sign === 1 ? "" : "-") +
-            [
+          if (absVstr.indexOf("e") >= 0) {
+            absVstr = String(v * sign * 0.01);
+          } else {
+            const zpadded = "00" + absVstr;
+            const dotIndex = zpadded.indexOf(".");
+            const newDotIndex =
+              dotIndex < 0 ? zpadded.length - 2 : dotIndex - 2;
+            absVstr = [
               zpadded.substring(0, newDotIndex),
               zpadded.substring(newDotIndex).replace(".", ""),
             ]
               .join(".")
-              .replace(/^0+|0+$/g, "")
-              .replace(/\.$/g, "")
-          );
+              .replace(/0+$/, "")
+              .replace(/\.$/, "");
+          }
         }
+        return (sign === 1 ? "" : "-") + absVstr.replace(/^0+/, "");
       }
       return String(v);
     },
