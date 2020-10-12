@@ -440,7 +440,7 @@ export default {
               zpadded.substring(newDotIndex).replace(".", ""),
             ]
               .join(".")
-              .replace(/0+/, "")
+              .replace(/0+$/, "")
               .replace(/\.$/, "");
           }
         }
