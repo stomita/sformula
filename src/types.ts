@@ -10,18 +10,12 @@ export type PrimitiveExpressionType =
     }
   | {
       type: "number";
-      precision?: number;
-      scale?: number;
     }
   | {
       type: "currency";
-      precision?: number;
-      scale?: number;
     }
   | {
       type: "percent";
-      precision?: number;
-      scale?: number;
     }
   | {
       type: "boolean";
