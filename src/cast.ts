@@ -1,4 +1,5 @@
 import { DateTime } from "luxon";
+import { shiftDecimalPoint } from "./builtin/common";
 import { Maybe } from "./types";
 
 /**
@@ -44,10 +45,10 @@ export function castValue(
     return DateTime.fromISO(value).toUTC().toISODate();
   }
   if (dstType === "percent" && srcType !== "percent") {
-    value = value * 100;
+    value = shiftDecimalPoint(value, -2);
   }
   if (dstType !== "percent" && srcType === "percent") {
-    value = value * 0.01;
+    value = shiftDecimalPoint(value, 2);
   }
   if (
     typeof scale === "number" &&

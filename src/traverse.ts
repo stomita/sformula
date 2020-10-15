@@ -109,8 +109,8 @@ function annotateArgumentTypes(
         return createArrayExpression([
           arg,
           createLiteral(argType.type),
-          createLiteral(argType.precision == null ? null : argType.precision),
-          createLiteral(argType.scale == null ? null : argType.scale),
+          // createLiteral(argType.precision == null ? null : argType.precision),
+          // createLiteral(argType.scale == null ? null : argType.scale),
         ]);
       default:
         return createArrayExpression([arg, createLiteral(argType.type)]);
@@ -127,14 +127,6 @@ function injectCallExpression(
   if (callee.type === "Identifier") {
     switch (callee.name) {
       case "TEXT":
-      case "MAX":
-      case "MIN":
-      case "MOD":
-      case "CEILING":
-      case "FLOOR":
-      case "ROUND":
-      case "MCEILING":
-      case "MFLOOR":
         return annotateArgumentTypes(callee.name, args, argumentTypes);
       default:
         break;
@@ -296,17 +288,20 @@ const NUMBER_OPERATOR_FN = {
   "!==": "$$NEQ_NUMBER$$",
 };
 
-function convertPercentToNumber(
-  expression: Expression,
-  precision?: number,
-  scale?: number
-): TraverseResult {
+function convertCurrencyToNumber(expression: Expression): TraverseResult {
   return {
-    expression: createCallExpression("$$MULTIPLY_NUMBER$$", [
-      createLiteral(0.01),
+    expression,
+    returnType: { type: "number" },
+  };
+}
+
+function convertPercentToNumber(expression: Expression): TraverseResult {
+  return {
+    expression: createCallExpression("$$SHIFT_DECIMAL$$", [
       expression,
+      createLiteral(2),
     ]),
-    returnType: { type: "number", precision, scale },
+    returnType: { type: "number" },
   };
 }
 
@@ -317,23 +312,8 @@ function traverseNumberBinaryExpression(
 ): TraverseResult {
   const { operator } = expression;
   const rightType = right.returnType;
-  if (rightType.type === "percent") {
-    const numRight = convertPercentToNumber(
-      right.expression,
-      rightType.precision,
-      rightType.scale
-    );
-    return traverseNumberBinaryExpression(expression, left, numRight);
-  }
-  if (
-    rightType.type !== "number" &&
-    rightType.type !== "currency" &&
-    rightType.type !== "any"
-  ) {
-    throw invalidTypeError(expression.right, rightType.type, [
-      "number",
-      "currency",
-    ]);
+  if (rightType.type !== "number" && rightType.type !== "any") {
+    throw invalidTypeError(expression.right, rightType.type, ["number"]);
   }
   switch (operator) {
     case "+":
@@ -370,23 +350,6 @@ function traverseNumberBinaryExpression(
         operator
       );
   }
-}
-
-function traversePercentBinaryExpression(
-  expression: BinaryExpression,
-  left: TraverseResult,
-  right: TraverseResult
-): TraverseResult {
-  const { returnType: leftType } = left;
-  if (leftType.type !== "percent") {
-    throw unexpectedError(expression, "could not be reached here");
-  }
-  const numLeft = convertPercentToNumber(
-    left.expression,
-    leftType.precision,
-    leftType.scale
-  );
-  return traverseNumberBinaryExpression(expression, numLeft, right);
 }
 
 const DATE_OPERATOR_FN = {
@@ -641,10 +604,7 @@ function traverseBinaryExpression(
     case "string":
       return traverseStringBinaryExpression(expression, left, right);
     case "number":
-    case "currency":
       return traverseNumberBinaryExpression(expression, left, right);
-    case "percent":
-      return traversePercentBinaryExpression(expression, left, right);
     case "date":
       return traverseDateBinaryExpression(expression, left, right);
     case "datetime":
@@ -657,6 +617,7 @@ function traverseBinaryExpression(
         "number",
         "date",
         "datetime",
+        "time",
       ]);
   }
 }
@@ -833,10 +794,15 @@ function traverseIdentifier(
       `identifier type information is not found: ${expression.name}`
     );
   }
+  let result: TraverseResult = { expression, returnType };
   if (returnType.type === "id") {
-    return idValue(expression);
+    result = idValue(expression);
+  } else if (returnType.type === "currency") {
+    result = convertCurrencyToNumber(expression);
+  } else if (returnType.type === "percent") {
+    result = convertPercentToNumber(expression);
   }
-  return nullValue({ expression, returnType }, blankAsZero);
+  return nullValue(result, blankAsZero);
 }
 
 function traverseLiteral(expression: Literal): TraverseResult {

@@ -5,7 +5,7 @@ import {
   SALESFORCE_TIME_FORMAT,
 } from "./constants";
 import type { Maybe } from "../types";
-import { parseTime } from "./common";
+import { parseTime, shiftDecimalPoint } from "./common";
 
 /**
  *
@@ -141,6 +141,28 @@ export default {
         return null;
       }
       return n1 / n2;
+    },
+    type: {
+      type: "function",
+      arguments: [
+        {
+          argument: { type: "number" },
+          optional: false,
+        },
+        {
+          argument: { type: "number" },
+          optional: false,
+        },
+      ],
+      returns: { type: "number" },
+    },
+  },
+  $$SHIFT_DECIMAL$$: {
+    value: (n: Maybe<number>, d: Maybe<number>) => {
+      if (n == null || d == null) {
+        return null;
+      }
+      return shiftDecimalPoint(n, d);
     },
     type: {
       type: "function",

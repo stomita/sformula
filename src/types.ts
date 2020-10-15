@@ -10,18 +10,12 @@ export type PrimitiveExpressionType =
     }
   | {
       type: "number";
-      precision?: number;
-      scale?: number;
     }
   | {
       type: "currency";
-      precision?: number;
-      scale?: number;
     }
   | {
       type: "percent";
-      precision?: number;
-      scale?: number;
     }
   | {
       type: "boolean";
@@ -86,9 +80,7 @@ export type ExpressionTypeDictionary = {
   [identifier: string]: Maybe<ExpressionType>;
 };
 
-export type MaybeTypeAnnotated<T> =
-  | T
-  | [T, string, Maybe<number>, Maybe<number>];
+export type MaybeTypeAnnotated<T> = T | [T, string]; // , Maybe<number>, Maybe<number>];
 
 export type DescribeFieldResult = {
   name: string;

@@ -28,29 +28,14 @@ async function describeFieldType(
     case "double":
       return {
         type: "number",
-        precision: fieldDef.precision,
-        scale: fieldDef.scale,
       };
     case "boolean":
-      return { type: "boolean" };
     case "date":
-      return { type: "date" };
     case "datetime":
-      return { type: "datetime" };
     case "time":
-      return { type: "time" };
     case "percent":
-      return {
-        type: "percent",
-        precision: fieldDef.precision,
-        scale: fieldDef.scale,
-      };
     case "currency":
-      return {
-        type: "currency",
-        precision: fieldDef.precision,
-        scale: fieldDef.scale,
-      };
+      return { type: fieldDef.type };
     case "picklist":
       return {
         type: "picklist",
