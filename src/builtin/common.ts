@@ -90,7 +90,7 @@ export function shiftDecimalPoint(n: number, d: number): number {
     .join("");
   const zpadded = zeros + s + (s.indexOf(".") < 0 ? "." : "") + zeros;
   const dindex = zpadded.indexOf(".");
-  const ndindex = dindex - d;
+  const ndindex = dindex - (d > 0 ? d : d - 1);
   const ss = [
     zpadded.substring(0, ndindex).replace(/\./g, ""),
     zpadded.substring(ndindex).replace(/\./g, ""),
