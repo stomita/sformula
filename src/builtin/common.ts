@@ -71,3 +71,32 @@ export function convertIdFrom18To15(s: string) {
   }
   return s;
 }
+
+/**
+ *
+ */
+export function shiftDecimalPoint(n: number, d: number): number {
+  if (n === 0) {
+    return n;
+  }
+  const sign = n > 0 ? 1 : -1;
+  const s = String(n * sign);
+  // give up accurate shift if it is floating number
+  if (s.indexOf("e") >= 0) {
+    return n * 10 ** -d;
+  }
+  const zeros = Array.from({ length: Math.abs(d) })
+    .map(() => "0")
+    .join("");
+  const zpadded = zeros + s + (s.indexOf(".") < 0 ? "." : "") + zeros;
+  const dindex = zpadded.indexOf(".");
+  const ndindex = dindex - d;
+  const ss = [
+    zpadded.substring(0, ndindex).replace(/\./g, ""),
+    zpadded.substring(ndindex).replace(/\./g, ""),
+  ]
+    .join(".")
+    .replace(/^0+/, "");
+  const nn = Number(ss);
+  return sign * nn;
+}
