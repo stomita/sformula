@@ -80,9 +80,7 @@ export type ExpressionTypeDictionary = {
   [identifier: string]: Maybe<ExpressionType>;
 };
 
-export type MaybeTypeAnnotated<T> =
-  | T
-  | [T, string, Maybe<number>, Maybe<number>];
+export type MaybeTypeAnnotated<T> = T | [T, string]; // , Maybe<number>, Maybe<number>];
 
 export type DescribeFieldResult = {
   name: string;

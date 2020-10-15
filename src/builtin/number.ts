@@ -1,4 +1,4 @@
-import type { MaybeTypeAnnotated, Maybe } from "../types";
+import type { Maybe } from "../types";
 
 /**
  *
@@ -12,40 +12,17 @@ export default {
       type: "function",
       arguments: [
         {
-          argument: {
-            type: "template",
-            ref: "T",
-            anyOf: [
-              {
-                type: "number",
-              },
-              {
-                type: "currency",
-              },
-              {
-                type: "percent",
-              },
-            ],
-          },
+          argument: { type: "number" },
           optional: false,
         },
       ],
-      returns: { type: "template", ref: "T" },
+      returns: { type: "number" },
     },
   },
   CEILING: {
-    value: (value: MaybeTypeAnnotated<Maybe<number>>) => {
-      let v, vType;
-      if (Array.isArray(value)) {
-        [v, vType] = value;
-      } else {
-        v = value;
-      }
+    value: (v: Maybe<number>) => {
       if (v == null) {
         return null;
-      }
-      if (vType === "percent") {
-        return v >= 0 ? Math.ceil(v * 0.01) * 100 : -Math.ceil(-v * 0.01) * 100;
       }
       return v >= 0 ? Math.ceil(v) : -Math.ceil(-v);
     },
@@ -53,42 +30,17 @@ export default {
       type: "function",
       arguments: [
         {
-          argument: {
-            type: "template",
-            ref: "T",
-            anyOf: [
-              {
-                type: "number",
-              },
-              {
-                type: "currency",
-              },
-              {
-                type: "percent",
-              },
-            ],
-          },
+          argument: { type: "number" },
           optional: false,
         },
       ],
-      returns: { type: "template", ref: "T" },
+      returns: { type: "number" },
     },
   },
   FLOOR: {
-    value: (value: MaybeTypeAnnotated<Maybe<number>>) => {
-      let v, vType;
-      if (Array.isArray(value)) {
-        [v, vType] = value;
-      } else {
-        v = value;
-      }
+    value: (v: Maybe<number>) => {
       if (v == null) {
         return null;
-      }
-      if (vType === "percent") {
-        return v >= 0
-          ? Math.floor(v * 0.01) * 100
-          : -Math.floor(-v * 0.01) * 100;
       }
       return v >= 0 ? Math.floor(v) : -Math.floor(-v);
     },
@@ -96,71 +48,26 @@ export default {
       type: "function",
       arguments: [
         {
-          argument: {
-            type: "template",
-            ref: "T",
-            anyOf: [
-              {
-                type: "number",
-              },
-              {
-                type: "currency",
-              },
-              {
-                type: "percent",
-              },
-            ],
-          },
+          argument: { type: "number" },
           optional: false,
         },
       ],
-      returns: { type: "template", ref: "T" },
+      returns: { type: "number" },
     },
   },
   ROUND: {
-    value: (
-      value: MaybeTypeAnnotated<Maybe<number>>,
-      digits: MaybeTypeAnnotated<Maybe<number>>
-    ) => {
-      let v, vType, d;
-      if (Array.isArray(value)) {
-        [v, vType] = value;
-      } else {
-        v = value;
-      }
-      if (Array.isArray(digits)) {
-        [d] = digits;
-      } else {
-        d = digits;
-      }
+    value: (v: Maybe<number>, d: Maybe<number>) => {
       if (v == null || d == null) {
         return null;
       }
-      let factor = 10 ** Math.floor(d);
-      if (vType === "percent") {
-        factor = factor * 0.01;
-      }
+      const factor = 10 ** Math.floor(d);
       return Math.round(v * factor) / factor;
     },
     type: {
       type: "function",
       arguments: [
         {
-          argument: {
-            type: "template",
-            ref: "T",
-            anyOf: [
-              {
-                type: "number",
-              },
-              {
-                type: "currency",
-              },
-              {
-                type: "percent",
-              },
-            ],
-          },
+          argument: { type: "number" },
           optional: false,
         },
         {
@@ -168,22 +75,13 @@ export default {
           optional: false,
         },
       ],
-      returns: { type: "template", ref: "T" },
+      returns: { type: "number" },
     },
   },
   MCEILING: {
-    value: (value: MaybeTypeAnnotated<Maybe<number>>) => {
-      let v, vType;
-      if (Array.isArray(value)) {
-        [v, vType] = value;
-      } else {
-        v = value;
-      }
+    value: (v: Maybe<number>) => {
       if (v == null) {
         return null;
-      }
-      if (vType === "percent") {
-        return Math.ceil(v * 0.01) * 100;
       }
       return Math.ceil(v);
     },
@@ -191,40 +89,17 @@ export default {
       type: "function",
       arguments: [
         {
-          argument: {
-            type: "template",
-            ref: "T",
-            anyOf: [
-              {
-                type: "number",
-              },
-              {
-                type: "currency",
-              },
-              {
-                type: "percent",
-              },
-            ],
-          },
+          argument: { type: "number" },
           optional: false,
         },
       ],
-      returns: { type: "template", ref: "T" },
+      returns: { type: "number" },
     },
   },
   MFLOOR: {
-    value: (value: MaybeTypeAnnotated<Maybe<number>>) => {
-      let v, vType;
-      if (Array.isArray(value)) {
-        [v, vType] = value;
-      } else {
-        v = value;
-      }
+    value: (v: Maybe<number>) => {
       if (v == null) {
         return null;
-      }
-      if (vType === "percent") {
-        return Math.floor(v * 0.01) * 100;
       }
       return Math.floor(v);
     },
@@ -232,25 +107,11 @@ export default {
       type: "function",
       arguments: [
         {
-          argument: {
-            type: "template",
-            ref: "T",
-            anyOf: [
-              {
-                type: "number",
-              },
-              {
-                type: "currency",
-              },
-              {
-                type: "percent",
-              },
-            ],
-          },
+          argument: { type: "number" },
           optional: false,
         },
       ],
-      returns: { type: "template", ref: "T" },
+      returns: { type: "number" },
     },
   },
   EXP: {
@@ -326,20 +187,11 @@ export default {
     },
   },
   MAX: {
-    value: (...nums: Array<MaybeTypeAnnotated<Maybe<number>>>) => {
+    value: (...nums: Array<Maybe<number>>) => {
       let max = null;
-      for (const num of nums) {
-        let n, nType;
-        if (Array.isArray(num)) {
-          [n, nType] = num;
-        } else {
-          n = num;
-        }
+      for (const n of nums) {
         if (n == null) {
           return null;
-        }
-        if (nType === "percent") {
-          n = n * 0.01;
         }
         if (max == null || max < n) {
           max = n;
@@ -350,41 +202,18 @@ export default {
     type: {
       type: "function",
       arguments: Array.from({ length: 50 }).map((_, i) => ({
-        argument: {
-          type: "template",
-          ref: `T${i}`,
-          anyOf: [
-            {
-              type: "number",
-            },
-            {
-              type: "currency",
-            },
-            {
-              type: "percent",
-            },
-          ],
-        },
+        argument: { type: "number" },
         optional: i > 0,
       })),
       returns: { type: "number" },
     },
   },
   MIN: {
-    value: (...nums: Array<MaybeTypeAnnotated<Maybe<number>>>) => {
+    value: (...nums: Array<Maybe<number>>) => {
       let min = null;
-      for (const num of nums) {
-        let n, nType;
-        if (Array.isArray(num)) {
-          [n, nType] = num;
-        } else {
-          n = num;
-        }
+      for (const n of nums) {
         if (n == null) {
           return null;
-        }
-        if (nType === "percent") {
-          n = n * 0.01;
         }
         if (min == null || min > n) {
           min = n;
@@ -395,50 +224,19 @@ export default {
     type: {
       type: "function",
       arguments: Array.from({ length: 50 }).map((_, i) => ({
-        argument: {
-          type: "template",
-          ref: `T${i}`,
-          anyOf: [
-            {
-              type: "number",
-            },
-            {
-              type: "currency",
-            },
-            {
-              type: "percent",
-            },
-          ],
-        },
+        argument: { type: "number" },
         optional: i > 0,
       })),
       returns: { type: "number" },
     },
   },
   MOD: {
-    value: (
-      num: MaybeTypeAnnotated<Maybe<number>>,
-      div: MaybeTypeAnnotated<Maybe<number>>
-    ) => {
-      let n, nType, d;
-      if (Array.isArray(num)) {
-        [n, nType] = num;
-      } else {
-        n = num;
-      }
-      if (Array.isArray(div)) {
-        [d] = div;
-      } else {
-        d = div;
-      }
+    value: (n: Maybe<number>, d: Maybe<number>) => {
       if (n == null || d == null) {
         return null;
       }
       if (d === 0) {
         return n;
-      }
-      if (nType === "percent") {
-        return ((n * 0.01) % d) * 100;
       }
       return n % d;
     },
@@ -446,21 +244,7 @@ export default {
       type: "function",
       arguments: [
         {
-          argument: {
-            type: "template",
-            ref: "T",
-            anyOf: [
-              {
-                type: "number",
-              },
-              {
-                type: "currency",
-              },
-              {
-                type: "percent",
-              },
-            ],
-          },
+          argument: { type: "number" },
           optional: false,
         },
         {
@@ -468,7 +252,7 @@ export default {
           optional: false,
         },
       ],
-      returns: { type: "template", ref: "T" },
+      returns: { type: "number" },
     },
   },
 };
