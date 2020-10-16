@@ -138,7 +138,10 @@
   formula: Number01__c + 2 < 0.5 * Number02__c
 -
   type: Text
-  formula: Text01__c & "\"" & Text01__c
+  formula: Text01__c & " " & Text02__c
+-
+  type: Text
+  formula: Text01__c & "\"" & Text02__c
 -
   type: Text
   formula: Text01__c + "_" + Text02__c
