@@ -58,7 +58,7 @@ export function castValue(
   }
   // trim the space from the output
   if (dstType === "string" && srcType === "string") {
-    value = String(value).replace(/^\s+|\s+$/g, "");
+    value = String(value).trim() || null;
   }
   return value;
 }
