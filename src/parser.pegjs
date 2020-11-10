@@ -169,7 +169,7 @@ ParenExpression =
  * Identifier
  */
 Identifier =
-  id:([a-zA-Z][0-9a-zA-Z_]* { return text() }) & { return !isReserved(id) } {
+  id:([a-zA-Z_$][0-9a-zA-Z_$]* { return text() }) & { return !isReserved(id) } {
     return createIdentifier(id);
   }
 / Literal
