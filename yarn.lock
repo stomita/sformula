@@ -4877,10 +4877,10 @@ jsesc@~0.5.0:
   resolved "https://registry.yarnpkg.com/jsesc/-/jsesc-0.5.0.tgz#e7dee66e35d6fc16f710fe91d5cf69f70f08911d"
   integrity sha1-597mbjXW/Bb3EP6R1c9p9w8IkR0=
 
-jsforce@^2.0.0-alpha.12:
-  version "2.0.0-alpha.12"
-  resolved "https://registry.yarnpkg.com/jsforce/-/jsforce-2.0.0-alpha.12.tgz#6bfcf639eb15304d3cb3c5c0ed5a2050d244ae26"
-  integrity sha512-5KhRl5sT/ZU/mqR37J7HScxHNt4qiA/NQhB5K2mImAuPFpEKId+Y3UcG9XWFh0+qe2A+R4KYq2pLzgC/Uxomsg==
+jsforce@^2.0.0-alpha.13:
+  version "2.0.0-alpha.13"
+  resolved "https://registry.yarnpkg.com/jsforce/-/jsforce-2.0.0-alpha.13.tgz#647f153680bd13790c855bb143e62e8d5b6ca0cb"
+  integrity sha512-QpfiJFn8bKhb6JDHZNRjCH8pOh5J2xcb0MmWVdl5QselDsYcIsgaZz7yrs+9KI/88PeG/Odr+1XpgRyG+w5gSg==
   dependencies:
     "@babel/runtime" "^7.8.3"
     "@babel/runtime-corejs3" "^7.8.3"
@@ -4896,6 +4896,7 @@ jsforce@^2.0.0-alpha.12:
     open "^7.0.0"
     regenerator-runtime "^0.13.3"
     request "^2.88.0"
+    strip-ansi "^6.0.0"
     xml2js "^0.4.22"
 
 json-parse-better-errors@^1.0.1, json-parse-better-errors@^1.0.2:
