@@ -1,4 +1,3 @@
-import {} from "./error";
 import type {
   Describer,
   ExpressionType,
