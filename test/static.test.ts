@@ -1,5 +1,7 @@
 import assert from "assert";
-import { parseSync } from "..";
+import { parseSync, parse } from "..";
+import { DescribeSObjectResult } from "../src/types";
+import { describe } from "./utils/schema";
 
 test("should yield null value if the result is empty or space", () => {
   const formula = "Text__c & ' ' & Text__c";
@@ -56,4 +58,49 @@ test("should correctly calculate WEEKDAY()", () => {
   assert(ret5 === 5);
   assert(ret6 === 6);
   assert(ret7 === 7);
+});
+
+const ACCOUNT_DESC: DescribeSObjectResult = {
+  label: "Account",
+  name: "Account",
+  fields: [
+    {
+      name: "Name",
+      type: "string",
+      label: "Name",
+      precision: 0,
+      scale: 0,
+      relationshipName: null,
+      referenceTo: [],
+      picklistValues: [],
+    },
+  ],
+};
+
+test("should describe only fields that are not in given types", async () => {
+  const formula = "$User.Id + ': ' + Name";
+  const described: { [name: string]: boolean } = {};
+  const fml = await parse(formula, {
+    inputTypes: {
+      $User: {
+        type: "object",
+        properties: {
+          Id: {
+            type: "string",
+          },
+        },
+      },
+    },
+    sobject: "Account",
+    describe: async (sobject: string) => {
+      described[sobject] = true;
+      return process.env.MOCK_DESCRIBE_REMOTE
+        ? describe(sobject)
+        : ACCOUNT_DESC;
+    },
+    returnType: "string",
+  });
+  const ret = fml.evaluate({ $User: { Id: "u001" }, Name: "Account #1" });
+  assert(described["Account"]);
+  assert(ret === "u001: Account #1");
 });
