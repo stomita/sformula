@@ -28,7 +28,7 @@ LogicalExpression = OrExpression
 
 OrExpression =
   head:AndExpression tail:OrExpressionTail* {
-    return concatinateLogicalExpressions(head, tail);
+    return concatinateLogicalExpressions(head, tail, location());
   }
 
 OrExpressionTail =
@@ -40,7 +40,7 @@ OrOperator = '||' { return text(); }
 
 AndExpression =
   head:BinaryExpression tail:AndExpressionTail* {
-    return concatinateLogicalExpressions(head, tail);
+    return concatinateLogicalExpressions(head, tail, location());
   }
 
 AndExpressionTail =
@@ -57,7 +57,7 @@ BinaryExpression = ComparisonExpression
 
 ComparisonExpression = 
   head:AdditiveExpression tail:ComparisonExpressionTail* {
-    return concatinateBinaryExpressions(head, tail);
+    return concatinateBinaryExpressions(head, tail, location());
   }
 
 ComparisonExpressionTail =
@@ -77,7 +77,7 @@ ComparisonOperator =
 
 AdditiveExpression = 
   head:MultiplicativeExpression tail:AdditiveExpressionTail* {
-    return concatinateBinaryExpressions(head, tail);
+    return concatinateBinaryExpressions(head, tail, location());
   }
 
 AdditiveExpressionTail =
@@ -91,7 +91,7 @@ AdditiveOperator =
 
 MultiplicativeExpression = 
   head:ExponentialExpression tail:MultiplicativeExpressionTail* {
-    return concatinateBinaryExpressions(head, tail);
+    return concatinateBinaryExpressions(head, tail, location());
   } 
 
 MultiplicativeExpressionTail =  
@@ -104,7 +104,7 @@ MultiplicativeOperator =
 
 ExponentialExpression =
   head:UnaryExpression tail:ExponentialExpressionTail* {
-    return concatinateBinaryExpressions(head, tail);
+    return concatinateBinaryExpressions(head, tail, location());
   }
 
 ExponentialExpressionTail =
@@ -119,7 +119,7 @@ ExponentialOperator = '^' { return '**'; }
  */
 UnaryExpression =
   op:UnaryOperator _ expr:UnaryExpression {
-    return createUnaryExpression(op, expr);
+    return createUnaryExpression(op, expr, location());
   }
 / CallExpression
 
@@ -131,7 +131,7 @@ UnaryOperator =
  */
 CallExpression =
   callee:Identifier _ LPAREN _ args:CallArgumentList? _ RPAREN {
-    return createCallExpression(callee, args || []);
+    return createCallExpression(callee, args || [], location());
   }
 / FieldExpression
 
@@ -146,7 +146,7 @@ CallArgumentList =
  */
 FieldExpression =
   fpath:FieldPath {
-    return createFieldExpression(fpath);
+    return createFieldExpression(fpath, location());
   }
 / ParenExpression
 
@@ -170,7 +170,7 @@ ParenExpression =
  */
 Identifier =
   id:([a-zA-Z_$][0-9a-zA-Z_$]* { return text() }) & { return !isReserved(id) } {
-    return createIdentifier(id);
+    return createIdentifier(id, location());
   }
 / Literal
 
@@ -185,7 +185,7 @@ Literal =
 
 NumberLiteral =
   n:Number {
-    return createNumberLiteral(n)
+    return createNumberLiteral(n, location())
   }
 
 Number =
@@ -207,10 +207,10 @@ Digit19 = [1-9]
 
 StringLiteral =
   QUOTE ca:(SingleChar*) QUOTE {
-    return createStringLiteral(ca.join(''));
+    return createStringLiteral(ca.join(''), location);
   }
 / DQUOTE ca:(SingleChar*) DQUOTE {
-    return createStringLiteral(ca.join(''));
+    return createStringLiteral(ca.join(''), location);
   }
 
 SingleChar =
@@ -224,14 +224,14 @@ EscapeChar =
 
 BooleanLiteral =
   TRUE {
-    return createBooleanLiteral(text());
+    return createBooleanLiteral(text(), location());
   }
 / FALSE {
-    return createBooleanLiteral(text());
+    return createBooleanLiteral(text(), location());
   }
 
 NullLiteral =
-  NULL { return createNullLiteral(text()); }
+  NULL { return createNullLiteral(text(), location()); }
 
 /**
  * 
