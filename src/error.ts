@@ -1,4 +1,4 @@
-import { Expression, Identifier } from "esformula";
+import { Expression } from "esformula";
 
 /**
  *
@@ -117,32 +117,6 @@ export class TypeNotFoundError extends ValidationError {
 export class UnexpectedError extends ValidationError {
   constructor(expression: Expression, message: string) {
     super(expression, "UnexpectedError", message);
-  }
-}
-
-/**
- *
- */
-export class FieldDescriptionError extends Error {
-  sobject: string;
-  field: string;
-  constructor(sobject: string, field: string) {
-    super(`cannot describe field ${field} on ${sobject}`);
-    this.name = "FieldDescriptionError";
-    this.sobject = sobject;
-    this.field = field;
-  }
-}
-
-/**
- *
- */
-export class InvalidFieldPathError extends Error {
-  fieldPath: string;
-  constructor(fieldPath: string) {
-    super(`cannot access to field path: ${fieldPath}`);
-    this.name = "InvalidFieldPathError";
-    this.fieldPath = fieldPath;
   }
 }
 

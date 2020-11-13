@@ -13,9 +13,7 @@ import { createFieldTypeDictionary } from "./fieldType";
 import { traverse } from "./traverse";
 import { isCastableType, castValue } from "./cast";
 import {
-  FieldDescriptionError,
   InvalidArgLengthError,
-  InvalidFieldPathError,
   InvalidOperatorError,
   InvalidTypeError,
   SyntaxError,
@@ -26,9 +24,7 @@ import {
 } from "./error";
 
 export {
-  FieldDescriptionError,
   InvalidArgLengthError,
-  InvalidFieldPathError,
   InvalidOperatorError,
   InvalidTypeError,
   SyntaxError,

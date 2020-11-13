@@ -1,4 +1,4 @@
-import { FieldDescriptionError, InvalidFieldPathError } from "./error";
+import {} from "./error";
 import type {
   Describer,
   ExpressionType,
@@ -8,13 +8,20 @@ import type {
 async function describeFieldType(
   field: string,
   describer: Describer
-): Promise<ExpressionType> {
-  const so = await describer.describe(describer.sobject);
+): Promise<ExpressionType | null> {
+  let so;
+  try {
+    so = await describer.describe(describer.sobject);
+  } catch (e) {
+    console.error(`failed to describe sobject: ${describer.sobject}`);
+    console.error(e.message);
+    return null;
+  }
   const fieldDef = so.fields.find(
     (f) => f.name === field || f.relationshipName === field
   );
   if (!fieldDef) {
-    throw new FieldDescriptionError(describer.sobject, field);
+    return null;
   }
   switch (fieldDef.type) {
     case "string":
@@ -56,7 +63,7 @@ async function describeFieldType(
         ? { type: "object", sobject: fieldDef.referenceTo[0], properties: {} }
         : { type: "object", sobject: "Name", properties: {} };
     default:
-      throw new FieldDescriptionError(describer.sobject, field);
+      return null;
   }
 }
 
@@ -69,12 +76,14 @@ async function applyFieldTypePath(
   let target: typeof dict | null = dict;
   for (const field of fieldPath) {
     if (!target) {
-      throw new InvalidFieldPathError(fieldPath.join("."));
+      return dict; // quit describe
     }
     const fieldType: ExpressionType | null =
       target[field] ??
       (describer ? await describeFieldType(field, describer) : null);
-    target[field] = fieldType;
+    if (fieldType) {
+      target[field] = fieldType;
+    }
     if (fieldType?.type === "object") {
       target = fieldType.properties;
       describer =
