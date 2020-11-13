@@ -1,3 +1,4 @@
+import { FieldDescriptionError, InvalidFieldPathError } from "./error";
 import type {
   Describer,
   ExpressionType,
@@ -13,7 +14,7 @@ async function describeFieldType(
     (f) => f.name === field || f.relationshipName === field
   );
   if (!fieldDef) {
-    throw new Error(`cannot describe field ${field} on ${describer.sobject}`);
+    throw new FieldDescriptionError(describer.sobject, field);
   }
   switch (fieldDef.type) {
     case "string":
@@ -55,9 +56,7 @@ async function describeFieldType(
         ? { type: "object", sobject: fieldDef.referenceTo[0], properties: {} }
         : { type: "object", sobject: "Name", properties: {} };
     default:
-      throw new Error(
-        `describe field ${field} on ${describer.sobject} is not supported`
-      );
+      throw new FieldDescriptionError(describer.sobject, field);
   }
 }
 
@@ -70,7 +69,7 @@ async function applyFieldTypePath(
   let target: typeof dict | null = dict;
   for (const field of fieldPath) {
     if (!target) {
-      throw new Error(`cannot access to field path ${fieldPath.join(".")}`);
+      throw new InvalidFieldPathError(fieldPath.join("."));
     }
     const fieldType: ExpressionType | null =
       target[field] ??

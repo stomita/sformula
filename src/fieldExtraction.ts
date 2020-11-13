@@ -1,10 +1,11 @@
 import type { Expression, MemberExpression } from "esformula";
+import { UnknownError } from "./error";
 
 function extractFieldsFromMemberExpression(
   expression: MemberExpression
 ): string {
   if (expression.object.type === "Super") {
-    throw new Error("could not be reached here");
+    throw new UnknownError("could not be reached here");
   }
   return [
     ...extractFieldsFromExpression(expression.object),
@@ -25,7 +26,7 @@ function extractFieldsFromExpression(expression: Expression): string[] {
     case "CallExpression":
       return expression.arguments.reduce((fields, arg) => {
         if (arg.type === "SpreadElement") {
-          throw new Error("could not be reached here");
+          throw new UnknownError("could not be reached here");
         }
         return [...fields, ...extractFieldsFromExpression(arg)];
       }, [] as string[]);

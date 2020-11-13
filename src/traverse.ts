@@ -10,6 +10,12 @@ import type {
   Identifier,
   Literal,
 } from "esformula";
+import {
+  InvalidArgLengthError,
+  InvalidOperatorError,
+  InvalidTypeError,
+  UnexpectedError,
+} from "./error";
 import type {
   ExpressionType,
   ExpressionTypeDictionary,
@@ -20,55 +26,6 @@ export type TraverseResult = {
   expression: Expression;
   returnType: ExpressionType;
 };
-
-export function validationError(
-  expression: Expression,
-  name: string,
-  message: string
-) {
-  const err = new Error(message);
-  err.name = name;
-  if (expression.loc) {
-    (err as any).lineNumber = expression.loc.start.line;
-    (err as any).columnNumber = expression.loc.start.column;
-  }
-  return err;
-}
-
-export function invalidArgLengthError(
-  expression: Expression,
-  argLen: number,
-  argRange: [number, number]
-) {
-  const message = `arguments num for the call is too small (expected ${
-    argRange[0] === argRange[1] ? argRange[0] : `${argRange[0]}-${argRange[1]}`
-  }, found ${argLen})`;
-  return validationError(expression, "INVALID_ARGUMENT_LENGTH", message);
-}
-
-export function invalidTypeError(
-  expression: Expression,
-  type: string,
-  expected: string[]
-) {
-  const message = `expected a ${expected
-    .map((e) => `'${e}'`)
-    .join(" or ")} type value, but '${type}' type found`;
-  return validationError(expression, "INVALID_TYPE", message);
-}
-
-export function invalidOperatorError(
-  expression: Expression,
-  type: string,
-  operator: string
-) {
-  const message = `operator ${operator} cannot be applied to '${type}' type value`;
-  return validationError(expression, "INVALID_OPERATOR", message);
-}
-
-export function unexpectedError(expression: Expression, message: string) {
-  return validationError(expression, "UNEXPECTED_ERROR", message);
-}
 
 function createCallExpression(
   name: string,
@@ -190,7 +147,7 @@ function traverseUnaryExpression(
     blankAsZero
   );
   if (operator !== "-" && operator !== "+" && operator !== "!") {
-    throw invalidOperatorError(
+    throw new InvalidOperatorError(
       expression.argument,
       argumentType.type,
       operator
@@ -199,7 +156,7 @@ function traverseUnaryExpression(
   switch (argumentType.type) {
     case "number":
       if (operator !== "-" && operator === "+") {
-        throw invalidOperatorError(
+        throw new InvalidOperatorError(
           expression.argument,
           argumentType.type,
           operator
@@ -208,7 +165,7 @@ function traverseUnaryExpression(
       break;
     case "boolean":
       if (operator !== "!") {
-        throw invalidOperatorError(
+        throw new InvalidOperatorError(
           expression.argument,
           argumentType.type,
           operator
@@ -216,7 +173,7 @@ function traverseUnaryExpression(
       }
       break;
     default:
-      throw invalidTypeError(expression.argument, argumentType.type, [
+      throw new InvalidTypeError(expression.argument, argumentType.type, [
         "boolean",
       ]);
   }
@@ -234,7 +191,7 @@ function traverseStringBinaryExpression(
   const { operator } = expression;
   const rightType = right.returnType.type;
   if (rightType !== "string" && rightType !== "any") {
-    throw invalidTypeError(expression.right, rightType, ["string"]);
+    throw new InvalidTypeError(expression.right, rightType, ["string"]);
   }
   switch (operator) {
     case "+":
@@ -264,7 +221,7 @@ function traverseStringBinaryExpression(
         returnType: { type: "boolean" },
       };
     default:
-      throw invalidOperatorError(
+      throw new InvalidOperatorError(
         expression.left,
         left.returnType.type,
         operator
@@ -313,7 +270,7 @@ function traverseNumberBinaryExpression(
   const { operator } = expression;
   const rightType = right.returnType;
   if (rightType.type !== "number" && rightType.type !== "any") {
-    throw invalidTypeError(expression.right, rightType.type, ["number"]);
+    throw new InvalidTypeError(expression.right, rightType.type, ["number"]);
   }
   switch (operator) {
     case "+":
@@ -344,7 +301,7 @@ function traverseNumberBinaryExpression(
         returnType: { type: "boolean" },
       };
     default:
-      throw invalidOperatorError(
+      throw new InvalidOperatorError(
         expression.left,
         left.returnType.type,
         operator
@@ -373,7 +330,7 @@ function traverseDateBinaryExpression(
   switch (operator) {
     case "+":
       if (rightType !== "number" && rightType !== "any") {
-        throw invalidTypeError(expression.right, rightType, ["number"]);
+        throw new InvalidTypeError(expression.right, rightType, ["number"]);
       }
       return {
         expression: createCallExpression("$$ADD_DATE$$", [
@@ -400,7 +357,10 @@ function traverseDateBinaryExpression(
           returnType: { type: "number" },
         };
       } else {
-        throw invalidTypeError(expression.right, rightType, ["number", "date"]);
+        throw new InvalidTypeError(expression.right, rightType, [
+          "number",
+          "date",
+        ]);
       }
     case "<":
     case ">":
@@ -411,7 +371,7 @@ function traverseDateBinaryExpression(
     case "===":
     case "!==": {
       if (rightType !== "date") {
-        throw invalidTypeError(expression.right, rightType, ["date"]);
+        throw new InvalidTypeError(expression.right, rightType, ["date"]);
       }
       const name = DATE_OPERATOR_FN[operator];
       return {
@@ -423,7 +383,7 @@ function traverseDateBinaryExpression(
       };
     }
     default:
-      throw invalidOperatorError(
+      throw new InvalidOperatorError(
         expression.left,
         left.returnType.type,
         operator
@@ -452,7 +412,7 @@ function traverseDatetimeBinaryExpression(
   switch (operator) {
     case "+":
       if (rightType !== "number" && rightType !== "any") {
-        throw invalidTypeError(expression.right, rightType, ["number"]);
+        throw new InvalidTypeError(expression.right, rightType, ["number"]);
       }
       return {
         expression: createCallExpression("$$ADD_DATETIME$$", [
@@ -479,7 +439,7 @@ function traverseDatetimeBinaryExpression(
           returnType: { type: "number" },
         };
       } else {
-        throw invalidTypeError(expression.right, rightType, [
+        throw new InvalidTypeError(expression.right, rightType, [
           "number",
           "datetime",
         ]);
@@ -493,7 +453,7 @@ function traverseDatetimeBinaryExpression(
     case "===":
     case "!==": {
       if (rightType !== "datetime") {
-        throw invalidTypeError(expression.right, rightType, ["datetime"]);
+        throw new InvalidTypeError(expression.right, rightType, ["datetime"]);
       }
       const name = DATETIME_OPERATOR_FN[operator];
       return {
@@ -505,7 +465,7 @@ function traverseDatetimeBinaryExpression(
       };
     }
     default:
-      throw invalidOperatorError(
+      throw new InvalidOperatorError(
         expression.left,
         left.returnType.type,
         operator
@@ -534,7 +494,7 @@ function traverseTimeBinaryExpression(
   switch (operator) {
     case "+":
       if (rightType !== "number" && rightType !== "any") {
-        throw invalidTypeError(expression.right, rightType, ["number"]);
+        throw new InvalidTypeError(expression.right, rightType, ["number"]);
       }
       return {
         expression: createCallExpression("$$ADD_TIME$$", [
@@ -561,7 +521,10 @@ function traverseTimeBinaryExpression(
           returnType: { type: "number" },
         };
       } else {
-        throw invalidTypeError(expression.right, rightType, ["number", "time"]);
+        throw new InvalidTypeError(expression.right, rightType, [
+          "number",
+          "time",
+        ]);
       }
     case "<":
     case ">":
@@ -572,7 +535,7 @@ function traverseTimeBinaryExpression(
     case "===":
     case "!==": {
       if (rightType !== "time") {
-        throw invalidTypeError(expression.right, rightType, ["time"]);
+        throw new InvalidTypeError(expression.right, rightType, ["time"]);
       }
       const name = TIME_OPERATOR_FN[operator];
       return {
@@ -584,7 +547,7 @@ function traverseTimeBinaryExpression(
       };
     }
     default:
-      throw invalidOperatorError(
+      throw new InvalidOperatorError(
         expression.left,
         left.returnType.type,
         operator
@@ -612,7 +575,7 @@ function traverseBinaryExpression(
     case "time":
       return traverseTimeBinaryExpression(expression, left, right);
     default:
-      throw invalidTypeError(expression.left, leftType, [
+      throw new InvalidTypeError(expression.left, leftType, [
         "string",
         "number",
         "date",
@@ -640,7 +603,7 @@ function traverseLogicalExpression(
   switch (leftType) {
     case "boolean":
       if (rightType !== "boolean" && rightType !== "any") {
-        throw invalidTypeError(expression.right, rightType, ["boolean"]);
+        throw new InvalidTypeError(expression.right, rightType, ["boolean"]);
       }
       return {
         expression: createCallExpression(LOGICAL_OPERATOR_FN[operator], [
@@ -650,7 +613,7 @@ function traverseLogicalExpression(
         returnType: { type: "boolean" },
       };
     default:
-      throw invalidTypeError(expression.left, leftType, ["boolean"]);
+      throw new InvalidTypeError(expression.left, leftType, ["boolean"]);
   }
 }
 
@@ -661,7 +624,7 @@ function traverseCallExpression(
 ): TraverseResult {
   const { type, callee, arguments: args, ...rexpression } = expression;
   if (callee.type === "Super") {
-    throw unexpectedError(expression, "callee cannot be a super type");
+    throw new UnexpectedError(expression, "callee cannot be a super type");
   }
   const { expression: callee_, returnType: calleeType } = traverseExpression(
     callee,
@@ -669,7 +632,7 @@ function traverseCallExpression(
     blankAsZero
   );
   if (calleeType.type !== "function") {
-    throw invalidTypeError(callee, calleeType.type, ["function"]);
+    throw new InvalidTypeError(callee, calleeType.type, ["function"]);
   }
   const calleeArgTypes: FunctionArgType[] = Array.isArray(calleeType.arguments)
     ? calleeType.arguments
@@ -678,14 +641,14 @@ function traverseCallExpression(
   const maxArgLen = calleeArgTypes.length;
   const argLen = args.length;
   if (argLen < minArgLen || maxArgLen < argLen) {
-    throw invalidArgLengthError(callee, argLen, [minArgLen, maxArgLen]);
+    throw new InvalidArgLengthError(callee, argLen, [minArgLen, maxArgLen]);
   }
   const args_ = [];
   const argumentTypes = [];
   const templateTypes: { [name: string]: ExpressionType | undefined } = {};
   for (const [i, arg] of args.entries()) {
     if (arg.type === "SpreadElement") {
-      throw unexpectedError(
+      throw new UnexpectedError(
         expression,
         "argument cannot be a spread element type"
       );
@@ -701,7 +664,9 @@ function traverseCallExpression(
           argumentType.type !== "any" &&
           argumentType.type !== templateType.type
         ) {
-          throw invalidTypeError(arg, argumentType.type, [templateType.type]);
+          throw new InvalidTypeError(arg, argumentType.type, [
+            templateType.type,
+          ]);
         }
         if (templateType.type === "any" && argumentType.type !== "any") {
           templateTypes[expectedType.ref] = argumentType;
@@ -714,7 +679,7 @@ function traverseCallExpression(
           anyOfTypes.indexOf(argumentType.type) < 0 &&
           argumentType.type !== "any"
         ) {
-          throw invalidTypeError(arg, argumentType.type, anyOfTypes);
+          throw new InvalidTypeError(arg, argumentType.type, anyOfTypes);
         }
         templateTypes[expectedType.ref] = argumentType;
       }
@@ -722,7 +687,7 @@ function traverseCallExpression(
       expectedType.type !== "any" &&
       argumentType.type !== expectedType.type
     ) {
-      throw invalidTypeError(arg, argumentType.type, [expectedType.type]);
+      throw new InvalidTypeError(arg, argumentType.type, [expectedType.type]);
     }
     args_.push(argument.expression);
     argumentTypes.push(argumentType);
@@ -752,19 +717,19 @@ function traverseMemberExpression(
 ): TraverseResult {
   const { type, object, property, ...rexpression } = expression;
   if (object.type === "Super") {
-    throw unexpectedError(expression, "object cannot be a super type");
+    throw new UnexpectedError(expression, "object cannot be a super type");
   }
   const objectResult = traverseExpression(object, typeDict, blankAsZero);
   const objectType = objectResult.returnType;
   if (objectType.type !== "object") {
-    throw invalidTypeError(object, objectType.type, ["object"]);
+    throw new InvalidTypeError(object, objectType.type, ["object"]);
   }
   if (property.type !== "Identifier") {
-    throw unexpectedError(property, "property must be an identifier");
+    throw new UnexpectedError(property, "property must be an identifier");
   }
   const returnType = objectType.properties[property.name];
   if (!returnType) {
-    throw unexpectedError(
+    throw new UnexpectedError(
       property,
       `property ${property.name} is not found in object`
     );
@@ -841,7 +806,7 @@ export function traverseExpression(
     case "Literal":
       return traverseLiteral(expression);
     default:
-      throw unexpectedError(
+      throw new UnexpectedError(
         expression,
         `unexpected expression type found: ${expression.type}`
       );

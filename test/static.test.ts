@@ -104,3 +104,18 @@ test("should describe only fields that are not in given types", async () => {
   assert(described["Account"]);
   assert(ret === "u001: Account #1");
 });
+
+test("should raise parse error", () => {
+  const formula = "Text__c !";
+  try {
+    parseSync(formula, {
+      inputTypes: {
+        Text__c: { type: "string" },
+      },
+      returnType: "string",
+    });
+    assert.fail("should not reach here");
+  } catch (e) {
+    assert(e.name === "SyntaxError");
+  }
+});
