@@ -1,4 +1,4 @@
-import { Expression } from "esformula";
+import { Expression, Identifier } from "esformula";
 
 /**
  *
@@ -95,6 +95,19 @@ export class InvalidOperatorError extends ValidationError {
     super(expression, "InvalidOperatorError", message);
     this.type = type;
     this.operator = operator;
+  }
+}
+
+/**
+ *
+ */
+export class TypeNotFoundError extends ValidationError {
+  identifier: string;
+
+  constructor(expression: Expression, identifier: string) {
+    const message = `type information is not found: ${identifier}`;
+    super(expression, "TypeNotFoundError", message);
+    this.identifier = identifier;
   }
 }
 

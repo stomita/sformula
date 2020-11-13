@@ -15,6 +15,7 @@ import {
   InvalidOperatorError,
   InvalidTypeError,
   UnexpectedError,
+  TypeNotFoundError,
 } from "./error";
 import type {
   ExpressionType,
@@ -755,9 +756,7 @@ function traverseIdentifier(
 ) {
   const returnType = typeDict[expression.name];
   if (!returnType) {
-    throw new Error(
-      `identifier type information is not found: ${expression.name}`
-    );
+    throw new TypeNotFoundError(expression, expression.name);
   }
   let result: TraverseResult = { expression, returnType };
   if (returnType.type === "id") {
