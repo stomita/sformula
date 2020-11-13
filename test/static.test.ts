@@ -94,7 +94,9 @@ test("should describe only fields that are not in given types", async () => {
     sobject: "Account",
     describe: async (sobject: string) => {
       described[sobject] = true;
-      return process.env.SF_CONNECTION_NAME ? describe(sobject) : ACCOUNT_DESC;
+      return process.env.MOCK_DESCRIBE_REMOTE
+        ? describe(sobject)
+        : ACCOUNT_DESC;
     },
     returnType: "string",
   });
