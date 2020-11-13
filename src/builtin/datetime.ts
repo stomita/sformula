@@ -202,7 +202,9 @@ export default {
         return null;
       }
       const dt = parseDate(s);
-      return dt.isValid ? (dt.weekday % 7) - 1 : null;
+      // Luxon returns 7 for Sunday, 1 for Monday
+      // should return 1 for Sunday, 2 for Monday in Salesforce WEEKDAY().
+      return dt.isValid ? (dt.weekday % 7) + 1 : null;
     },
     type: {
       type: "function",
