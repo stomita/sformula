@@ -157,7 +157,11 @@ export async function parse(
   } = options;
   const expression: Expression = parseFormula(formula);
   const fields = extractFields(expression);
-  const fieldTypes = await createFieldTypeDictionary(fields, describer);
+  const fieldTypes = await createFieldTypeDictionary(
+    inputTypes,
+    fields,
+    describer
+  );
   try {
     return traverseAndCreateFormula(
       expression,
