@@ -10,8 +10,27 @@ import { parseFormula } from "./formula";
 import { context as builtins, types as builtinTypes } from "./builtin";
 import { extractFields } from "./fieldExtraction";
 import { createFieldTypeDictionary } from "./fieldType";
-import { traverse, invalidTypeError } from "./traverse";
+import { traverse } from "./traverse";
 import { isCastableType, castValue } from "./cast";
+import {
+  InvalidArgLengthError,
+  InvalidOperatorError,
+  InvalidTypeError,
+  SyntaxError,
+  TypeNotFoundError,
+  UnexpectedError,
+  ValidationError,
+} from "./error";
+
+export {
+  InvalidArgLengthError,
+  InvalidOperatorError,
+  InvalidTypeError,
+  SyntaxError,
+  TypeNotFoundError,
+  UnexpectedError,
+  ValidationError,
+};
 
 export type FormulaReturnType = PrimitiveExpressionType["type"];
 
@@ -87,7 +106,7 @@ function traverseAndCreateFormula(
     calculatedType.type === "function" ||
     calculatedType.type === "template"
   ) {
-    throw invalidTypeError(expression, calculatedType.type, [
+    throw new InvalidTypeError(expression, calculatedType.type, [
       "string",
       "number",
       "currency",
@@ -99,7 +118,7 @@ function traverseAndCreateFormula(
     ]);
   }
   if (returnType && !isCastableType(calculatedType.type, returnType)) {
-    throw invalidTypeError(expression, calculatedType.type, [returnType]);
+    throw new InvalidTypeError(expression, calculatedType.type, [returnType]);
   }
   return create({
     expression: expression_,
@@ -126,19 +145,11 @@ export function parseSync(
     scale,
     blankAsZero = false,
   } = options;
-
-  try {
-    return traverseAndCreateFormula(expression, types, fields, {
-      returnType,
-      scale,
-      blankAsZero,
-    });
-  } catch (e) {
-    console.log(e.stack);
-    console.log({ returnType });
-    console.log(expression);
-    throw e;
-  }
+  return traverseAndCreateFormula(expression, types, fields, {
+    returnType,
+    scale,
+    blankAsZero,
+  });
 }
 
 /**
@@ -155,30 +166,23 @@ export async function parse(
     blankAsZero = false,
     ...describer
   } = options;
-  const expression: Expression = parseFormula(formula);
+  const expression = parseFormula(formula);
   const fields = extractFields(expression);
   const fieldTypes = await createFieldTypeDictionary(
     inputTypes,
     fields,
     describer
   );
-  try {
-    return traverseAndCreateFormula(
-      expression,
-      { ...inputTypes, ...fieldTypes },
-      fields,
-      {
-        returnType,
-        scale,
-        blankAsZero,
-      }
-    );
-  } catch (e) {
-    console.log(e.stack);
-    console.log({ returnType });
-    console.log(expression);
-    throw e;
-  }
+  return traverseAndCreateFormula(
+    expression,
+    { ...inputTypes, ...fieldTypes },
+    fields,
+    {
+      returnType,
+      scale,
+      blankAsZero,
+    }
+  );
 }
 
 export { builtins };
