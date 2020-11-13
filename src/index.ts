@@ -149,19 +149,11 @@ export function parseSync(
     scale,
     blankAsZero = false,
   } = options;
-
-  try {
-    return traverseAndCreateFormula(expression, types, fields, {
-      returnType,
-      scale,
-      blankAsZero,
-    });
-  } catch (e) {
-    console.log(e.stack);
-    console.log({ returnType });
-    console.log(expression);
-    throw e;
-  }
+  return traverseAndCreateFormula(expression, types, fields, {
+    returnType,
+    scale,
+    blankAsZero,
+  });
 }
 
 /**
@@ -185,23 +177,16 @@ export async function parse(
     fields,
     describer
   );
-  try {
-    return traverseAndCreateFormula(
-      expression,
-      { ...inputTypes, ...fieldTypes },
-      fields,
-      {
-        returnType,
-        scale,
-        blankAsZero,
-      }
-    );
-  } catch (e) {
-    console.log(e.stack);
-    console.log({ returnType });
-    console.log(expression);
-    throw e;
-  }
+  return traverseAndCreateFormula(
+    expression,
+    { ...inputTypes, ...fieldTypes },
+    fields,
+    {
+      returnType,
+      scale,
+      blankAsZero,
+    }
+  );
 }
 
 export { builtins };
