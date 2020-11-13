@@ -355,6 +355,11 @@
   precision: 18
   scale: 0
 -
+  type: Number
+  formula: WEEKDAY(Date01__c)
+  precision: 18
+  scale: 0
+-
   type: DateTime
   formula: NOW()
   fluctuation: 10000
