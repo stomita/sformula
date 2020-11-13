@@ -19,7 +19,6 @@ import {
   SyntaxError,
   TypeNotFoundError,
   UnexpectedError,
-  UnknownError,
   ValidationError,
 } from "./error";
 
@@ -30,7 +29,6 @@ export {
   SyntaxError,
   TypeNotFoundError,
   UnexpectedError,
-  UnknownError,
   ValidationError,
 };
 

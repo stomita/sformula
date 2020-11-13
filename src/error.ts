@@ -119,13 +119,3 @@ export class UnexpectedError extends ValidationError {
     super(expression, "UnexpectedError", message);
   }
 }
-
-/**
- *
- */
-export class UnknownError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "UnknownError";
-  }
-}
