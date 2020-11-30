@@ -3142,10 +3142,10 @@ escodegen@^1.14.1:
   optionalDependencies:
     source-map "~0.6.1"
 
-esformula@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/esformula/-/esformula-2.0.1.tgz#2ace3eda728ff8d25e8721b5355dbf59e9a457cd"
-  integrity sha512-rZoQvWEWRmSA5ly9SQmw3bCnYT+gLhElzcgKwPZUQqq7J6pIDr8t/u+FezZPDdjiwIUwWPzXUHvk6oLNTxxhKw==
+esformula@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/esformula/-/esformula-2.1.0.tgz#a55f38c7d7b413b306a747939d18f50a50f5c70e"
+  integrity sha512-kC+Wc6yFDWp8PZL7VFoHwsSpCqiqU2MeeJxIWkitwREjPZb0WJpkFh209p8/yoRIUgJuYV8cvstrqPaVtYKbCg==
   dependencies:
     acorn "^7.2.0"
 
@@ -5770,10 +5770,10 @@ pbkdf2@^3.0.3:
     safe-buffer "^5.0.1"
     sha.js "^2.4.8"
 
-pegjs@^0.10.0:
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/pegjs/-/pegjs-0.10.0.tgz#cf8bafae6eddff4b5a7efb185269eaaf4610ddbd"
-  integrity sha1-z4uvrm7d/0tafvsYUmnqr0YQ3b0=
+pegjs@^0.11.0-master.b7b87ea:
+  version "0.11.0-master.f69239d"
+  resolved "https://registry.yarnpkg.com/pegjs/-/pegjs-0.11.0-master.f69239d.tgz#4f6e445231cc369f9860a0999a685a79cec520ab"
+  integrity sha512-8PXSaXnLh9hw0R/SfOL1b8JSgiPv1KSl8B1h+sP0uwngmx3Vk+QdB2cuBAT1lXPbP5necVZ2Dl2t4DfR3KKbZg==
 
 performance-now@^2.1.0:
   version "2.1.0"
