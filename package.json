@@ -40,7 +40,7 @@
     "types"
   ],
   "dependencies": {
-    "esformula": "^2.1.0",
+    "esformula": "^2.1.1",
     "luxon": "~1.18.2"
   },
   "devDependencies": {
