@@ -380,6 +380,9 @@
       NULL
     )
 -
+  type: Text
+  formula: CASE(Picklist01__c, 'A', 'a', 'B', 'b', '-')
+-
   type: Number
   formula: ABS(Number02__c)
   precision: 18

@@ -618,6 +618,15 @@ function traverseLogicalExpression(
   }
 }
 
+function isExtendedType(targetType: ExpressionType, baseType: ExpressionType) {
+  return (
+    targetType.type === "any" ||
+    baseType.type === "any" ||
+    targetType.type === baseType.type ||
+    (targetType.type === "picklist" && baseType.type === "string")
+  );
+}
+
 function traverseCallExpression(
   expression: CallExpression,
   typeDict: ExpressionTypeDictionary,
@@ -660,11 +669,7 @@ function traverseCallExpression(
     if (expectedType.type === "template") {
       const templateType = templateTypes[expectedType.ref];
       if (templateType) {
-        if (
-          templateType.type !== "any" &&
-          argumentType.type !== "any" &&
-          argumentType.type !== templateType.type
-        ) {
+        if (!isExtendedType(templateType, argumentType)) {
           throw new InvalidTypeError(arg, argumentType.type, [
             templateType.type,
           ]);
