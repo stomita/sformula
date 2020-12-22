@@ -128,3 +128,38 @@ test("should parse CASE() funciton with Picklist field value", async () => {
   const ret = fml.evaluate({ Picklist__c: "A" });
   assert(ret === "a");
 });
+
+test("should compare boolean field value", async () => {
+  const formula1 = "Checkbox1__c = Checkbox2__c";
+  const fml1 = await parseSync(formula1, {
+    inputTypes: {
+      Checkbox1__c: {
+        type: "boolean",
+      },
+      Checkbox2__c: {
+        type: "boolean",
+      },
+    },
+    returnType: "boolean",
+  });
+  const ret11 = fml1.evaluate({ Checkbox1__c: true, Checkbox2__c: false });
+  assert(ret11 === false);
+  const ret12 = fml1.evaluate({ Checkbox1__c: false, Checkbox2__c: false });
+  assert(ret12 === true);
+  const formula2 = "Checkbox1__c != Checkbox2__c";
+  const fml2 = await parseSync(formula2, {
+    inputTypes: {
+      Checkbox1__c: {
+        type: "boolean",
+      },
+      Checkbox2__c: {
+        type: "boolean",
+      },
+    },
+    returnType: "boolean",
+  });
+  const ret21 = fml2.evaluate({ Checkbox1__c: true, Checkbox2__c: false });
+  assert(ret21 === true);
+  const ret22 = fml2.evaluate({ Checkbox1__c: false, Checkbox2__c: false });
+  assert(ret22 === false);
+});
