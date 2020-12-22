@@ -104,3 +104,27 @@ test("should describe only fields that are not in given types", async () => {
   assert(described["Account"]);
   assert(ret === "u001: Account #1");
 });
+
+test("should parse CASE() funciton with Picklist field value", async () => {
+  const formula = "CASE(Picklist__c, 'A', 'a', 'B', 'b', '-')";
+  const fml = await parseSync(formula, {
+    inputTypes: {
+      Picklist__c: {
+        type: "picklist",
+        picklistValues: [
+          {
+            label: "A",
+            value: "A",
+          },
+          {
+            label: "B",
+            value: "B",
+          },
+        ],
+      },
+    },
+    returnType: "string",
+  });
+  const ret = fml.evaluate({ Picklist__c: "A" });
+  assert(ret === "a");
+});
