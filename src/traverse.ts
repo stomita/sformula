@@ -310,6 +310,44 @@ function traverseNumberBinaryExpression(
   }
 }
 
+const BOOLEAN_OPERATOR_FN = {
+  "==": "$$EQ_BOOLEAN$$",
+  "!=": "$$NEQ_BOOLEAN$$",
+  "===": "$$EQ_BOOLEAN$$",
+  "!==": "$$NEQ_BOOLEAN$$",
+};
+
+function traverseBooleanBinaryExpression(
+  expression: BinaryExpression,
+  left: TraverseResult,
+  right: TraverseResult
+): TraverseResult {
+  const { operator } = expression;
+  const rightType = right.returnType;
+  if (rightType.type !== "boolean" && rightType.type !== "any") {
+    throw new InvalidTypeError(expression.right, rightType.type, ["boolean"]);
+  }
+  switch (operator) {
+    case "==":
+    case "!=":
+    case "===":
+    case "!==":
+      return {
+        expression: createCallExpression(BOOLEAN_OPERATOR_FN[operator], [
+          left.expression,
+          right.expression,
+        ]),
+        returnType: { type: "boolean" },
+      };
+    default:
+      throw new InvalidOperatorError(
+        expression.left,
+        left.returnType.type,
+        operator
+      );
+  }
+}
+
 const DATE_OPERATOR_FN = {
   "<": "$$LT_DATE$$",
   "<=": "$$LTE_DATE$$",
@@ -569,6 +607,8 @@ function traverseBinaryExpression(
       return traverseStringBinaryExpression(expression, left, right);
     case "number":
       return traverseNumberBinaryExpression(expression, left, right);
+    case "boolean":
+      return traverseBooleanBinaryExpression(expression, left, right);
     case "date":
       return traverseDateBinaryExpression(expression, left, right);
     case "datetime":

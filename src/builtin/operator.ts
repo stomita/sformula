@@ -369,6 +369,50 @@ export default {
       returns: { type: "boolean" },
     },
   },
+  $$EQ_BOOLEAN$$: {
+    value: (n1: Maybe<boolean>, n2: Maybe<boolean>) => {
+      if (n1 == null || n2 == null) {
+        return null;
+      }
+      return n1 === n2;
+    },
+    type: {
+      type: "function",
+      arguments: [
+        {
+          argument: { type: "boolean" },
+          optional: false,
+        },
+        {
+          argument: { type: "boolean" },
+          optional: false,
+        },
+      ],
+      returns: { type: "boolean" },
+    },
+  },
+  $$NEQ_BOOLEAN$$: {
+    value: (n1: Maybe<boolean>, n2: Maybe<boolean>) => {
+      if (n1 == null || n2 == null) {
+        return null;
+      }
+      return n1 !== n2;
+    },
+    type: {
+      type: "function",
+      arguments: [
+        {
+          argument: { type: "boolean" },
+          optional: false,
+        },
+        {
+          argument: { type: "boolean" },
+          optional: false,
+        },
+      ],
+      returns: { type: "boolean" },
+    },
+  },
   $$ADD_DATE$$: {
     value: (d: string, n: number) => {
       if (d == null || n == null) {
