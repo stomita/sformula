@@ -137,6 +137,12 @@
   type: Checkbox
   formula: Number01__c + 2 < 0.5 * Number02__c
 -
+  type: Checkbox
+  formula: Checkbox01__c = Checkbox02__c
+-
+  type: Checkbox
+  formula: Checkbox01__c != Checkbox02__c
+-
   type: Text
   formula: Text01__c & " " & Text02__c
 -
