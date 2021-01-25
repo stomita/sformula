@@ -21,6 +21,7 @@ import {
   UnexpectedError,
   ValidationError,
 } from "./error";
+import { toTypeIdentifier } from "./utils";
 
 export {
   InvalidArgLengthError,
@@ -104,9 +105,10 @@ function traverseAndCreateFormula(
     calculatedType.type === "multipicklist" ||
     calculatedType.type === "object" ||
     calculatedType.type === "function" ||
+    calculatedType.type === "class" ||
     calculatedType.type === "template"
   ) {
-    throw new InvalidTypeError(expression, calculatedType.type, [
+    throw new InvalidTypeError(expression, toTypeIdentifier(calculatedType), [
       "string",
       "number",
       "currency",
