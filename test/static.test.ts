@@ -1,5 +1,5 @@
 import assert from "assert";
-import { parseSync, parse } from "..";
+import { parseSync, parse, InvalidTypeError } from "..";
 import { DescribeSObjectResult } from "../src/types";
 import { describe } from "./utils/schema";
 
@@ -162,4 +162,145 @@ test("should compare boolean field value", async () => {
   assert(ret21 === true);
   const ret22 = fml2.evaluate({ Checkbox1__c: false, Checkbox2__c: false });
   assert(ret22 === false);
+});
+
+test("class and type parameters", async () => {
+  const formula1 = "UNWRAP(Container1) / 5";
+  const fml1 = await parseSync(formula1, {
+    inputTypes: {
+      Container1: {
+        type: "class",
+        name: "Container",
+        typeParams: [{ type: "number" }],
+      },
+      UNWRAP: {
+        type: "function",
+        arguments: [
+          {
+            argument: {
+              type: "template",
+              ref: "C",
+              typeParamRefs: ["T"],
+            },
+            optional: false,
+          },
+        ],
+        returns: {
+          type: "template",
+          ref: "T",
+        },
+      },
+    },
+    returnType: "number",
+  });
+  const ret1 = fml1.evaluate({
+    Container1: { _value: 100 },
+    UNWRAP: (v: any) => v?._value,
+  });
+  assert(ret1 === 20);
+
+  const formula2 = "UNWRAP_PLUS(Container1, Container2)";
+  const fml2 = await parseSync(formula2, {
+    inputTypes: {
+      Container1: {
+        type: "class",
+        name: "Container",
+        typeParams: [{ type: "string" }],
+      },
+      Container2: {
+        type: "class",
+        name: "Container",
+        typeParams: [{ type: "string" }],
+      },
+      UNWRAP_PLUS: {
+        type: "function",
+        arguments: [
+          {
+            argument: {
+              type: "template",
+              ref: "C",
+              typeParamRefs: ["T"],
+            },
+            optional: false,
+          },
+          {
+            argument: {
+              type: "template",
+              ref: "C",
+              typeParamRefs: ["T"],
+            },
+            optional: false,
+          },
+        ],
+        returns: {
+          type: "template",
+          ref: "T",
+        },
+      },
+    },
+    returnType: "string",
+  });
+  const ret2 = fml2.evaluate({
+    Container1: { _value: "a" },
+    Container2: { _value: "b" },
+    UNWRAP_PLUS: (v1: any, v2: any) => (v1?._value ?? "") + (v2?._value ?? ""),
+  });
+  assert(ret2 === "ab");
+
+  try {
+    const formula3 = "UNWRAP_IF(Checkbox, Container1, Box1)";
+    await parseSync(formula3, {
+      inputTypes: {
+        Checkbox: {
+          type: "boolean",
+        },
+        Container1: {
+          type: "class",
+          name: "Container",
+          typeParams: [{ type: "number" }],
+        },
+        Box1: {
+          type: "class",
+          name: "Box",
+          typeParams: [{ type: "number" }],
+        },
+        UNWRAP_IF: {
+          type: "function",
+          arguments: [
+            {
+              argument: { type: "boolean" },
+              optional: false,
+            },
+            {
+              argument: {
+                type: "template",
+                ref: "C",
+                typeParamRefs: ["T"],
+              },
+              optional: false,
+            },
+            {
+              argument: {
+                type: "template",
+                ref: "C",
+                typeParamRefs: ["T"],
+              },
+              optional: false,
+            },
+          ],
+          returns: {
+            type: "template",
+            ref: "T",
+          },
+        },
+      },
+      returnType: "number",
+    });
+    assert.fail("should not reach here");
+  } catch (e) {
+    assert(e instanceof InvalidTypeError);
+    assert(e.type === "class:Box");
+    assert.deepStrictEqual(e.expected, ["class:Container"]);
+    assert(true);
+  }
 });

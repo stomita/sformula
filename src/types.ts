@@ -71,9 +71,15 @@ export type ExpressionType =
       returns: ExpressionType;
     }
   | {
+      type: "class";
+      name: string;
+      typeParams?: ExpressionType[];
+    }
+  | {
       type: "template";
       ref: string;
       anyOf?: ExpressionType[];
+      typeParamRefs?: string[];
     };
 
 export type ExpressionTypeDictionary = {
