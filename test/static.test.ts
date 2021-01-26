@@ -1,6 +1,7 @@
 import assert from "assert";
 import { parseSync, parse, InvalidTypeError } from "..";
 import { DescribeSObjectResult } from "../src/types";
+import { catchError } from "./utils";
 import { describe } from "./utils/schema";
 
 test("should yield null value if the result is empty or space", () => {
@@ -247,60 +248,115 @@ test("class and type parameters", async () => {
   });
   assert(ret2 === "ab");
 
-  try {
-    const formula3 = "UNWRAP_IF(Checkbox, Container1, Box1)";
-    await parseSync(formula3, {
-      inputTypes: {
-        Checkbox: {
-          type: "boolean",
-        },
-        Container1: {
-          type: "class",
-          name: "Container",
-          typeParams: [{ type: "number" }],
-        },
-        Box1: {
-          type: "class",
-          name: "Box",
-          typeParams: [{ type: "number" }],
-        },
-        UNWRAP_IF: {
-          type: "function",
-          arguments: [
-            {
-              argument: { type: "boolean" },
-              optional: false,
-            },
-            {
-              argument: {
-                type: "template",
-                ref: "C",
-                typeParamRefs: ["T"],
+  await catchError(
+    async () => {
+      const formula3 = "UNWRAP_IF(Checkbox, Container1, Box1)";
+      await parseSync(formula3, {
+        inputTypes: {
+          Checkbox: {
+            type: "boolean",
+          },
+          Container1: {
+            type: "class",
+            name: "Container",
+            typeParams: [{ type: "number" }],
+          },
+          Box1: {
+            type: "class",
+            name: "Box",
+            typeParams: [{ type: "number" }],
+          },
+          UNWRAP_IF: {
+            type: "function",
+            arguments: [
+              {
+                argument: { type: "boolean" },
+                optional: false,
               },
-              optional: false,
-            },
-            {
-              argument: {
-                type: "template",
-                ref: "C",
-                typeParamRefs: ["T"],
+              {
+                argument: {
+                  type: "template",
+                  ref: "C",
+                  typeParamRefs: ["T"],
+                },
+                optional: false,
               },
-              optional: false,
+              {
+                argument: {
+                  type: "template",
+                  ref: "C",
+                  typeParamRefs: ["T"],
+                },
+                optional: false,
+              },
+            ],
+            returns: {
+              type: "template",
+              ref: "T",
             },
-          ],
-          returns: {
-            type: "template",
-            ref: "T",
           },
         },
-      },
-      returnType: "number",
-    });
-    assert.fail("should not reach here");
-  } catch (e) {
-    assert(e instanceof InvalidTypeError);
-    assert(e.type === "class:Box");
-    assert.deepStrictEqual(e.expected, ["class:Container"]);
-    assert(true);
-  }
+        returnType: "number",
+      });
+    },
+    (e) => {
+      assert(e instanceof InvalidTypeError);
+      assert(e.type === "class:Box");
+      assert.deepStrictEqual(e.expected, ["class:Container"]);
+      assert(true);
+    }
+  );
+
+  await catchError(
+    async () => {
+      const formula4 = "0.5 * LOOKUP('A', Column1, Column2)";
+      await parseSync(formula4, {
+        inputTypes: {
+          Column1: {
+            type: "class",
+            name: "Column",
+            typeParams: [{ type: "string" }],
+          },
+          Column2: {
+            type: "class",
+            name: "Column",
+            typeParams: [{ type: "boolean" }],
+          },
+          LOOKUP: {
+            type: "function",
+            arguments: [
+              {
+                argument: { type: "template", ref: "T1" },
+                optional: false,
+              },
+              {
+                argument: {
+                  type: "template",
+                  ref: "C1",
+                  typeParamRefs: ["T1"],
+                },
+                optional: false,
+              },
+              {
+                argument: {
+                  type: "template",
+                  ref: "C1",
+                  typeParamRefs: ["T2"],
+                },
+                optional: false,
+              },
+            ],
+            returns: { type: "template", ref: "T2" },
+          },
+        },
+        returnType: "number",
+      });
+    },
+    (e) => {
+      assert(e instanceof InvalidTypeError);
+      assert(e.type === "boolean");
+      assert.deepStrictEqual(e.expected, ["number"]);
+      assert(true);
+    }
+  );
 });
