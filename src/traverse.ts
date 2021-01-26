@@ -673,6 +673,131 @@ function isExtendedType(targetType: ExpressionType, baseType: ExpressionType) {
   );
 }
 
+type MatchTypeResult =
+  | {
+      matched: true;
+      actual: string;
+    }
+  | {
+      matched: false;
+      actual: string;
+      expected: string[];
+    };
+
+function matchArgTypes(
+  argumentType: ExpressionType,
+  expectedType: ExpressionType,
+  templateTypes: Map<string, ExpressionType>
+): MatchTypeResult {
+  const argumentTypeId = toTypeIdentifier(argumentType);
+  const expectedTypeId = toTypeIdentifier(expectedType);
+  if (expectedType.type === "template") {
+    const templateType = templateTypes.get(expectedType.ref);
+    if (templateType) {
+      if (!isExtendedType(templateType, argumentType)) {
+        return {
+          matched: false,
+          actual: argumentTypeId,
+          expected: [toTypeIdentifier(templateType)],
+        };
+      }
+      if (templateType.type === "any" && argumentType.type !== "any") {
+        templateTypes.set(expectedType.ref, argumentType);
+      }
+    } else {
+      const anyOfTypeIds =
+        expectedType.anyOf && expectedType.anyOf.map(toTypeIdentifier);
+      if (
+        anyOfTypeIds &&
+        anyOfTypeIds.indexOf(argumentTypeId) < 0 &&
+        argumentType.type !== "any"
+      ) {
+        return {
+          matched: false,
+          actual: argumentTypeId,
+          expected: anyOfTypeIds,
+        };
+      }
+      templateTypes.set(expectedType.ref, argumentType);
+    }
+    if (
+      expectedType.typeParamRefs &&
+      argumentType.type === "class" &&
+      argumentType.typeParams
+    ) {
+      for (let i = 0; i < expectedType.typeParamRefs.length; i++) {
+        const typeParamRef = expectedType.typeParamRefs[i];
+        const argTypeParamType = argumentType.typeParams[i];
+        const typeParamTemplateType = templateTypes.get(typeParamRef);
+        if (typeParamTemplateType) {
+          if (!isExtendedType(typeParamTemplateType, argTypeParamType)) {
+            return {
+              matched: false,
+              actual: toTypeIdentifier(argTypeParamType),
+              expected: [toTypeIdentifier(typeParamTemplateType)],
+            };
+          }
+          if (
+            typeParamTemplateType.type === "any" &&
+            argTypeParamType.type !== "any"
+          ) {
+            templateTypes.set(typeParamRef, argTypeParamType);
+          }
+        } else {
+          templateTypes.set(typeParamRef, argTypeParamType);
+        }
+      }
+    }
+  } else if (expectedTypeId !== "any" && expectedTypeId !== argumentTypeId) {
+    return {
+      matched: false,
+      actual: argumentTypeId,
+      expected: [expectedTypeId],
+    };
+  } else if (expectedType.type === "class" && argumentType.type === "class") {
+    const argumentTypeParams = argumentType.typeParams ?? [];
+    const expectedTypeParams = expectedType.typeParams ?? [];
+    if (argumentTypeParams.length !== expectedTypeParams.length) {
+      return {
+        matched: false,
+        actual: `${argumentTypeId}<${argumentTypeParams
+          .map(() => "?")
+          .join(",")}>`,
+        expected: [
+          `${expectedTypeId}<${expectedTypeParams.map(() => "?").join(",")}>`,
+        ],
+      };
+    }
+    let allmatched = true;
+    const argumentParamTypeIds = [];
+    const expectedParamTypeIds = [];
+    for (let i = 0; i < expectedTypeParams.length; i++) {
+      const argumentParamType = argumentTypeParams[i];
+      const expectedParamType = expectedTypeParams[i];
+      const result = matchArgTypes(
+        argumentParamType,
+        expectedParamType,
+        templateTypes
+      );
+      argumentParamTypeIds.push(result.actual);
+      if (result.matched) {
+        expectedParamTypeIds.push(toTypeIdentifier(expectedParamType));
+      } else {
+        allmatched = false;
+        expectedParamTypeIds.push(result.expected.join("|"));
+      }
+    }
+    if (!allmatched) {
+      return {
+        matched: false,
+        actual: `${argumentTypeId}<${argumentParamTypeIds.join(",")}>`,
+        expected: [`${expectedTypeId}<${expectedParamTypeIds.join(",")}>`],
+      };
+    }
+  }
+  return { matched: true, actual: argumentTypeId };
+}
+
 function traverseCallExpression(
   expression: CallExpression,
   typeDict: ExpressionTypeDictionary,
@@ -703,7 +828,7 @@ function traverseCallExpression(
   }
   const args_ = [];
   const argumentTypes = [];
-  const templateTypes: { [name: string]: ExpressionType | undefined } = {};
+  const templateTypes: Map<string, ExpressionType> = new Map();
   for (const [i, arg] of args.entries()) {
     if (arg.type === "SpreadElement") {
       throw new UnexpectedError(
@@ -713,69 +838,17 @@ function traverseCallExpression(
     }
     const argument = traverseExpression(arg, typeDict, blankAsZero);
     const argumentType = argument.returnType;
-    const argumentTypeId = toTypeIdentifier(argumentType);
     const expectedType = calleeArgTypes[i].argument;
-    const expectedTypeId = toTypeIdentifier(expectedType);
-    if (expectedType.type === "template") {
-      const templateType = templateTypes[expectedType.ref];
-      if (templateType) {
-        if (!isExtendedType(templateType, argumentType)) {
-          throw new InvalidTypeError(arg, argumentTypeId, [
-            toTypeIdentifier(templateType),
-          ]);
-        }
-        if (templateType.type === "any" && argumentType.type !== "any") {
-          templateTypes[expectedType.ref] = argumentType;
-        }
-      } else {
-        const anyOfTypeIds =
-          expectedType.anyOf && expectedType.anyOf.map(toTypeIdentifier);
-        if (
-          anyOfTypeIds &&
-          anyOfTypeIds.indexOf(argumentTypeId) < 0 &&
-          argumentType.type !== "any"
-        ) {
-          throw new InvalidTypeError(arg, argumentTypeId, anyOfTypeIds);
-        }
-        templateTypes[expectedType.ref] = argumentType;
-      }
-      if (
-        expectedType.typeParamRefs &&
-        argumentType.type === "class" &&
-        argumentType.typeParams
-      ) {
-        for (let i = 0; i < expectedType.typeParamRefs.length; i++) {
-          const typeParamRef = expectedType.typeParamRefs[i];
-          const argTypeParamType = argumentType.typeParams[i];
-          const typeParamTemplateType = templateTypes[typeParamRef];
-          if (typeParamTemplateType) {
-            if (!isExtendedType(typeParamTemplateType, argTypeParamType)) {
-              throw new InvalidTypeError(
-                arg,
-                toTypeIdentifier(argTypeParamType),
-                [toTypeIdentifier(typeParamTemplateType)]
-              );
-            }
-            if (
-              typeParamTemplateType.type === "any" &&
-              argTypeParamType.type !== "any"
-            ) {
-              templateTypes[typeParamRef] = argTypeParamType;
-            }
-          } else {
-            templateTypes[typeParamRef] = argTypeParamType;
-          }
-        }
-      }
-    } else if (expectedTypeId !== "any" && expectedTypeId !== argumentTypeId) {
-      throw new InvalidTypeError(arg, argumentTypeId, [expectedTypeId]);
+    const result = matchArgTypes(argumentType, expectedType, templateTypes);
+    if (!result.matched) {
+      throw new InvalidTypeError(arg, result.actual, result.expected);
     }
     args_.push(argument.expression);
     argumentTypes.push(argumentType);
   }
   const returnType =
     calleeType.returns.type === "template"
-      ? templateTypes[calleeType.returns.ref] || { type: "any" }
+      ? templateTypes.get(calleeType.returns.ref) ?? { type: "any" }
       : calleeType.returns;
   return {
     expression: injectCallExpression(

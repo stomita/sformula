@@ -300,6 +300,9 @@ test("class and type parameters", async () => {
       });
     },
     (e) => {
+      if (!e) {
+        assert.fail("should raise invalid type error");
+      }
       assert(e instanceof InvalidTypeError);
       assert(e.type === "class:Box");
       assert.deepStrictEqual(e.expected, ["class:Container"]);
@@ -311,6 +314,72 @@ test("class and type parameters", async () => {
     async () => {
       const formula4 = "0.5 * LOOKUP('A', Column1, Column2)";
       await parseSync(formula4, {
+        inputTypes: {
+          Column1: {
+            type: "class",
+            name: "Column",
+            typeParams: [{ type: "number" }],
+          },
+          Column2: {
+            type: "class",
+            name: "Column",
+            typeParams: [{ type: "number" }],
+          },
+          LOOKUP: {
+            type: "function",
+            arguments: [
+              {
+                argument: { type: "template", ref: "T1" },
+                optional: false,
+              },
+              {
+                argument: {
+                  type: "class",
+                  name: "Column",
+                  typeParams: [
+                    {
+                      type: "template",
+                      ref: "T1",
+                    },
+                  ],
+                },
+                optional: false,
+              },
+              {
+                argument: {
+                  type: "class",
+                  name: "Column",
+                  typeParams: [
+                    {
+                      type: "template",
+                      ref: "T2",
+                    },
+                  ],
+                },
+                optional: false,
+              },
+            ],
+            returns: { type: "template", ref: "T2" },
+          },
+        },
+        returnType: "number",
+      });
+    },
+    (e) => {
+      if (!e) {
+        assert.fail("should raise invalid type error");
+      }
+      assert(e instanceof InvalidTypeError);
+      assert(e.type === "class:Column<number>");
+      assert.deepStrictEqual(e.expected, ["class:Column<string>"]);
+      assert(true);
+    }
+  );
+
+  await catchError(
+    async () => {
+      const formula5 = "0.5 * LOOKUP('A', Column1, Column2)";
+      await parseSync(formula5, {
         inputTypes: {
           Column1: {
             type: "class",
@@ -331,17 +400,27 @@ test("class and type parameters", async () => {
               },
               {
                 argument: {
-                  type: "template",
-                  ref: "C1",
-                  typeParamRefs: ["T1"],
+                  type: "class",
+                  name: "Column",
+                  typeParams: [
+                    {
+                      type: "template",
+                      ref: "T1",
+                    },
+                  ],
                 },
                 optional: false,
               },
               {
                 argument: {
-                  type: "template",
-                  ref: "C1",
-                  typeParamRefs: ["T2"],
+                  type: "class",
+                  name: "Column",
+                  typeParams: [
+                    {
+                      type: "template",
+                      ref: "T2",
+                    },
+                  ],
                 },
                 optional: false,
               },
@@ -353,6 +432,9 @@ test("class and type parameters", async () => {
       });
     },
     (e) => {
+      if (!e) {
+        assert.fail("should raise invalid type error");
+      }
       assert(e instanceof InvalidTypeError);
       assert(e.type === "boolean");
       assert.deepStrictEqual(e.expected, ["number"]);
