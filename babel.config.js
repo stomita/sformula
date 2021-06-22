@@ -9,6 +9,7 @@ module.exports = {
   env: {
     test: {
       presets: ["power-assert"],
+      plugins: ["@babel/transform-runtime"],
     },
   },
 };
