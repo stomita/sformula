@@ -169,6 +169,12 @@ ParenExpression =
  * Identifier
  */
 Identifier =
+  LBRACKET id:(SingleIdentifierChar* { return text() }) RBRACKET {
+    return createIdentifier(id, location());
+  }
+/ PureIdentifier
+
+PureIdentifier =
   id:([a-zA-Z_$][0-9a-zA-Z_$]* { return text() }) & { return !isReserved(id) } {
     return createIdentifier(id, location());
   }
@@ -222,6 +228,15 @@ EscapeChar =
 / '\\"'  { return '"'; }
 / "\\\\" { return "\\"; }
 
+SingleIdentifierChar =
+  [^\[\]\\\0-\x1F\x7f]
+/ EscapeIdentifierChar
+
+EscapeIdentifierChar =
+  "\\["  { return "["; }
+/ '\\]'  { return "["; }
+/ "\\\\" { return "\\"; }
+
 BooleanLiteral =
   TRUE {
     return createBooleanLiteral(text(), location());
@@ -246,6 +261,8 @@ COMMA  = ","
 DOT    = "."
 LPAREN = "("
 RPAREN = ")"
+LBRACKET = "["
+RBRACKET = "]"
 QUOTE  = "'"
 DQUOTE = '"'
 NULL   = "NULL"i
