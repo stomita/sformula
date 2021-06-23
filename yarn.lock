@@ -1257,6 +1257,11 @@
   dependencies:
     "@babel/types" "^7.3.0"
 
+"@types/estree@^0.0.48":
+  version "0.0.48"
+  resolved "https://registry.yarnpkg.com/@types/estree/-/estree-0.0.48.tgz#18dc8091b285df90db2f25aa7d906cfc394b7f74"
+  integrity sha512-LfZwXoGUDo0C3me81HXgkBg5CTQYb6xzEl+fNmbO4JdRiSKQ8A0GD1OBBvKAIsbCUgoyAty7m99GqqMQe784ew==
+
 "@types/fs-extra@^9.0.1":
   version "9.0.1"
   resolved "https://registry.yarnpkg.com/@types/fs-extra/-/fs-extra-9.0.1.tgz#91c8fc4c51f6d5dbe44c2ca9ab09310bd00c7918"
@@ -2946,11 +2951,12 @@ escodegen@^2.0.0:
   optionalDependencies:
     source-map "~0.6.1"
 
-esformula@^2.1.1:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/esformula/-/esformula-2.1.1.tgz#2888b0bb2cdeda3d7be6a5e932275e8d41c2aae9"
-  integrity sha512-IKc8GPe2sBkIZGsqmqq/U2D78nSZZxgbq5TyiVivSIX0djfvYzwtCRuXHewaagvGk2GWSpeTabTguxaAuo4Plg==
+esformula@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/esformula/-/esformula-2.2.1.tgz#b8a6d98c6d4d5b120e22e99cf94a9eebe253cf59"
+  integrity sha512-mDGcs2RksYCNO78WHi/NwQRCOBfuCRUOzgb0h9kq/6lsCY5QUQIBQdXGqVuxKHUQFh+MwNzoExapLB7S3lN4Xw==
   dependencies:
+    "@types/estree" "^0.0.48"
     acorn "^7.2.0"
 
 eslint-config-prettier@^6.12.0:
