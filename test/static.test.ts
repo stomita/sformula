@@ -478,3 +478,40 @@ test("accept process builder bracket syntax", async () => {
   const ret2 = fml2.evaluate({ "Sales Result": {} });
   assert(ret2 === true);
 });
+
+test("accept block comments", async () => {
+  const formula1 = `
+  /* First comment */
+  Account.Name & ': ' &
+  Contact/* Intermediate comment in the expression */.Name
+  /* This is multiline comment.
+   * Hello, programmers! */
+  `;
+
+  const fml1 = await parseSync(formula1, {
+    inputTypes: {
+      Account: {
+        type: "object",
+        properties: {
+          Name: {
+            type: "string",
+          },
+        },
+      },
+      Contact: {
+        type: "object",
+        properties: {
+          Name: {
+            type: "string",
+          },
+        },
+      },
+    },
+    returnType: "string",
+  });
+  const ret1 = fml1.evaluate({
+    Account: { Name: "Apple, Inc." },
+    Contact: { Name: "John Doe" },
+  });
+  assert(ret1 === "Apple, Inc.: John Doe");
+});

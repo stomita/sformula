@@ -19,7 +19,10 @@
 /**
  * Root
  */
-Expression = LogicalExpression
+Expression =
+  _ expr:LogicalExpression _ {
+    return expr;
+  }
 
 /**
  * Logical Exprssion (&&, ||)
@@ -169,13 +172,13 @@ ParenExpression =
  * Identifier
  */
 Identifier =
-  LBRACKET id:(SingleIdentifierChar* { return text() }) RBRACKET {
+  LBRACKET id:(SingleIdentifierChar* { return text(); }) RBRACKET {
     return createIdentifier(id, location());
   }
 / PureIdentifier
 
 PureIdentifier =
-  id:([a-zA-Z_$][0-9a-zA-Z_$]* { return text() }) & { return !isReserved(id) } {
+  id:([a-zA-Z_$][0-9a-zA-Z_$]* { return text(); }) & { return !isReserved(id); } {
     return createIdentifier(id, location());
   }
 / Literal
@@ -213,10 +216,10 @@ Digit19 = [1-9]
 
 StringLiteral =
   QUOTE ca:(SingleChar*) QUOTE {
-    return createStringLiteral(ca.join(''), location);
+    return createStringLiteral(ca.join(''), location());
   }
 / DQUOTE ca:(SingleChar*) DQUOTE {
-    return createStringLiteral(ca.join(''), location);
+    return createStringLiteral(ca.join(''), location());
   }
 
 SingleChar =
@@ -249,13 +252,20 @@ NullLiteral =
   NULL { return createNullLiteral(text(), location()); }
 
 /**
- * 
+ *
  */
+Comment =
+  COMMENTSTART comment:((!"*/" .)*) COMMENTEND
+
 _ "spacer" =
+  __ Comment _
+/ __
+
+__ "space" =
   [ \t\n\r]*
 
-__ "whitespaces" =
-  [ \t\n\r]+
+COMMENTSTART = "/*"
+COMMENTEND   = "*/"
 
 COMMA  = ","
 DOT    = "."
