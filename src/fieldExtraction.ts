@@ -6,6 +6,9 @@ function extractFieldsFromMemberExpression(
   if (expression.object.type === "Super") {
     throw new Error("could not be reached here");
   }
+  if (expression.property.type === "PrivateIdentifier") {
+    throw new Error("could not be reached here");
+  }
   return [
     ...extractFieldsFromExpression(expression.object),
     ...extractFieldsFromExpression(expression.property),
