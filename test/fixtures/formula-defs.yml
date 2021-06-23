@@ -677,4 +677,12 @@
 -
   type: Text
   formula: Id & '; ' & Parent__c
+-
+  type: Text
+  formula: |
+    /* This is comment */
+    Text01__c + /* Second comment */ ' ' + Text02__c
+    /* Multiline Comment.
+       Hello, world.
+    */
 
