@@ -35,18 +35,25 @@ export {
 
 export type FormulaReturnType = PrimitiveExpressionType["type"];
 
-export type Formula = {
-  compiled: CompiledFormula;
-  returnType: FormulaReturnType;
-  evaluate(context?: Context): any;
-};
-
-export type CompiledFormula = {
-  expression: Expression;
+type CompiledFormulaV1 = {
+  expression: Expression; // ecmascript expression
   fields: string[];
   returnType: FormulaReturnType;
   scale: number | undefined;
   calculatedType: FormulaReturnType;
+};
+
+type CompiledFormulaV2 = {
+  version: 2;
+  ast: Expression; // salesforce formula ast
+} & CompiledFormulaV1;
+
+export type CompiledFormula = CompiledFormulaV2 | CompiledFormulaV1;
+
+export type Formula = {
+  compiled: CompiledFormula;
+  returnType: FormulaReturnType;
+  evaluate(context?: Context): any;
 };
 
 export type SyncParseOptions = {
@@ -58,21 +65,24 @@ export type SyncParseOptions = {
   blankAsZero?: boolean;
 };
 
-export type ParseOptions = {
+export type Describer = {
   sobject: string;
-  inputTypes?: ExpressionTypeDictionary;
   describe: (sobject: string) => Promise<DescribeSObjectResult>;
+};
+
+export type ParseOptions = {
+  inputTypes?: ExpressionTypeDictionary;
   returnType?: FormulaReturnType;
   scale?: number;
   blankAsZero?: boolean;
-};
+} & Describer;
 
 /**
  *
  */
 export function create(compiled: CompiledFormula): Formula {
-  const esformula = buildFormula(compiled.expression);
-  const { returnType, scale, calculatedType } = compiled;
+  const { expression, returnType, scale, calculatedType } = compiled;
+  const esformula = buildFormula(expression);
   return {
     compiled,
     returnType,
@@ -84,7 +94,7 @@ export function create(compiled: CompiledFormula): Formula {
 }
 
 function traverseAndCreateFormula(
-  expression: Expression,
+  ast: Expression,
   inputTypes: ExpressionTypeDictionary,
   fields: string[],
   options: {
@@ -94,8 +104,8 @@ function traverseAndCreateFormula(
   }
 ) {
   const { returnType, scale, blankAsZero } = options;
-  const { expression: expression_, returnType: calculatedType } = traverse(
-    expression,
+  const { expression, returnType: calculatedType } = traverse(
+    ast,
     { ...inputTypes, ...builtinTypes },
     blankAsZero
   );
@@ -108,7 +118,7 @@ function traverseAndCreateFormula(
     calculatedType.type === "class" ||
     calculatedType.type === "template"
   ) {
-    throw new InvalidTypeError(expression, toTypeIdentifier(calculatedType), [
+    throw new InvalidTypeError(ast, toTypeIdentifier(calculatedType), [
       "string",
       "number",
       "currency",
@@ -120,10 +130,12 @@ function traverseAndCreateFormula(
     ]);
   }
   if (returnType && !isCastableType(calculatedType.type, returnType)) {
-    throw new InvalidTypeError(expression, calculatedType.type, [returnType]);
+    throw new InvalidTypeError(ast, calculatedType.type, [returnType]);
   }
   return create({
-    expression: expression_,
+    version: 2,
+    ast,
+    expression,
     fields,
     returnType:
       returnType && returnType !== "any" ? returnType : calculatedType.type,
@@ -135,19 +147,15 @@ function traverseAndCreateFormula(
 /**
  *
  */
-export function parseSync(
-  formula: string,
-  options: SyncParseOptions = {}
-): Formula {
-  const expression = parseFormula(formula);
-  const fields = extractFields(expression);
+export function compileSync(ast: Expression, options: SyncParseOptions) {
+  const fields = extractFields(ast);
   const {
     returnType,
     inputTypes: types = options.fieldTypes ?? {},
     scale,
     blankAsZero = false,
   } = options;
-  return traverseAndCreateFormula(expression, types, fields, {
+  return traverseAndCreateFormula(ast, types, fields, {
     returnType,
     scale,
     blankAsZero,
@@ -157,10 +165,18 @@ export function parseSync(
 /**
  *
  */
-export async function parse(
+export function parseSync(
   formula: string,
-  options: ParseOptions
-): Promise<Formula> {
+  options: SyncParseOptions = {}
+): Formula {
+  const ast = parseFormula(formula);
+  return compileSync(ast, options);
+}
+
+/**
+ *
+ */
+export async function compile(ast: Expression, options: ParseOptions) {
   const {
     inputTypes = {},
     returnType,
@@ -168,15 +184,14 @@ export async function parse(
     blankAsZero = false,
     ...describer
   } = options;
-  const expression = parseFormula(formula);
-  const fields = extractFields(expression);
+  const fields = extractFields(ast);
   const fieldTypes = await createFieldTypeDictionary(
     inputTypes,
     fields,
     describer
   );
   return traverseAndCreateFormula(
-    expression,
+    ast,
     { ...inputTypes, ...fieldTypes },
     fields,
     {
@@ -185,6 +200,17 @@ export async function parse(
       blankAsZero,
     }
   );
+}
+
+/**
+ *
+ */
+export async function parse(
+  formula: string,
+  options: ParseOptions
+): Promise<Formula> {
+  const ast = parseFormula(formula);
+  return compile(ast, options);
 }
 
 export { builtins };

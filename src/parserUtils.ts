@@ -10,7 +10,6 @@ import type {
   MemberExpression,
   Identifier,
   Literal,
-  SpreadElement,
   SourceLocation,
 } from "esformula";
 
@@ -96,7 +95,8 @@ export function createCallExpression(
   return {
     type: "CallExpression",
     callee,
-    arguments: (args as any) as Array<Expression | SpreadElement>,
+    arguments: args,
+    optional: false,
     loc,
   };
 }
@@ -114,6 +114,7 @@ export function createFieldExpression(
     computed: false,
     object,
     property,
+    optional: false,
     loc,
   };
   for (const field of fpaths) {
@@ -122,6 +123,7 @@ export function createFieldExpression(
       computed: false,
       object: expression,
       property: field,
+      optional: false,
       loc,
     };
   }

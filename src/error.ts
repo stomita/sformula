@@ -1,4 +1,4 @@
-import { Expression } from "esformula";
+import { Node, Expression } from "esformula";
 
 /**
  *
@@ -36,11 +36,11 @@ export class SyntaxError extends Error {
 export class ValidationError extends Error {
   location?: Location;
 
-  constructor(expression: Expression, name: string, message: string) {
+  constructor(node: Node, name: string, message: string) {
     super(message);
     this.name = name;
-    if (expression.loc) {
-      this.location = expression.loc;
+    if (node.loc) {
+      this.location = node.loc;
     }
   }
 }
@@ -104,9 +104,9 @@ export class InvalidOperatorError extends ValidationError {
 export class TypeNotFoundError extends ValidationError {
   identifier: string;
 
-  constructor(expression: Expression, identifier: string) {
+  constructor(node: Node, identifier: string) {
     const message = `type information is not found: ${identifier}`;
-    super(expression, "TypeNotFoundError", message);
+    super(node, "TypeNotFoundError", message);
     this.identifier = identifier;
   }
 }
@@ -115,7 +115,7 @@ export class TypeNotFoundError extends ValidationError {
  *
  */
 export class UnexpectedError extends ValidationError {
-  constructor(expression: Expression, message: string) {
-    super(expression, "UnexpectedError", message);
+  constructor(node: Node, message: string) {
+    super(node, "UnexpectedError", message);
   }
 }

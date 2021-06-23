@@ -37,6 +37,7 @@ function createCallExpression(
     type: "CallExpression",
     callee: { type: "Identifier", name },
     arguments: args,
+    optional: false,
   };
 }
 
@@ -630,7 +631,7 @@ function traverseBinaryExpression(
   }
 }
 
-const LOGICAL_OPERATOR_FN = {
+const LOGICAL_OPERATOR_FN: { [op: string]: string } = {
   "&&": "AND",
   "||": "OR",
 };
@@ -651,10 +652,10 @@ function traverseLogicalExpression(
         throw new InvalidTypeError(expression.right, rightTypeId, ["boolean"]);
       }
       return {
-        expression: createCallExpression(LOGICAL_OPERATOR_FN[operator], [
-          left.expression,
-          right.expression,
-        ]),
+        expression: createCallExpression(
+          LOGICAL_OPERATOR_FN[operator as string],
+          [left.expression, right.expression]
+        ),
         returnType: { type: "boolean" },
       };
     default:
@@ -856,6 +857,7 @@ function traverseCallExpression(
         type: "CallExpression",
         callee: callee_,
         arguments: args_,
+        optional: false,
         ...rexpression,
       },
       argumentTypes
