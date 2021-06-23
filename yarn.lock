@@ -1257,7 +1257,14 @@
   dependencies:
     "@babel/types" "^7.3.0"
 
-"@types/estree@^0.0.48":
+"@types/estraverse@^5.1.0":
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/@types/estraverse/-/estraverse-5.1.0.tgz#7a16cf8a8ee7764c05ccef3b2701bbcde6d5d0ae"
+  integrity sha512-vH2ItsZq47KprWHdv8OMjlfpygPHp1P7X4zuJuTghXldyezatpaotNSujld/HNsxh9TUS7+JRB0HEldkv67qaw==
+  dependencies:
+    "@types/estree" "*"
+
+"@types/estree@*", "@types/estree@^0.0.48":
   version "0.0.48"
   resolved "https://registry.yarnpkg.com/@types/estree/-/estree-0.0.48.tgz#18dc8091b285df90db2f25aa7d906cfc394b7f74"
   integrity sha512-LfZwXoGUDo0C3me81HXgkBg5CTQYb6xzEl+fNmbO4JdRiSKQ8A0GD1OBBvKAIsbCUgoyAty7m99GqqMQe784ew==
