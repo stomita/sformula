@@ -442,3 +442,39 @@ test("class and type parameters", async () => {
     }
   );
 });
+
+test("accept process builder bracket syntax", async () => {
+  const formula1 = "ISBLANK([Sales__c].AccountingDate__c)";
+  const fml1 = await parseSync(formula1, {
+    inputTypes: {
+      Sales__c: {
+        type: "object",
+        properties: {
+          AccountingDate__c: {
+            type: "date",
+          },
+        },
+      },
+    },
+    returnType: "boolean",
+  });
+  const ret1 = fml1.evaluate({ Sales__c: {} });
+  assert(ret1 === true);
+
+  const formula2 = "ISBLANK([Sales Result].AccountingDate__c)";
+  const fml2 = await parseSync(formula2, {
+    inputTypes: {
+      "Sales Result": {
+        type: "object",
+        properties: {
+          AccountingDate__c: {
+            type: "date",
+          },
+        },
+      },
+    },
+    returnType: "boolean",
+  });
+  const ret2 = fml2.evaluate({ "Sales Result": {} });
+  assert(ret2 === true);
+});
