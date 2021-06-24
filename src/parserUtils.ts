@@ -13,6 +13,20 @@ import type {
   SourceLocation,
 } from "esformula";
 
+/* ------------------------------------------------------------------------- */
+
+let _bracketIdentifierHolder: string | undefined = undefined;
+
+export function setBracketIdentifierHolder(name: string) {
+  _bracketIdentifierHolder = name;
+}
+
+export function resetBracketIdentifierHolder() {
+  _bracketIdentifierHolder = undefined;
+}
+
+/* ------------------------------------------------------------------------- */
+
 export function isReserved(id: string) {
   return /^(TRUE|FALSE|NULL)$/i.test(id);
 }
@@ -128,6 +142,17 @@ export function createFieldExpression(
     };
   }
   return expression;
+}
+
+export function createBracketFieldPath(
+  name: string,
+  loc: SourceLocation
+): Identifier[] {
+  const id = createIdentifier(name, loc);
+  if (_bracketIdentifierHolder) {
+    return [createIdentifier(_bracketIdentifierHolder, loc), id];
+  }
+  return [id];
 }
 
 export function createIdentifier(

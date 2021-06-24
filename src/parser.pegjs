@@ -7,6 +7,7 @@
     createUnaryExpression,
     createCallExpression,
     createFieldExpression,
+    createBracketFieldPath,
     createIdentifier,
     createNumberLiteral,
     createStringLiteral,
@@ -154,10 +155,18 @@ FieldExpression =
 / ParenExpression
 
 FieldPath =
-  field:Identifier _ DOT _ fields:FieldPath {
-    return [ field, ...fields ];
+  head:BracketFieldPath _ DOT _ tail:FieldPath {
+    return [ ...head, ...tail ];
   }
-/ field:Identifier { return [ field ]; }
+/ head:BracketFieldPath { return head; }
+
+BracketFieldPath =
+  LBRACKET id:(BracketIdentifierChar* { return text(); }) RBRACKET {
+    return createBracketFieldPath(id, location());
+  }
+/ id:Identifier {
+    return [id];
+  }
 
 /**
  * Paren Expression (....)
@@ -172,12 +181,6 @@ ParenExpression =
  * Identifier
  */
 Identifier =
-  LBRACKET id:(SingleIdentifierChar* { return text(); }) RBRACKET {
-    return createIdentifier(id, location());
-  }
-/ PureIdentifier
-
-PureIdentifier =
   id:([a-zA-Z_$][0-9a-zA-Z_$]* { return text(); }) & { return !isReserved(id); } {
     return createIdentifier(id, location());
   }
@@ -231,11 +234,11 @@ EscapeChar =
 / '\\"'  { return '"'; }
 / "\\\\" { return "\\"; }
 
-SingleIdentifierChar =
+BracketIdentifierChar =
   [^\[\]\\\0-\x1F\x7f]
-/ EscapeIdentifierChar
+/ EscapeBracketIdentifierChar
 
-EscapeIdentifierChar =
+EscapeBracketIdentifierChar =
   "\\["  { return "["; }
 / '\\]'  { return "["; }
 / "\\\\" { return "\\"; }

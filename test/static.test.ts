@@ -443,9 +443,9 @@ test("class and type parameters", async () => {
   );
 });
 
-test("accept process builder bracket syntax", async () => {
+test("accept process builder bracket syntax", () => {
   const formula1 = "ISBLANK([Sales__c].AccountingDate__c)";
-  const fml1 = await parseSync(formula1, {
+  const fml1 = parseSync(formula1, {
     inputTypes: {
       Sales__c: {
         type: "object",
@@ -462,7 +462,7 @@ test("accept process builder bracket syntax", async () => {
   assert(ret1 === true);
 
   const formula2 = "ISBLANK([Sales Result].AccountingDate__c)";
-  const fml2 = await parseSync(formula2, {
+  const fml2 = parseSync(formula2, {
     inputTypes: {
       "Sales Result": {
         type: "object",
@@ -479,6 +479,37 @@ test("accept process builder bracket syntax", async () => {
   assert(ret2 === true);
 });
 
+test("evacuate bracket identifier in separate holder object", () => {
+  const formula3 = "[ObjOrField__c].Name + ', ' + ObjOrField__c";
+  const fml3 = parseSync(formula3, {
+    inputTypes: {
+      __: {
+        type: "object",
+        properties: {
+          ObjOrField__c: {
+            type: "object",
+            properties: {
+              Name: {
+                type: "string",
+              },
+            },
+          },
+        },
+      },
+      ObjOrField__c: {
+        type: "string",
+      },
+    },
+    returnType: "string",
+    bracketIdentifierHolder: "__",
+  });
+  const ret3 = fml3.evaluate({
+    __: { ObjOrField__c: { Name: "Hello" } },
+    ObjOrField__c: "World",
+  });
+  assert(ret3 === "Hello, World");
+});
+
 test("accept block comments", async () => {
   const formula1 = `
   /* First comment */
@@ -488,7 +519,7 @@ test("accept block comments", async () => {
    * Hello, programmers! */
   `;
 
-  const fml1 = await parseSync(formula1, {
+  const fml1 = parseSync(formula1, {
     inputTypes: {
       Account: {
         type: "object",
