@@ -27,6 +27,7 @@ async function describeFieldType(
     case "textarea":
     case "url":
     case "phone":
+    case "email":
       return { type: "string" };
     case "id":
       return { type: "id" };

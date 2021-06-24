@@ -685,4 +685,6 @@
     /* Multiline Comment.
        Hello, world.
     */
-
+-
+  type: Text
+  formula: Phone01__c & ':' & Phone02__c & ':' & Email01__c & ':' & Email02__c & ':' & Url01__c & ':' & Url02__c
