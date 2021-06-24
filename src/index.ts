@@ -63,6 +63,7 @@ export type SyncParseOptions = {
   returnType?: FormulaReturnType;
   scale?: number;
   blankAsZero?: boolean;
+  bracketIdentifierHolder?: string;
 };
 
 export type Describer = {
@@ -70,12 +71,7 @@ export type Describer = {
   describe: (sobject: string) => Promise<DescribeSObjectResult>;
 };
 
-export type ParseOptions = {
-  inputTypes?: ExpressionTypeDictionary;
-  returnType?: FormulaReturnType;
-  scale?: number;
-  blankAsZero?: boolean;
-} & Describer;
+export type ParseOptions = SyncParseOptions & Describer;
 
 /**
  *
@@ -169,7 +165,7 @@ export function parseSync(
   formula: string,
   options: SyncParseOptions = {}
 ): Formula {
-  const ast = parseFormula(formula);
+  const ast = parseFormula(formula, options);
   return compileSync(ast, options);
 }
 
