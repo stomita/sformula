@@ -288,3 +288,9 @@
 -
   Text01__c: ABC
   Text02__c: abc
+  Email01__c: abc@def.com
+  Email02__c: hello@example.net
+  Phone01__c: "+81-3-1234-5678"
+  Phone02__c: "0312345678"
+  Url01__c: "https://www.google.com/"
+  Url02__c: "www.apple.com/ja"
