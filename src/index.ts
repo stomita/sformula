@@ -205,7 +205,7 @@ export async function parse(
   formula: string,
   options: ParseOptions
 ): Promise<Formula> {
-  const ast = parseFormula(formula);
+  const ast = parseFormula(formula, options);
   return compile(ast, options);
 }
 
