@@ -1,4 +1,5 @@
 import { DateTime } from "luxon";
+import { MaybeTypeAnnotated } from "../types";
 import {
   ISO8601_DATE_FORMAT,
   ISO8601_DATETIME_INPUT_FORMAT,
@@ -118,4 +119,14 @@ export function escapeHtml(str: string): string {
  */
 export function normalizeCSSStyleNum(num: number): string {
   return String(num).replace(/^(-)?0\./, (_$0, $1) => `${$1 ? "-" : ""}.`);
+}
+
+/**
+ *
+ */
+export function extractValueAnnotation<T>(
+  value: MaybeTypeAnnotated<T>,
+  defaultType: string
+) {
+  return Array.isArray(value) ? value : [value, defaultType];
 }

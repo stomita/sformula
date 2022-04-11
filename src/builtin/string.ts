@@ -9,6 +9,7 @@ import {
   convertIdFrom15To18,
   convertIdFrom18To15,
   escapeHtml,
+  extractValueAnnotation,
   normalizeCSSStyleNum,
 } from "./common";
 
@@ -542,25 +543,29 @@ export default {
   },
   HYPERLINK: {
     value: (
-      url: Maybe<string>,
-      friendlyName: Maybe<string>,
-      target: Maybe<string>
+      url_: MaybeTypeAnnotated<string>,
+      friendlyName: MaybeTypeAnnotated<string>,
+      target_: MaybeTypeAnnotated<string>
     ) => {
+      let [url] = extractValueAnnotation(url_, "string");
       if (!url) {
         url = " ";
       }
-      if (!friendlyName) {
-        friendlyName = " ";
-      }
+      const [child_, childType] = extractValueAnnotation(
+        friendlyName,
+        "string"
+      );
+      const child = child_ || " ";
+      let [target] = extractValueAnnotation(target_, "string");
       if (target == null) {
         target = "_blank";
       }
       if (!target) {
         target = "";
       }
-      return `<a href="${url}" target="${escapeHtml(target)}">${escapeHtml(
-        friendlyName
-      )}</a>`;
+      return `<a href="${url}" target="${escapeHtml(target)}">${
+        childType === "html" ? child : escapeHtml(child)
+      }</a>`;
     },
     type: {
       type: "function",
@@ -570,7 +575,18 @@ export default {
           optional: false,
         },
         {
-          argument: { type: "string" },
+          argument: {
+            type: "template",
+            ref: "T",
+            anyOf: [
+              {
+                type: "string",
+              },
+              {
+                type: "html",
+              },
+            ],
+          },
           optional: false,
         },
         {
@@ -578,7 +594,7 @@ export default {
           optional: true,
         },
       ],
-      returns: { type: "string" },
+      returns: { type: "html" },
     },
   },
   IMAGE: {
@@ -631,7 +647,7 @@ export default {
           optional: true,
         },
       ],
-      returns: { type: "string" },
+      returns: { type: "html" },
     },
   },
 };

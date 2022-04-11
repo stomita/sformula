@@ -700,3 +700,6 @@
 -
   type: Text
   formula: IMAGE(Url01__c, Text01__c, Number01__c, Number02__c)
+-
+  type: Text
+  formula: HYPERLINK(Url02__c, IMAGE(Url01__c, Text01__c), Text02__c)

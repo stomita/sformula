@@ -299,17 +299,20 @@
   Url02__c: "www.apple.com/ja"
 -
   Url01__c: "https://www.google.com/"
+  Url02__c: "/path/to/servlet"
   Text01__c: "The quick brown fox jumps over the lazy dog"
   Text02__c: "lazy dog"
   Number01__c: 16
   Number02__c: 16
 -
   Url01__c: "https://www.google.com/"
+  Url02__c: "/path/to/servlet"
   Text01__c: "Self"
   Text02__c: "_self"
   Number01__c: 120
 -
   Url01__c: "https://www.google.com/"
+  Url02__c: "/path/to/servlet"
   Text01__c: "With <tagged> text"
   Text02__c: "With \"double quoted\" text"
   Number01__c: 4.23
