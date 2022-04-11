@@ -240,6 +240,9 @@
   Text01__c: 'abcABCde'
   Number01__c: 15
 -
+  Text01__c: 'abcABCde'
+  Number01__c: 2.81
+-
   Text01__c: 'abcあいう０１２ＡＢＣ'
   Text02__c: 'A'
 -

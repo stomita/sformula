@@ -135,6 +135,10 @@ export default {
       if (!str || num == null) {
         return "";
       }
+      if (num < 0) {
+        num = 0;
+      }
+      num = Math.floor(num);
       return str.substring(0, num);
     },
     type: {
@@ -155,6 +159,10 @@ export default {
   RIGHT: {
     value: (str: Maybe<string>, num: Maybe<number>) => {
       if (!str || num == null) {
+        return "";
+      }
+      // num must be an integer value - otherwise returns empty string
+      if (Math.floor(num) !== num) {
         return "";
       }
       return str.substring(str.length - num);
@@ -185,6 +193,8 @@ export default {
       if (num < 0) {
         num = 0;
       }
+      start = Math.floor(start);
+      num = Math.floor(num);
       return str.substring(start - 1, start + num - 1);
     },
     type: {
