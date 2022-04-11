@@ -100,3 +100,22 @@ export function shiftDecimalPoint(n: number, d: number): number {
   const nn = Number(ss);
   return sign * nn;
 }
+
+/**
+ *
+ */
+export function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+/**
+ *
+ */
+export function normalizeCSSStyleNum(num: number): string {
+  return String(num).replace(/^(-)?0\./, (_$0, $1) => `${$1 ? "-" : ""}.`);
+}

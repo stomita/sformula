@@ -688,3 +688,15 @@
 -
   type: Text
   formula: Phone01__c & ':' & Phone02__c & ':' & Email01__c & ':' & Email02__c & ':' & Url01__c & ':' & Url02__c
+-
+  type: Text
+  formula: HYPERLINK(Url01__c, Text01__c)
+-
+  type: Text
+  formula: HYPERLINK('https://www.google.com', Text01__c, Text02__c)
+-
+  type: Text
+  formula: IMAGE(Url01__c, Text01__c)
+-
+  type: Text
+  formula: IMAGE(Url01__c, Text01__c, Number01__c, Number02__c)
