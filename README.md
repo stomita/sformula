@@ -189,10 +189,10 @@ console.log(ret2); // 3.5
 - [x] TEXT 
 - [x] VALUE
 - [x] CASESAFEID
-- [ ] ~~BR~~ *(will not be supported)*
+- [x] HYPERLINK
+- [x] IMAGE
+- [ ] BR
 - [ ] ~~GETSESSIONID~~ *(will not be supported)*
-- [ ] ~~HYPERLINK~~ *(will not be supported)*
-- [ ] ~~IMAGE~~ *(will not be supported)*
 
 ### Other Functions
 
