@@ -87,6 +87,7 @@ function injectCallExpression(
   if (callee.type === "Identifier") {
     switch (callee.name) {
       case "TEXT":
+      case "HYPERLINK":
         return annotateArgumentTypes(callee.name, args, argumentTypes);
       default:
         break;

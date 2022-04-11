@@ -14,7 +14,10 @@ export function isCastableType(srcType: string, dstType: string) {
     ((srcType === "number" ||
       srcType === "currency" ||
       srcType === "percent") &&
-      (dstType === "number" || dstType === "currency" || dstType === "percent"))
+      (dstType === "number" ||
+        dstType === "currency" ||
+        dstType === "percent")) ||
+    (srcType === "html" && dstType === "string")
   );
 }
 

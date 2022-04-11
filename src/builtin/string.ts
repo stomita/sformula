@@ -5,7 +5,13 @@ import {
   SALESFORCE_TIME_FORMAT,
   SALESFORCE_TIME_TEXT_FORMAT,
 } from "./constants";
-import { convertIdFrom15To18, convertIdFrom18To15 } from "./common";
+import {
+  convertIdFrom15To18,
+  convertIdFrom18To15,
+  escapeHtml,
+  extractValueAnnotation,
+  normalizeCSSStyleNum,
+} from "./common";
 
 /**
  *
@@ -533,6 +539,115 @@ export default {
         },
       ],
       returns: { type: "string" },
+    },
+  },
+  HYPERLINK: {
+    value: (
+      url_: MaybeTypeAnnotated<string>,
+      friendlyName: MaybeTypeAnnotated<string>,
+      target_: MaybeTypeAnnotated<string>
+    ) => {
+      let [url] = extractValueAnnotation(url_, "string");
+      if (!url) {
+        url = " ";
+      }
+      const [child_, childType] = extractValueAnnotation(
+        friendlyName,
+        "string"
+      );
+      const child = child_ || " ";
+      let [target] = extractValueAnnotation(target_, "string");
+      if (target == null) {
+        target = "_blank";
+      }
+      if (!target) {
+        target = "";
+      }
+      return `<a href="${url}" target="${escapeHtml(target)}">${
+        childType === "html" ? child : escapeHtml(child)
+      }</a>`;
+    },
+    type: {
+      type: "function",
+      arguments: [
+        {
+          argument: { type: "string" },
+          optional: false,
+        },
+        {
+          argument: {
+            type: "template",
+            ref: "T",
+            anyOf: [
+              {
+                type: "string",
+              },
+              {
+                type: "html",
+              },
+            ],
+          },
+          optional: false,
+        },
+        {
+          argument: { type: "string" },
+          optional: true,
+        },
+      ],
+      returns: { type: "html" },
+    },
+  },
+  IMAGE: {
+    value: (
+      imageUrl: Maybe<string>,
+      alternateText: Maybe<string>,
+      height: Maybe<number>,
+      width: Maybe<number>
+    ) => {
+      if (!imageUrl) {
+        imageUrl = " ";
+      }
+      if (!alternateText) {
+        alternateText = " ";
+      }
+      const styles = [];
+      if (height === null) {
+        height = 0;
+      }
+      if (height != null) {
+        styles.push(`height:${normalizeCSSStyleNum(height)}px;`);
+      }
+      if (width === null) {
+        width = 0;
+      }
+      if (width != null) {
+        styles.push(`width:${normalizeCSSStyleNum(width)}px;`);
+      }
+      return `<img src="${imageUrl}" alt="${escapeHtml(alternateText)}"${
+        styles.length > 0 ? ` style="${styles.join(" ")}"` : ""
+      } border="0"/>`;
+    },
+    type: {
+      type: "function",
+      arguments: [
+        {
+          argument: { type: "string" },
+          optional: false,
+        },
+        {
+          argument: { type: "string" },
+          optional: false,
+        },
+        {
+          argument: { type: "number" },
+          optional: true,
+        },
+        {
+          argument: { type: "number" },
+          optional: true,
+        },
+      ],
+      returns: { type: "html" },
     },
   },
 };

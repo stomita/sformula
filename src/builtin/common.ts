@@ -1,4 +1,5 @@
 import { DateTime } from "luxon";
+import { MaybeTypeAnnotated } from "../types";
 import {
   ISO8601_DATE_FORMAT,
   ISO8601_DATETIME_INPUT_FORMAT,
@@ -99,4 +100,33 @@ export function shiftDecimalPoint(n: number, d: number): number {
     .replace(/^0+/, "");
   const nn = Number(ss);
   return sign * nn;
+}
+
+/**
+ *
+ */
+export function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+/**
+ *
+ */
+export function normalizeCSSStyleNum(num: number): string {
+  return String(num).replace(/^(-)?0\./, (_$0, $1) => `${$1 ? "-" : ""}.`);
+}
+
+/**
+ *
+ */
+export function extractValueAnnotation<T>(
+  value: MaybeTypeAnnotated<T>,
+  defaultType: string
+) {
+  return Array.isArray(value) ? value : [value, defaultType];
 }
