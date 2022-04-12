@@ -268,6 +268,22 @@ function convertPercentToNumber(expression: Expression): TraverseResult {
   };
 }
 
+function wrapValue(
+  expression: Expression,
+  returnType: ExpressionType,
+  blankAsZero: boolean
+): TraverseResult {
+  let result: TraverseResult = { expression, returnType };
+  if (returnType.type === "id") {
+    result = idValue(expression);
+  } else if (returnType.type === "currency") {
+    result = convertCurrencyToNumber(expression);
+  } else if (returnType.type === "percent") {
+    result = convertPercentToNumber(expression);
+  }
+  return nullValue(result, blankAsZero);
+}
+
 function traverseNumberBinaryExpression(
   expression: BinaryExpression,
   left: TraverseResult,
@@ -893,16 +909,14 @@ function traverseMemberExpression(
       `property ${property.name} is not found in object`
     );
   }
-  return nullValue(
+  return wrapValue(
     {
-      expression: {
-        type: "MemberExpression",
-        object: objectResult.expression,
-        property,
-        ...rexpression,
-      },
-      returnType,
+      type: "MemberExpression",
+      object: objectResult.expression,
+      property,
+      ...rexpression,
     },
+    returnType,
     blankAsZero
   );
 }
@@ -916,15 +930,7 @@ function traverseIdentifier(
   if (!returnType) {
     throw new TypeNotFoundError(expression, expression.name);
   }
-  let result: TraverseResult = { expression, returnType };
-  if (returnType.type === "id") {
-    result = idValue(expression);
-  } else if (returnType.type === "currency") {
-    result = convertCurrencyToNumber(expression);
-  } else if (returnType.type === "percent") {
-    result = convertPercentToNumber(expression);
-  }
-  return nullValue(result, blankAsZero);
+  return wrapValue(expression, returnType, blankAsZero);
 }
 
 function traverseLiteral(expression: Literal): TraverseResult {
