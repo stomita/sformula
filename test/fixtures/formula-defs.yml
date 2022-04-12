@@ -679,6 +679,9 @@
   formula: Id & '; ' & Parent__c
 -
   type: Text
+  formula: Id + '; ' + Parent__r.Id
+-
+  type: Text
   formula: |
     /* This is comment */
     Text01__c + /* Second comment */ ' ' + Text02__c
