@@ -49,7 +49,7 @@ export function castValue(
     return !!value;
   }
   if (value == null) {
-    return value;
+    return null;
   }
   if (dstType === "date" && srcType === "datetime") {
     const dt = dayjs(value);

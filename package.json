@@ -41,7 +41,7 @@
   ],
   "dependencies": {
     "dayjs": "^1.11.3",
-    "esformula": "^2.2.1"
+    "esformula": "^3.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.14.5",

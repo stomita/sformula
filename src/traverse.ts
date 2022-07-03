@@ -116,13 +116,6 @@ function nullValue(result: TraverseResult, blankAsZero: boolean) {
     returnType.type === "percent"
   ) {
     altValue = createLiteral(blankAsZero ? 0 : null);
-  } else if (returnType.type === "object") {
-    altValue = {
-      type: "ObjectExpression",
-      properties: [],
-    };
-  } else if (returnType.type !== "function") {
-    altValue = createLiteral(null);
   }
   if (altValue) {
     return {
