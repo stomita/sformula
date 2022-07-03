@@ -1,11 +1,17 @@
-import { DateTime } from "luxon";
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
 import {
-  MSECS_IN_DAY,
   ISO8601_DATETIME_FORMAT,
   SALESFORCE_TIME_FORMAT,
+  ISO8601_DATE_FORMAT,
 } from "./constants";
 import type { Maybe } from "../types";
 import { parseTime, shiftDecimalPoint } from "./common";
+
+/**
+ *
+ */
+dayjs.extend(duration);
 
 /**
  *
@@ -418,11 +424,12 @@ export default {
       if (d == null || n == null) {
         return null;
       }
-      const dt = DateTime.fromISO(d);
-      if (!dt.isValid) {
+      const dt = dayjs(d);
+      if (!dt.isValid()) {
         return null;
       }
-      return dt.plus({ day: n }).toISODate();
+      const ms = dayjs.duration(n, "day").asMilliseconds();
+      return dt.add(ms, "millisecond").format(ISO8601_DATE_FORMAT);
     },
     type: {
       type: "function",
@@ -444,11 +451,12 @@ export default {
       if (d == null || n == null) {
         return null;
       }
-      const dt = DateTime.fromISO(d);
-      if (!dt.isValid) {
+      const dt = dayjs(d);
+      if (!dt.isValid()) {
         return null;
       }
-      return dt.plus({ day: -n }).toISODate();
+      const ms = dayjs.duration(n, "day").asMilliseconds();
+      return dt.add(-ms, "millisecond").format(ISO8601_DATE_FORMAT);
     },
     type: {
       type: "function",
@@ -470,15 +478,15 @@ export default {
       if (d1 == null || d2 == null) {
         return null;
       }
-      const dt1 = DateTime.fromISO(d1);
-      if (!dt1.isValid) {
+      const dt1 = dayjs(d1);
+      if (!dt1.isValid()) {
         return null;
       }
-      const dt2 = DateTime.fromISO(d2);
-      if (!dt2.isValid) {
+      const dt2 = dayjs(d2);
+      if (!dt2.isValid()) {
         return null;
       }
-      return dt1.diff(dt2, "days").as("days");
+      return dt1.diff(dt2, "day", true);
     },
     type: {
       type: "function",
@@ -500,12 +508,12 @@ export default {
       if (d1 == null || d2 == null) {
         return null;
       }
-      const dt1 = DateTime.fromISO(d1);
-      if (!dt1.isValid) {
+      const dt1 = dayjs(d1);
+      if (!dt1.isValid()) {
         return null;
       }
-      const dt2 = DateTime.fromISO(d2);
-      if (!dt2.isValid) {
+      const dt2 = dayjs(d2);
+      if (!dt2.isValid()) {
         return null;
       }
       return dt1.valueOf() < dt2.valueOf();
@@ -530,12 +538,12 @@ export default {
       if (d1 == null || d2 == null) {
         return null;
       }
-      const dt1 = DateTime.fromISO(d1);
-      if (!dt1.isValid) {
+      const dt1 = dayjs(d1);
+      if (!dt1.isValid()) {
         return null;
       }
-      const dt2 = DateTime.fromISO(d2);
-      if (!dt2.isValid) {
+      const dt2 = dayjs(d2);
+      if (!dt2.isValid()) {
         return null;
       }
       return dt1.valueOf() <= dt2.valueOf();
@@ -560,12 +568,12 @@ export default {
       if (d1 == null || d2 == null) {
         return null;
       }
-      const dt1 = DateTime.fromISO(d1);
-      if (!dt1.isValid) {
+      const dt1 = dayjs(d1);
+      if (!dt1.isValid()) {
         return null;
       }
-      const dt2 = DateTime.fromISO(d2);
-      if (!dt2.isValid) {
+      const dt2 = dayjs(d2);
+      if (!dt2.isValid()) {
         return null;
       }
       return dt1.valueOf() > dt2.valueOf();
@@ -590,12 +598,12 @@ export default {
       if (d1 == null || d2 == null) {
         return null;
       }
-      const dt1 = DateTime.fromISO(d1);
-      if (!dt1.isValid) {
+      const dt1 = dayjs(d1);
+      if (!dt1.isValid()) {
         return null;
       }
-      const dt2 = DateTime.fromISO(d2);
-      if (!dt2.isValid) {
+      const dt2 = dayjs(d2);
+      if (!dt2.isValid()) {
         return null;
       }
       return dt1.valueOf() >= dt2.valueOf();
@@ -620,15 +628,15 @@ export default {
       if (d1 == null || d2 == null) {
         return null;
       }
-      const dt1 = DateTime.fromISO(d1);
-      if (!dt1.isValid) {
+      const dt1 = dayjs(d1);
+      if (!dt1.isValid()) {
         return null;
       }
-      const dt2 = DateTime.fromISO(d2);
-      if (!dt2.isValid) {
+      const dt2 = dayjs(d2);
+      if (!dt2.isValid()) {
         return null;
       }
-      return dt1.hasSame(dt2, "day");
+      return dt1.isSame(dt2, "day");
     },
     type: {
       type: "function",
@@ -650,15 +658,15 @@ export default {
       if (d1 == null || d2 == null) {
         return null;
       }
-      const dt1 = DateTime.fromISO(d1);
-      if (!dt1.isValid) {
+      const dt1 = dayjs(d1);
+      if (!dt1.isValid()) {
         return null;
       }
-      const dt2 = DateTime.fromISO(d2);
-      if (!dt2.isValid) {
+      const dt2 = dayjs(d2);
+      if (!dt2.isValid()) {
         return null;
       }
-      return !dt1.hasSame(dt2, "day");
+      return !dt1.isSame(dt2, "day");
     },
     type: {
       type: "function",
@@ -680,14 +688,12 @@ export default {
       if (d == null || n == null) {
         return null;
       }
-      const dt = DateTime.fromISO(d);
-      if (!dt.isValid) {
+      const dt = dayjs(d);
+      if (!dt.isValid()) {
         return null;
       }
-      return dt
-        .plus({ milliseconds: n * MSECS_IN_DAY })
-        .toUTC()
-        .toFormat(ISO8601_DATETIME_FORMAT);
+      const ms = dayjs.duration(n, "day").asMilliseconds();
+      return dt.add(ms).utc().format(ISO8601_DATETIME_FORMAT);
     },
     type: {
       type: "function",
@@ -709,14 +715,12 @@ export default {
       if (d == null || n == null) {
         return null;
       }
-      const dt = DateTime.fromISO(d);
-      if (!dt.isValid) {
+      const dt = dayjs(d);
+      if (!dt.isValid()) {
         return null;
       }
-      return dt
-        .plus({ milliseconds: -n * MSECS_IN_DAY })
-        .toUTC()
-        .toFormat(ISO8601_DATETIME_FORMAT);
+      const ms = dayjs.duration(n, "day").asMilliseconds();
+      return dt.add(-ms).utc().format(ISO8601_DATETIME_FORMAT);
     },
     type: {
       type: "function",
@@ -738,15 +742,15 @@ export default {
       if (d1 == null || d2 == null) {
         return null;
       }
-      const dt1 = DateTime.fromISO(d1);
-      if (!dt1.isValid) {
+      const dt1 = dayjs(d1);
+      if (!dt1.isValid()) {
         return null;
       }
-      const dt2 = DateTime.fromISO(d2);
-      if (!dt2.isValid) {
+      const dt2 = dayjs(d2);
+      if (!dt2.isValid()) {
         return null;
       }
-      return dt1.diff(dt2, "milliseconds").as("milliseconds") / MSECS_IN_DAY;
+      return dt1.diff(dt2, "day", true);
     },
     type: {
       type: "function",
@@ -768,12 +772,12 @@ export default {
       if (d1 == null || d2 == null) {
         return null;
       }
-      const dt1 = DateTime.fromISO(d1);
-      if (!dt1.isValid) {
+      const dt1 = dayjs(d1);
+      if (!dt1.isValid()) {
         return null;
       }
-      const dt2 = DateTime.fromISO(d2);
-      if (!dt2.isValid) {
+      const dt2 = dayjs(d2);
+      if (!dt2.isValid()) {
         return null;
       }
       return dt1.valueOf() < dt2.valueOf();
@@ -798,12 +802,12 @@ export default {
       if (d1 == null || d2 == null) {
         return null;
       }
-      const dt1 = DateTime.fromISO(d1);
-      if (!dt1.isValid) {
+      const dt1 = dayjs(d1);
+      if (!dt1.isValid()) {
         return null;
       }
-      const dt2 = DateTime.fromISO(d2);
-      if (!dt2.isValid) {
+      const dt2 = dayjs(d2);
+      if (!dt2.isValid()) {
         return null;
       }
       return dt1.valueOf() <= dt2.valueOf();
@@ -828,12 +832,12 @@ export default {
       if (d1 == null || d2 == null) {
         return null;
       }
-      const dt1 = DateTime.fromISO(d1);
-      if (!dt1.isValid) {
+      const dt1 = dayjs(d1);
+      if (!dt1.isValid()) {
         return null;
       }
-      const dt2 = DateTime.fromISO(d2);
-      if (!dt2.isValid) {
+      const dt2 = dayjs(d2);
+      if (!dt2.isValid()) {
         return null;
       }
       return dt1.valueOf() > dt2.valueOf();
@@ -858,12 +862,12 @@ export default {
       if (d1 == null || d2 == null) {
         return null;
       }
-      const dt1 = DateTime.fromISO(d1);
-      if (!dt1.isValid) {
+      const dt1 = dayjs(d1);
+      if (!dt1.isValid()) {
         return null;
       }
-      const dt2 = DateTime.fromISO(d2);
-      if (!dt2.isValid) {
+      const dt2 = dayjs(d2);
+      if (!dt2.isValid()) {
         return null;
       }
       return dt1.valueOf() >= dt2.valueOf();
@@ -888,15 +892,15 @@ export default {
       if (d1 == null || d2 == null) {
         return null;
       }
-      const dt1 = DateTime.fromISO(d1);
-      if (!dt1.isValid) {
+      const dt1 = dayjs(d1);
+      if (!dt1.isValid()) {
         return null;
       }
-      const dt2 = DateTime.fromISO(d2);
-      if (!dt2.isValid) {
+      const dt2 = dayjs(d2);
+      if (!dt2.isValid()) {
         return null;
       }
-      return dt1.hasSame(dt2, "millisecond");
+      return dt1.isSame(dt2, "millisecond");
     },
     type: {
       type: "function",
@@ -918,15 +922,15 @@ export default {
       if (d1 == null || d2 == null) {
         return null;
       }
-      const dt1 = DateTime.fromISO(d1);
-      if (!dt1.isValid) {
+      const dt1 = dayjs(d1);
+      if (!dt1.isValid()) {
         return null;
       }
-      const dt2 = DateTime.fromISO(d2);
-      if (!dt2.isValid) {
+      const dt2 = dayjs(d2);
+      if (!dt2.isValid()) {
         return null;
       }
-      return !dt1.hasSame(dt2, "millisecond");
+      return !dt1.isSame(dt2, "millisecond");
     },
     type: {
       type: "function",
@@ -949,10 +953,10 @@ export default {
         return null;
       }
       const dt = parseTime(d);
-      if (!dt.isValid) {
+      if (!dt.isValid()) {
         return null;
       }
-      return dt.plus({ milliseconds: n }).toFormat(SALESFORCE_TIME_FORMAT);
+      return dt.add(n, "millisecond").format(SALESFORCE_TIME_FORMAT);
     },
     type: {
       type: "function",
@@ -975,10 +979,10 @@ export default {
         return null;
       }
       const dt = parseTime(d);
-      if (!dt.isValid) {
+      if (!dt.isValid()) {
         return null;
       }
-      return dt.plus({ milliseconds: -n }).toFormat(SALESFORCE_TIME_FORMAT);
+      return dt.add(-n, "millisecond").format(SALESFORCE_TIME_FORMAT);
     },
     type: {
       type: "function",
@@ -1001,14 +1005,14 @@ export default {
         return null;
       }
       const dt1 = parseTime(d1);
-      if (!dt1.isValid) {
+      if (!dt1.isValid()) {
         return null;
       }
       const dt2 = parseTime(d2);
-      if (!dt2.isValid) {
+      if (!dt2.isValid()) {
         return null;
       }
-      return dt1.diff(dt2, "milliseconds").as("milliseconds");
+      return dt1.diff(dt2, "millisecond", true);
     },
     type: {
       type: "function",
@@ -1031,11 +1035,11 @@ export default {
         return null;
       }
       const dt1 = parseTime(d1);
-      if (!dt1.isValid) {
+      if (!dt1.isValid()) {
         return null;
       }
       const dt2 = parseTime(d2);
-      if (!dt2.isValid) {
+      if (!dt2.isValid()) {
         return null;
       }
       return dt1.valueOf() < dt2.valueOf();
@@ -1061,11 +1065,11 @@ export default {
         return null;
       }
       const dt1 = parseTime(d1);
-      if (!dt1.isValid) {
+      if (!dt1.isValid()) {
         return null;
       }
       const dt2 = parseTime(d2);
-      if (!dt2.isValid) {
+      if (!dt2.isValid()) {
         return null;
       }
       return dt1.valueOf() <= dt2.valueOf();
@@ -1091,11 +1095,11 @@ export default {
         return null;
       }
       const dt1 = parseTime(d1);
-      if (!dt1.isValid) {
+      if (!dt1.isValid()) {
         return null;
       }
       const dt2 = parseTime(d2);
-      if (!dt2.isValid) {
+      if (!dt2.isValid()) {
         return null;
       }
       return dt1.valueOf() > dt2.valueOf();
@@ -1121,11 +1125,11 @@ export default {
         return null;
       }
       const dt1 = parseTime(d1);
-      if (!dt1.isValid) {
+      if (!dt1.isValid()) {
         return null;
       }
       const dt2 = parseTime(d2);
-      if (!dt2.isValid) {
+      if (!dt2.isValid()) {
         return null;
       }
       return dt1.valueOf() >= dt2.valueOf();
@@ -1151,14 +1155,14 @@ export default {
         return null;
       }
       const dt1 = parseTime(d1);
-      if (!dt1.isValid) {
+      if (!dt1.isValid()) {
         return null;
       }
       const dt2 = parseTime(d2);
-      if (!dt2.isValid) {
+      if (!dt2.isValid()) {
         return null;
       }
-      return dt1.hasSame(dt2, "millisecond");
+      return dt1.isSame(dt2, "millisecond");
     },
     type: {
       type: "function",
@@ -1181,14 +1185,14 @@ export default {
         return null;
       }
       const dt1 = parseTime(d1);
-      if (!dt1.isValid) {
+      if (!dt1.isValid()) {
         return null;
       }
       const dt2 = parseTime(d2);
-      if (!dt2.isValid) {
+      if (!dt2.isValid()) {
         return null;
       }
-      return !dt1.hasSame(dt2, "millisecond");
+      return !dt1.isSame(dt2, "millisecond");
     },
     type: {
       type: "function",

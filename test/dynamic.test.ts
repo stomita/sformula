@@ -1,5 +1,6 @@
 import assert from "assert";
-import { DateTime } from "luxon";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 import { parse, FormulaReturnType } from "..";
 import { loadFormulaDefs } from "./utils/formulaDef";
 import {
@@ -15,6 +16,10 @@ import {
   Record,
 } from "./utils/testRecords";
 
+//
+dayjs.extend(utc);
+//
+
 function zeropad(n: number) {
   return (n < 10 ? "00" : n < 100 ? "0" : "") + String(n);
 }
@@ -27,9 +32,9 @@ function toReturnType(type: string): FormulaReturnType {
     : type.toLowerCase()) as FormulaReturnType;
 }
 
-const ISO8601_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZZZ";
+const ISO8601_DATETIME_FORMAT = "YYYY-MM-DD[T]HH:mm:ss.SSSZZZ";
 
-const SALESFORCE_TIME_OUTPUT_FORMAT = "HH:mm:ss.SSS'Z'";
+const SALESFORCE_TIME_OUTPUT_FORMAT = "HH:mm:ss.SSS[Z]";
 
 function calcFluctuatedValue(
   value: string | number | null,
@@ -45,17 +50,23 @@ function calcFluctuatedValue(
     return [value - fluctuation, value + fluctuation] as [number, number];
   }
   if (returnType === "datetime" && typeof value === "string") {
-    const dt = DateTime.fromISO(value);
+    const dt = dayjs(value);
     return [
-      dt.plus(-fluctuation).toUTC().toFormat(ISO8601_DATETIME_FORMAT),
-      dt.plus(fluctuation).toUTC().toFormat(ISO8601_DATETIME_FORMAT),
+      dt.add(-fluctuation, "millisecond").utc().format(ISO8601_DATETIME_FORMAT),
+      dt.add(fluctuation, "millisecond").utc().format(ISO8601_DATETIME_FORMAT),
     ] as [string, string];
   }
   if (returnType === "time" && typeof value === "string") {
-    const dt = DateTime.fromISO(value);
+    const dt = dayjs.utc(value, SALESFORCE_TIME_OUTPUT_FORMAT, true);
     return [
-      dt.plus(-fluctuation).toUTC().toFormat(SALESFORCE_TIME_OUTPUT_FORMAT),
-      dt.plus(fluctuation).toUTC().toFormat(SALESFORCE_TIME_OUTPUT_FORMAT),
+      dt
+        .add(-fluctuation, "millisecond")
+        .utc()
+        .format(SALESFORCE_TIME_OUTPUT_FORMAT),
+      dt
+        .add(fluctuation, "millisecond")
+        .utc()
+        .format(SALESFORCE_TIME_OUTPUT_FORMAT),
     ] as [string, string];
   }
   return [value, value] as [typeof value, typeof value];
@@ -77,7 +88,7 @@ const describer = { sobject: FORMULA_TEST_OBJECT, describe: describeSObject };
 /**
  *
  */
-jest.setTimeout(120000);
+jest.setTimeout(300000);
 
 /**
  *
