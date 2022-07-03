@@ -41,8 +41,7 @@
   ],
   "dependencies": {
     "dayjs": "^1.11.3",
-    "esformula": "^2.2.1",
-    "luxon": "~1.18.2"
+    "esformula": "^2.2.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.14.5",
