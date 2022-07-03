@@ -1,4 +1,5 @@
 import assert from "assert";
+import dayjs from "dayjs";
 import { parseSync, parse, InvalidTypeError } from "..";
 import { DescribeSObjectResult } from "../src/types";
 import { catchError } from "./utils";
@@ -556,31 +557,7 @@ test("date/datetime/time calc regression tests", () => {
     },
     returnType: "date",
   });
-  const testPairs1 = [
-    {
-      expected: "2018-01-01",
-      datetimes: [
-        "2018-01-01T14:00:00+09:00",
-        "2018-01-01T01:00:00Z",
-        "2017-12-31T18:00:00-08:00",
-      ],
-    },
-    {
-      expected: "2017-12-31",
-      datetimes: [
-        "2018-01-01T05:00:00+09:00",
-        "2017-12-31T23:59:59Z",
-        "2017-12-31T13:00:00-08:00",
-      ],
-    },
-  ];
-  for (const { expected, datetimes } of testPairs1) {
-    for (const datetime of datetimes) {
-      assert.ok(expected === fml1.evaluate({ Datetime01__c: datetime }));
-    }
-  }
-
-  const fml2 = parseSync("Datetime01__c - 0.5", {
+  const fml2 = parseSync("DATEVALUE(Datetime01__c)", {
     inputTypes: {
       Datetime01__c: {
         type: "datetime",
@@ -588,31 +565,7 @@ test("date/datetime/time calc regression tests", () => {
     },
     returnType: "date",
   });
-  const testPairs2 = [
-    {
-      expected: "2018-01-01",
-      datetimes: [
-        "2018-01-01T22:00:00+09:00",
-        "2018-01-01T13:00:00Z",
-        "2018-01-01T04:00:00-08:00",
-      ],
-    },
-    {
-      expected: "2017-12-31",
-      datetimes: [
-        "2018-01-01T12:00:00+09:00",
-        "2018-01-01T08:00:00Z",
-        "2018-01-01T02:00:00-08:00",
-      ],
-    },
-  ];
-  for (const { expected, datetimes } of testPairs2) {
-    for (const datetime of datetimes) {
-      assert.ok(expected === fml2.evaluate({ Datetime01__c: datetime }));
-    }
-  }
-
-  const fml3 = parseSync("DATEVALUE(Datetime01__c)", {
+  const fml3 = parseSync("Datetime01__c - 0.5", {
     inputTypes: {
       Datetime01__c: {
         type: "datetime",
@@ -620,28 +573,31 @@ test("date/datetime/time calc regression tests", () => {
     },
     returnType: "date",
   });
-  const testPairs3 = [
-    {
-      expected: "2018-01-01",
-      datetimes: [
-        "2018-01-01T00:00:00+09:00",
-        "2018-01-01T10:00:00Z",
-        "2017-12-31T18:00:00-08:00",
-      ],
-    },
-    {
-      expected: "2017-12-31",
-      datetimes: [
-        "2017-12-31T23:00:00+09:00",
-        "2017-12-30T23:00:00Z",
-        "2017-12-30T15:00:00-08:00",
-      ],
-    },
+
+  const datetimes = [
+    "2018-01-01T14:00:00+09:00",
+    "2018-01-01T01:00:00Z",
+    "2017-12-31T18:00:00-08:00",
+    "2018-01-01T05:00:00+09:00",
+    "2017-12-31T23:59:59Z",
+    "2017-12-31T13:00:00-08:00",
+    "2018-01-01T22:00:00+09:00",
+    "2018-01-01T13:00:00Z",
+    "2018-01-01T04:00:00-08:00",
+    "2018-01-01T12:00:00+09:00",
+    "2018-01-01T08:00:00Z",
+    "2018-01-01T02:00:00-08:00",
   ];
-  for (const { expected, datetimes } of testPairs3) {
-    for (const datetime of datetimes) {
-      assert.ok(expected === fml3.evaluate({ Datetime01__c: datetime }));
-    }
+  for (const datetime of datetimes) {
+    const expected1 = dayjs(datetime).utc().format("YYYY-MM-DD");
+    assert.ok(expected1 === fml1.evaluate({ Datetime01__c: datetime }));
+    const expected2 = dayjs(datetime).format("YYYY-MM-DD");
+    assert.ok(expected2 === fml2.evaluate({ Datetime01__c: datetime }));
+    const expected3 = dayjs(datetime)
+      .add(-12 * 60 * 60, "second")
+      .utc()
+      .format("YYYY-MM-DD");
+    assert.ok(expected3 === fml3.evaluate({ Datetime01__c: datetime }));
   }
 
   let fml = parseSync("DATE(2020, 9, 4)", {
