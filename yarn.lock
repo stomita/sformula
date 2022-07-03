@@ -1264,10 +1264,15 @@
   dependencies:
     "@types/estree" "*"
 
-"@types/estree@*", "@types/estree@^0.0.48":
+"@types/estree@*":
   version "0.0.48"
   resolved "https://registry.yarnpkg.com/@types/estree/-/estree-0.0.48.tgz#18dc8091b285df90db2f25aa7d906cfc394b7f74"
   integrity sha512-LfZwXoGUDo0C3me81HXgkBg5CTQYb6xzEl+fNmbO4JdRiSKQ8A0GD1OBBvKAIsbCUgoyAty7m99GqqMQe784ew==
+
+"@types/estree@^0.0.52":
+  version "0.0.52"
+  resolved "https://registry.yarnpkg.com/@types/estree/-/estree-0.0.52.tgz#7f1f57ad5b741f3d5b210d3b1f145640d89bf8fe"
+  integrity sha512-BZWrtCU0bMVAIliIV+HJO1f1PR41M7NKjfxrFJwwhKI1KwhwOxYw1SXg9ao+CIMt774nFuGiG6eU+udtbEI9oQ==
 
 "@types/fs-extra@^9.0.1":
   version "9.0.1"
@@ -1634,7 +1639,7 @@ acorn@^6.4.1:
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-6.4.2.tgz#35866fd710528e92de10cf06016498e47e39e1e6"
   integrity sha512-XtGIhXwF8YM8bJhGxG5kXgjkEuNGLTkoYqVE+KMR+aspr4KGYmKYg7yUe3KghyQ9yheNwLnjmzh/7+gfDBmHCQ==
 
-acorn@^7.1.1, acorn@^7.2.0:
+acorn@^7.1.1:
   version "7.2.0"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-7.2.0.tgz#17ea7e40d7c8640ff54a694c889c26f31704effe"
   integrity sha512-apwXVmYVpQ34m/i71vrApRrRKCWQnZZF1+npOD0WV5xZFfwWOmKGQ2RWlfdy9vWITsenisM8M0Qeq8agcFHNiQ==
@@ -1648,6 +1653,11 @@ acorn@^8.2.4:
   version "8.4.0"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-8.4.0.tgz#af53266e698d7cffa416714b503066a82221be60"
   integrity sha512-ULr0LDaEqQrMFGyQ3bhJkLsbtrQ8QibAseGZeaSUiT/6zb9IvIkomWHJIvgvwad+hinRAgsI51JcWk2yvwyL+w==
+
+acorn@^8.7.1:
+  version "8.7.1"
+  resolved "https://registry.yarnpkg.com/acorn/-/acorn-8.7.1.tgz#0197122c843d1bf6d0a5e83220a788f278f63c30"
+  integrity sha512-Xx54uLJQZ19lKygFXOWsscKUbsBZW0CPykPhVQdhIeIwrbPmJzqeASDInc8nKBnp/JT6igTs82qPXz069H8I/A==
 
 adm-zip@^0.4.16:
   version "0.4.16"
@@ -2963,13 +2973,13 @@ escodegen@^2.0.0:
   optionalDependencies:
     source-map "~0.6.1"
 
-esformula@^2.2.1:
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/esformula/-/esformula-2.2.1.tgz#b8a6d98c6d4d5b120e22e99cf94a9eebe253cf59"
-  integrity sha512-mDGcs2RksYCNO78WHi/NwQRCOBfuCRUOzgb0h9kq/6lsCY5QUQIBQdXGqVuxKHUQFh+MwNzoExapLB7S3lN4Xw==
+esformula@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/esformula/-/esformula-3.0.0.tgz#11cc9360268ff920085dc6f54596b8bea7331e00"
+  integrity sha512-pMSYBzo+oqxkxZUy9rA2b/HUAP1VU60dlxS8o2bTFWsWBnkRRu1k8OOOsRTk4skJdQO3LX6/cH0A8SqhvioIAA==
   dependencies:
-    "@types/estree" "^0.0.48"
-    acorn "^7.2.0"
+    "@types/estree" "^0.0.52"
+    acorn "^8.7.1"
 
 eslint-config-prettier@^6.12.0:
   version "6.12.0"
