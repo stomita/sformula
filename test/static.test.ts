@@ -1,4 +1,5 @@
 import assert from "assert";
+import dayjs from "dayjs";
 import { parseSync, parse, InvalidTypeError } from "..";
 import { DescribeSObjectResult } from "../src/types";
 import { catchError } from "./utils";
@@ -545,4 +546,107 @@ test("accept block comments", async () => {
     Contact: { Name: "John Doe" },
   });
   assert(ret1 === "Apple, Inc.: John Doe");
+});
+
+test("date/datetime/time calc regression tests", () => {
+  const fml1 = parseSync("Datetime01__c", {
+    inputTypes: {
+      Datetime01__c: {
+        type: "datetime",
+      },
+    },
+    returnType: "date",
+  });
+  const fml2 = parseSync("DATEVALUE(Datetime01__c)", {
+    inputTypes: {
+      Datetime01__c: {
+        type: "datetime",
+      },
+    },
+    returnType: "date",
+  });
+  const fml3 = parseSync("Datetime01__c - 0.5", {
+    inputTypes: {
+      Datetime01__c: {
+        type: "datetime",
+      },
+    },
+    returnType: "date",
+  });
+
+  const datetimes = [
+    "2018-01-01T14:00:00+09:00",
+    "2018-01-01T01:00:00Z",
+    "2017-12-31T18:00:00-08:00",
+    "2018-01-01T05:00:00+09:00",
+    "2017-12-31T23:59:59Z",
+    "2017-12-31T13:00:00-08:00",
+    "2018-01-01T22:00:00+09:00",
+    "2018-01-01T13:00:00Z",
+    "2018-01-01T04:00:00-08:00",
+    "2018-01-01T12:00:00+09:00",
+    "2018-01-01T08:00:00Z",
+    "2018-01-01T02:00:00-08:00",
+  ];
+  for (const datetime of datetimes) {
+    const expected1 = dayjs(datetime).utc().format("YYYY-MM-DD");
+    assert.ok(expected1 === fml1.evaluate({ Datetime01__c: datetime }));
+    const expected2 = dayjs(datetime).format("YYYY-MM-DD");
+    assert.ok(expected2 === fml2.evaluate({ Datetime01__c: datetime }));
+    const expected3 = dayjs(datetime)
+      .add(-12 * 60 * 60, "second")
+      .utc()
+      .format("YYYY-MM-DD");
+    assert.ok(expected3 === fml3.evaluate({ Datetime01__c: datetime }));
+  }
+
+  let fml = parseSync("DATE(2020, 9, 4)", {
+    returnType: "date",
+  });
+  assert.ok("2020-09-04" === fml.evaluate({}));
+
+  fml = parseSync("DATE(2020, 11, 0)", {
+    returnType: "date",
+  });
+  assert.ok(null === fml.evaluate({}));
+
+  fml = parseSync("DATE(2020, 4, 31)", {
+    returnType: "date",
+  });
+  assert.ok(null === fml.evaluate({}));
+
+  fml = parseSync("DATE(2020, 3.6, 1.25)", {
+    returnType: "date",
+  });
+  assert.ok("2020-03-01" === fml.evaluate({}));
+
+  fml = parseSync("DATETIMEVALUE('2017-12-29')", {
+    returnType: "datetime",
+  });
+  assert.ok("2017-12-29T00:00:00.000+0000" === fml.evaluate({}));
+
+  fml = parseSync("TIMEVALUE('12:34:56.789')", {
+    returnType: "time",
+  });
+  assert.ok("12:34:56.789Z" === fml.evaluate({}));
+
+  fml = parseSync("TIMEVALUE('abcABCde 01201 444-888')", {
+    returnType: "time",
+  });
+  assert.ok(null === fml.evaluate({}));
+
+  fml = parseSync("TIMEVALUE('2018-01-01T14:56:43Z')", {
+    returnType: "time",
+  });
+  assert.ok("14:56:43.000Z" === fml.evaluate({}));
+  fml = parseSync("ADDMONTHS(Date01__c, Number01__c)", {
+    inputTypes: {
+      Date01__c: { type: "date" },
+      Number01__c: { type: "number" },
+    },
+    returnType: "date",
+  });
+  assert.ok(
+    "2018-02-01" === fml.evaluate({ Date01__c: "2018-01-01", Number01__c: 1 })
+  );
 });

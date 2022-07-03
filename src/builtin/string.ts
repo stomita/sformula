@@ -1,8 +1,8 @@
-import { DateTime } from "luxon";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 import type { MaybeTypeAnnotated, Maybe } from "../types";
 import {
   SALESFORCE_DATETIME_TEXT_FORMAT_Z,
-  SALESFORCE_TIME_FORMAT,
   SALESFORCE_TIME_TEXT_FORMAT,
 } from "./constants";
 import {
@@ -11,7 +11,13 @@ import {
   escapeHtml,
   extractValueAnnotation,
   normalizeCSSStyleNum,
+  parseTime,
 } from "./common";
+
+/**
+ *
+ */
+dayjs.extend(utc);
 
 /**
  *
@@ -412,11 +418,11 @@ export default {
         if (typeof v !== "string") {
           v = String(v);
         }
-        const dt = DateTime.fromISO(v);
-        if (!dt.isValid) {
+        const dt = dayjs(v);
+        if (!dt.isValid()) {
           return null;
         }
-        return dt.toUTC().toFormat(SALESFORCE_DATETIME_TEXT_FORMAT_Z);
+        return dt.utc().format(SALESFORCE_DATETIME_TEXT_FORMAT_Z);
       }
       if (vType === "time") {
         if (v == null) {
@@ -425,13 +431,11 @@ export default {
         if (typeof v !== "string") {
           v = String(v);
         }
-        const dt = DateTime.fromFormat(v, SALESFORCE_TIME_FORMAT, {
-          zone: "utc",
-        });
-        if (!dt.isValid) {
+        const dt = parseTime(v);
+        if (!dt.isValid()) {
           return null;
         }
-        return dt.toFormat(SALESFORCE_TIME_TEXT_FORMAT);
+        return dt.format(SALESFORCE_TIME_TEXT_FORMAT);
       }
       if (v == null) {
         return null;

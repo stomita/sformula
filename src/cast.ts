@@ -1,6 +1,13 @@
-import { DateTime } from "luxon";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 import { shiftDecimalPoint } from "./builtin/common";
+import { ISO8601_DATE_FORMAT } from "./builtin/constants";
 import { Maybe } from "./types";
+
+/**
+ *
+ */
+dayjs.extend(utc);
 
 /**
  *
@@ -45,7 +52,8 @@ export function castValue(
     return value;
   }
   if (dstType === "date" && srcType === "datetime") {
-    return DateTime.fromISO(value).toUTC().toISODate();
+    const dt = dayjs(value);
+    return dt.isValid() ? dt.utc().format(ISO8601_DATE_FORMAT) : null;
   }
   if (dstType === "percent" && srcType !== "percent") {
     value = shiftDecimalPoint(value, -2);

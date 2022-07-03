@@ -1,4 +1,6 @@
-import { DateTime } from "luxon";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+import utc from "dayjs/plugin/utc";
 import { MaybeTypeAnnotated } from "../types";
 import {
   ISO8601_DATE_FORMAT,
@@ -9,32 +11,46 @@ import {
 /**
  *
  */
+dayjs.extend(customParseFormat);
+dayjs.extend(utc);
+
+/**
+ *
+ */
 export function parseDate(s: string) {
-  return DateTime.fromFormat(s, ISO8601_DATE_FORMAT, { zone: "utc" });
+  return dayjs(s, ISO8601_DATE_FORMAT, true);
+}
+
+export function parseUtcDate(s: string) {
+  return dayjs.utc(s, ISO8601_DATE_FORMAT, true);
 }
 
 export function parseDatetime(s: string) {
-  let dt_: DateTime = null as any;
   for (const millisec of ["", ".S", ".SSS"]) {
-    for (const zone of ["Z", "ZZ", "ZZZ", "'Z'"]) {
-      const fmt = `${ISO8601_DATETIME_INPUT_FORMAT}${millisec}${zone}`;
-      const dt = DateTime.fromFormat(s, fmt, { zone: "utc" });
-      if (dt.isValid) {
-        return dt;
+    const fmt = `${ISO8601_DATETIME_INPUT_FORMAT}${millisec}`;
+    for (const zone of ["Z", "ZZ", "[Z]"]) {
+      const zfmt = fmt + zone;
+      // should parse non-strict mode because timezoned input might not be same as the formatted result
+      const dt = dayjs(s, zfmt);
+      if (dt.isValid()) {
+        const ss = s.replace(/(Z|[+-][0-9]{2}:?[0-9]{2})$/, "");
+        const dt2 = dayjs(ss, fmt);
+        if (dt2.isValid() && ss === dt2.format(fmt)) {
+          return dt;
+        }
       }
-      dt_ = dt;
     }
   }
-  return dt_;
+  return dayjs(null);
 }
 
 export function parseTime(s: string) {
-  return DateTime.fromFormat(s, SALESFORCE_TIME_FORMAT, { zone: "utc" });
+  return dayjs.utc(s, SALESFORCE_TIME_FORMAT, true);
 }
 
 export function parseDateOrDatetime(s: string) {
-  let dt = parseDate(s);
-  if (!dt.isValid) {
+  let dt = parseUtcDate(s);
+  if (!dt.isValid()) {
     dt = parseDatetime(s);
   }
   return dt;
@@ -42,7 +58,7 @@ export function parseDateOrDatetime(s: string) {
 
 export function parseDatetimeOrTime(s: string) {
   let dt = parseTime(s);
-  if (!dt.isValid) {
+  if (!dt.isValid()) {
     dt = parseDatetime(s);
   }
   return dt;
