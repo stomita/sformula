@@ -1,4 +1,5 @@
 import assert from "assert";
+import { Expression } from "estree";
 import { replace } from "estraverse";
 import { parseSync, compileSync } from "..";
 
@@ -15,7 +16,7 @@ test("should compile transformed ast directly", () => {
   assert(ret1 === "a b");
   assert("version" in fml1.compiled);
   const { ast } = fml1.compiled;
-  const ast2 = replace(ast, {
+  const ast2 = replace(ast as Expression, {
     enter(node) {
       if (node.type === "Identifier") {
         if (node.name === "Text1__c") {
