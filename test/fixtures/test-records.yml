@@ -317,3 +317,15 @@
   Text02__c: "With \"double quoted\" text"
   Number01__c: 4.23
   Number02__c: -12.8
+-
+  Date01__c: '2019-11-30'
+  Number01__c: 5
+-
+  Date01__c: '2019-12-31'
+  Number01__c: 5
+-
+  Date01__c: '2019-04-30'
+  Number01__c: 1
+-
+  Date01__c: '2019-05-30'
+  Number01__c: 1

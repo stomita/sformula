@@ -36,6 +36,15 @@ export default {
       if (!dt.isValid()) {
         return null;
       }
+      // it should return the last day of the month if the given day is the last day of the month,
+      // so add 1 day before adding months and then subtract 1 day after
+      if (dt.daysInMonth() === dt.date()) {
+        return dt
+          .add(1, "day")
+          .add(n, "month")
+          .add(-1, "day")
+          .format(ISO8601_DATE_FORMAT);
+      }
       return dt.add(n, "month").format(ISO8601_DATE_FORMAT);
     },
     type: {

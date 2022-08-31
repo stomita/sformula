@@ -639,6 +639,7 @@ test("date/datetime/time calc regression tests", () => {
     returnType: "time",
   });
   assert.ok("14:56:43.000Z" === fml.evaluate({}));
+
   fml = parseSync("ADDMONTHS(Date01__c, Number01__c)", {
     inputTypes: {
       Date01__c: { type: "date" },
@@ -648,5 +649,20 @@ test("date/datetime/time calc regression tests", () => {
   });
   assert.ok(
     "2018-02-01" === fml.evaluate({ Date01__c: "2018-01-01", Number01__c: 1 })
+  );
+  assert.ok(
+    "2020-02-29" === fml.evaluate({ Date01__c: "2019-02-28", Number01__c: 12 })
+  );
+  assert.ok(
+    "2019-05-31" === fml.evaluate({ Date01__c: "2019-04-30", Number01__c: 1 })
+  );
+  assert.ok(
+    "2019-01-31" === fml.evaluate({ Date01__c: "2019-02-28", Number01__c: -1 })
+  );
+  assert.ok(
+    "2020-01-31" === fml.evaluate({ Date01__c: "2020-02-29", Number01__c: -1 })
+  );
+  assert.ok(
+    "2019-06-30" === fml.evaluate({ Date01__c: "2019-05-30", Number01__c: 1 })
   );
 });
