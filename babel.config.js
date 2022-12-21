@@ -6,10 +6,10 @@ module.exports = {
     ],
     "@babel/typescript",
   ],
+  plugins: ["@babel/transform-runtime"],
   env: {
     test: {
       presets: ["power-assert"],
-      plugins: ["@babel/transform-runtime"],
     },
   },
 };
