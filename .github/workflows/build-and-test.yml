@@ -8,7 +8,7 @@ on:
 
 # Jobs to be executed
 jobs:
-    buind-and-test:
+    build-and-test:
         runs-on: ubuntu-latest
         steps:
             # Checkout the source code
