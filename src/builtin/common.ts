@@ -134,7 +134,7 @@ export function escapeHtml(str: string): string {
  *
  */
 export function normalizeCSSStyleNum(num: number): string {
-  return String(num).replace(/^(-)?0\./, (_$0, $1) => `${$1 ? "-" : ""}.`);
+  return String(num).replace(/^(-)?0?\./, (_$0, $1) => `${$1 ? "-0" : "0"}.`);
 }
 
 /**
