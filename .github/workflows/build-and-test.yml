@@ -61,7 +61,7 @@ jobs:
 
             # Test
             - name: 'Test'
-              run: yarn test
+              run: JSFORCE_CONNECTION_REGISTRY=sfdx SF_CONNECTION_NAME=scratch-org yarn test
 
             # Housekeeping
             - name: 'Delete scratch org'
