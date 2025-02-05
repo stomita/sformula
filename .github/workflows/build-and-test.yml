@@ -10,6 +10,9 @@ on:
 jobs:
     build-and-test:
         runs-on: ubuntu-latest
+        env:
+            TZ: America/Los_Angeles
+            JSFORCE_CONNECTION_REGISTRY: sfdx
         steps:
             # Checkout the source code
             - name: 'Checkout source code'
@@ -61,7 +64,7 @@ jobs:
 
             # Test
             - name: 'Test'
-              run: JSFORCE_CONNECTION_REGISTRY=sfdx SF_CONNECTION_NAME=scratch-org yarn test
+              run: SF_CONNECTION_NAME=scratch-org yarn test
 
             # Housekeeping
             - name: 'Delete scratch org'
