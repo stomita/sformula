@@ -263,14 +263,14 @@ export default {
     },
   },
   LPAD: {
-    value: (
-      str: Maybe<string>,
-      len: Maybe<number>,
-      pstr: Maybe<string> = " "
-    ) => {
-      if (!str || !pstr || len == null) {
+    value: (str: Maybe<string>, len: Maybe<number>, pstr: Maybe<string>) => {
+      if (!str || pstr === "" || pstr === null || len == null || len < 0) {
         return "";
       }
+      // Really odd behavior of salesforce.
+      // LPAD with float number length rounds nearest integer without padding chars,
+      // but with padding chars it rounds down.
+      len = pstr === undefined ? Math.round(len) : Math.floor(len);
       const pchars = pstr || " ";
       const plen = len > str.length ? len - str.length : 0;
       const padded = Array.from({ length: plen })
@@ -298,14 +298,14 @@ export default {
     },
   },
   RPAD: {
-    value: (
-      str: Maybe<string>,
-      len: Maybe<number>,
-      pstr: Maybe<string> = " "
-    ) => {
-      if (!str || !pstr || len == null) {
+    value: (str: Maybe<string>, len: Maybe<number>, pstr: Maybe<string>) => {
+      if (!str || pstr === "" || pstr === null || len == null || len < 0) {
         return "";
       }
+      // Really odd behavior of salesforce.
+      // RPAD with float number length rounds nearest integer without padding chars,
+      // but with padding chars it rounds down.
+      len = pstr === undefined ? Math.round(len) : Math.floor(len);
       const pchars = pstr || " ";
       const plen = len > str.length ? len - str.length : 0;
       const padded = Array.from({ length: plen })
