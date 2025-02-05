@@ -173,10 +173,8 @@ export default {
       if (!str || num == null) {
         return "";
       }
-      // num must be an integer value - otherwise returns empty string
-      if (Math.floor(num) !== num) {
-        return "";
-      }
+      // rounds num to integer
+      num = Math.round(num);
       return str.substring(str.length - num);
     },
     type: {
