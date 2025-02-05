@@ -1,0 +1,69 @@
+# Unique name for this workflow
+name: build and test
+
+# Definition when the workflow should run
+on:
+    pull_request:
+        types: [opened, edited, synchronize, reopened]
+
+# Jobs to be executed
+jobs:
+    buind-and-test:
+        runs-on: ubuntu-latest
+        steps:
+            # Checkout the source code
+            - name: 'Checkout source code'
+              uses: actions/checkout@v4
+            
+            # Setup Node.js
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                node-version: 20
+
+            # Install Yarn
+            - name: 'Install Yarn'
+              run: |
+                  npm install -g yarn
+                  yarn
+
+            # Build
+            - name: 'Build'
+              run: NODE_OPTIONS=--openssl-legacy-provider yarn build
+
+            # Lint
+            - name: 'Lint'
+              run: yarn lint
+
+            # Typecheck
+            - name: 'Typecheck'
+              run: yarn typecheck
+
+            # Install Salesforce CLI
+            - name: 'Install Salesforce CLI'
+              run: |
+                  npm install -g @salesforce/cli
+                  sf --version
+
+            # Store secret for dev hub
+            - name: 'Populate auth file with DEVHUB_SFDX_URL secret'
+              shell: bash
+              run: |
+                  echo ${{ secrets.DEVHUB_SFDX_URL }} > ./DEVHUB_SFDX_URL.txt
+
+            # Authenticate dev hub
+            - name: 'Authenticate Dev Hub'
+              run: sf org login sfdx-url -f ./DEVHUB_SFDX_URL.txt -a devhub -d
+
+            # Create scratch org
+            - name: 'Create scratch org'
+              run: sf org create scratch -f force/config/project-scratch-def.json -a scratch-org -d -y 1
+
+            # Test
+            - name: 'Test'
+              run: yarn test
+
+            # Housekeeping
+            - name: 'Delete scratch org'
+              if: always()
+              run: sf org delete scratch -p -o scratch-org
