@@ -1,3 +1,4 @@
+import { BigNumber } from "bignumber.js";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import {
@@ -5,8 +6,16 @@ import {
   SALESFORCE_TIME_FORMAT,
   ISO8601_DATE_FORMAT,
 } from "./constants";
-import type { Maybe } from "../types";
-import { parseTime, shiftDecimalPoint } from "./common";
+import { parseTime } from "./common";
+import type { FunctionDefDictionary } from "../types";
+import type {
+  SfNumber,
+  SfString,
+  SfBoolean,
+  SfDate,
+  SfDatetime,
+  SfTime,
+} from "./types";
 
 /**
  *
@@ -16,10 +25,10 @@ dayjs.extend(duration);
 /**
  *
  */
-export default {
+const operatorBuiltins = {
   // builtin operators
   $$CONCAT_STRING$$: {
-    value: (s1: Maybe<string>, s2: Maybe<string>) => {
+    value: (s1: SfString, s2: SfString) => {
       return (s1 || "") + (s2 || "");
     },
     type: {
@@ -38,7 +47,7 @@ export default {
     },
   },
   $$EQ_STRING$$: {
-    value: (s1: Maybe<string>, s2: Maybe<string>) => {
+    value: (s1: SfString, s2: SfString) => {
       return (s1 || "") === (s2 || "");
     },
     type: {
@@ -57,7 +66,7 @@ export default {
     },
   },
   $$NEQ_STRING$$: {
-    value: (s1: Maybe<string>, s2: Maybe<string>) => {
+    value: (s1: SfString, s2: SfString) => {
       return (s1 || "") !== (s2 || "");
     },
     type: {
@@ -76,11 +85,11 @@ export default {
     },
   },
   $$ADD_NUMBER$$: {
-    value: (n1: Maybe<number>, n2: Maybe<number>) => {
+    value: (n1: SfNumber, n2: SfNumber) => {
       if (n1 == null || n2 == null) {
         return null;
       }
-      return n1 + n2;
+      return BigNumber(n1).plus(n2);
     },
     type: {
       type: "function",
@@ -98,11 +107,11 @@ export default {
     },
   },
   $$SUBTRACT_NUMBER$$: {
-    value: (n1: Maybe<number>, n2: Maybe<number>) => {
+    value: (n1: SfNumber, n2: SfNumber) => {
       if (n1 == null || n2 == null) {
         return null;
       }
-      return n1 - n2;
+      return BigNumber(n1).minus(n2);
     },
     type: {
       type: "function",
@@ -120,11 +129,11 @@ export default {
     },
   },
   $$MULTIPLY_NUMBER$$: {
-    value: (n1: Maybe<number>, n2: Maybe<number>) => {
+    value: (n1: SfNumber, n2: SfNumber) => {
       if (n1 == null || n2 == null) {
         return null;
       }
-      return n1 * n2;
+      return BigNumber(n1).times(n2);
     },
     type: {
       type: "function",
@@ -142,11 +151,11 @@ export default {
     },
   },
   $$DIVIDE_NUMBER$$: {
-    value: (n1: Maybe<number>, n2: Maybe<number>) => {
-      if (n1 == null || n2 == null || n2 === 0) {
+    value: (n1: SfNumber, n2: SfNumber) => {
+      if (n1 == null || n2 == null || BigNumber(n2).isZero()) {
         return null;
       }
-      return n1 / n2;
+      return BigNumber(n1).div(n2);
     },
     type: {
       type: "function",
@@ -164,11 +173,14 @@ export default {
     },
   },
   $$SHIFT_DECIMAL$$: {
-    value: (n: Maybe<number>, d: Maybe<number>) => {
+    value: (n: SfNumber, d: SfNumber) => {
       if (n == null || d == null) {
         return null;
       }
-      return shiftDecimalPoint(n, d);
+      // Note: The direction is opposite to BigNumber.shiftedBy()
+      // - BigNumber(1).shiftedBy(2) => 100 (moves decimal point to right)
+      // - $$SHIFT_DECIMAL$$(1, 2) => 0.01 (moves decimal point to left)
+      return BigNumber(n).shiftedBy(-BigNumber(d).toNumber());
     },
     type: {
       type: "function",
@@ -186,11 +198,11 @@ export default {
     },
   },
   $$POWER_NUMBER$$: {
-    value: (n1: Maybe<number>, n2: Maybe<number>) => {
+    value: (n1: SfNumber, n2: SfNumber) => {
       if (n1 == null || n2 == null) {
         return null;
       }
-      return n1 ** n2;
+      return BigNumber(n1).pow(n2);
     },
     type: {
       type: "function",
@@ -208,11 +220,11 @@ export default {
     },
   },
   $$MINUS_NUMBER$$: {
-    value: (n: Maybe<number>) => {
+    value: (n: SfNumber) => {
       if (n == null) {
         return null;
       }
-      return -n;
+      return BigNumber(n).negated();
     },
     type: {
       type: "function",
@@ -226,11 +238,11 @@ export default {
     },
   },
   $$PLUS_NUMBER$$: {
-    value: (n: Maybe<number>) => {
+    value: (n: SfNumber) => {
       if (n == null) {
         return null;
       }
-      return +n;
+      return new BigNumber(n);
     },
     type: {
       type: "function",
@@ -244,11 +256,11 @@ export default {
     },
   },
   $$LT_NUMBER$$: {
-    value: (n1: Maybe<number>, n2: Maybe<number>) => {
+    value: (n1: SfNumber, n2: SfNumber) => {
       if (n1 == null || n2 == null) {
         return null;
       }
-      return n1 < n2;
+      return BigNumber(n1).lt(n2);
     },
     type: {
       type: "function",
@@ -266,11 +278,11 @@ export default {
     },
   },
   $$LTE_NUMBER$$: {
-    value: (n1: Maybe<number>, n2: Maybe<number>) => {
+    value: (n1: SfNumber, n2: SfNumber) => {
       if (n1 == null || n2 == null) {
         return null;
       }
-      return n1 <= n2;
+      return BigNumber(n1).lte(n2);
     },
     type: {
       type: "function",
@@ -288,11 +300,11 @@ export default {
     },
   },
   $$GT_NUMBER$$: {
-    value: (n1: Maybe<number>, n2: Maybe<number>) => {
+    value: (n1: SfNumber, n2: SfNumber) => {
       if (n1 == null || n2 == null) {
         return null;
       }
-      return n1 > n2;
+      return BigNumber(n1).gt(n2);
     },
     type: {
       type: "function",
@@ -310,11 +322,11 @@ export default {
     },
   },
   $$GTE_NUMBER$$: {
-    value: (n1: Maybe<number>, n2: Maybe<number>) => {
+    value: (n1: SfNumber, n2: SfNumber) => {
       if (n1 == null || n2 == null) {
         return null;
       }
-      return n1 >= n2;
+      return BigNumber(n1).gte(n2);
     },
     type: {
       type: "function",
@@ -332,11 +344,11 @@ export default {
     },
   },
   $$EQ_NUMBER$$: {
-    value: (n1: Maybe<number>, n2: Maybe<number>) => {
+    value: (n1: SfNumber, n2: SfNumber) => {
       if (n1 == null || n2 == null) {
         return null;
       }
-      return n1 === n2;
+      return BigNumber(n1).eq(n2);
     },
     type: {
       type: "function",
@@ -354,11 +366,11 @@ export default {
     },
   },
   $$NEQ_NUMBER$$: {
-    value: (n1: Maybe<number>, n2: Maybe<number>) => {
+    value: (n1: SfNumber, n2: SfNumber) => {
       if (n1 == null || n2 == null) {
         return null;
       }
-      return n1 !== n2;
+      return !BigNumber(n1).eq(n2);
     },
     type: {
       type: "function",
@@ -376,7 +388,7 @@ export default {
     },
   },
   $$EQ_BOOLEAN$$: {
-    value: (n1: Maybe<boolean>, n2: Maybe<boolean>) => {
+    value: (n1: SfBoolean, n2: SfBoolean) => {
       if (n1 == null || n2 == null) {
         return null;
       }
@@ -398,7 +410,7 @@ export default {
     },
   },
   $$NEQ_BOOLEAN$$: {
-    value: (n1: Maybe<boolean>, n2: Maybe<boolean>) => {
+    value: (n1: SfBoolean, n2: SfBoolean) => {
       if (n1 == null || n2 == null) {
         return null;
       }
@@ -420,7 +432,7 @@ export default {
     },
   },
   $$ADD_DATE$$: {
-    value: (d: string, n: number) => {
+    value: (d: SfDate, n: SfNumber) => {
       if (d == null || n == null) {
         return null;
       }
@@ -428,7 +440,8 @@ export default {
       if (!dt.isValid()) {
         return null;
       }
-      const ms = dayjs.duration(n, "day").asMilliseconds();
+      const nn = BigNumber(n).toNumber();
+      const ms = dayjs.duration(nn, "day").asMilliseconds();
       return dt.add(ms, "millisecond").format(ISO8601_DATE_FORMAT);
     },
     type: {
@@ -447,7 +460,7 @@ export default {
     },
   },
   $$SUBTRACT_DATE$$: {
-    value: (d: Maybe<string>, n: Maybe<number>) => {
+    value: (d: SfDate, n: SfNumber) => {
       if (d == null || n == null) {
         return null;
       }
@@ -455,7 +468,9 @@ export default {
       if (!dt.isValid()) {
         return null;
       }
-      const ms = dayjs.duration(n, "day").asMilliseconds();
+      const ms = dayjs
+        .duration(BigNumber(n).toNumber(), "day")
+        .asMilliseconds();
       return dt.add(-ms, "millisecond").format(ISO8601_DATE_FORMAT);
     },
     type: {
@@ -474,7 +489,7 @@ export default {
     },
   },
   $$DIFF_DATE$$: {
-    value: (d1: string, d2: string) => {
+    value: (d1: SfDate, d2: SfDate) => {
       if (d1 == null || d2 == null) {
         return null;
       }
@@ -504,7 +519,7 @@ export default {
     },
   },
   $$LT_DATE$$: {
-    value: (d1: string, d2: string) => {
+    value: (d1: SfDate, d2: SfDate) => {
       if (d1 == null || d2 == null) {
         return null;
       }
@@ -534,7 +549,7 @@ export default {
     },
   },
   $$LTE_DATE$$: {
-    value: (d1: string, d2: string) => {
+    value: (d1: SfDate, d2: SfDate) => {
       if (d1 == null || d2 == null) {
         return null;
       }
@@ -564,7 +579,7 @@ export default {
     },
   },
   $$GT_DATE$$: {
-    value: (d1: string, d2: string) => {
+    value: (d1: SfDate, d2: SfDate) => {
       if (d1 == null || d2 == null) {
         return null;
       }
@@ -594,7 +609,7 @@ export default {
     },
   },
   $$GTE_DATE$$: {
-    value: (d1: string, d2: string) => {
+    value: (d1: SfDate, d2: SfDate) => {
       if (d1 == null || d2 == null) {
         return null;
       }
@@ -624,7 +639,7 @@ export default {
     },
   },
   $$EQ_DATE$$: {
-    value: (d1: string, d2: string) => {
+    value: (d1: SfDate, d2: SfDate) => {
       if (d1 == null || d2 == null) {
         return null;
       }
@@ -654,7 +669,7 @@ export default {
     },
   },
   $$NEQ_DATE$$: {
-    value: (d1: string, d2: string) => {
+    value: (d1: SfDate, d2: SfDate) => {
       if (d1 == null || d2 == null) {
         return null;
       }
@@ -684,7 +699,7 @@ export default {
     },
   },
   $$ADD_DATETIME$$: {
-    value: (d: Maybe<string>, n: Maybe<number>) => {
+    value: (d: SfDatetime, n: SfNumber) => {
       if (d == null || n == null) {
         return null;
       }
@@ -692,7 +707,8 @@ export default {
       if (!dt.isValid()) {
         return null;
       }
-      const ms = dayjs.duration(n, "day").asMilliseconds();
+      const nn = BigNumber(n).toNumber();
+      const ms = dayjs.duration(nn, "day").asMilliseconds();
       return dt.add(ms).utc().format(ISO8601_DATETIME_FORMAT);
     },
     type: {
@@ -711,7 +727,7 @@ export default {
     },
   },
   $$SUBTRACT_DATETIME$$: {
-    value: (d: Maybe<string>, n: Maybe<number>) => {
+    value: (d: SfDatetime, n: SfNumber) => {
       if (d == null || n == null) {
         return null;
       }
@@ -719,7 +735,9 @@ export default {
       if (!dt.isValid()) {
         return null;
       }
-      const ms = dayjs.duration(n, "day").asMilliseconds();
+      const ms = dayjs
+        .duration(BigNumber(n).toNumber(), "day")
+        .asMilliseconds();
       return dt.add(-ms).utc().format(ISO8601_DATETIME_FORMAT);
     },
     type: {
@@ -738,7 +756,7 @@ export default {
     },
   },
   $$DIFF_DATETIME$$: {
-    value: (d1: Maybe<string>, d2: Maybe<string>) => {
+    value: (d1: SfDatetime, d2: SfDatetime) => {
       if (d1 == null || d2 == null) {
         return null;
       }
@@ -768,7 +786,7 @@ export default {
     },
   },
   $$LT_DATETIME$$: {
-    value: (d1: Maybe<string>, d2: Maybe<string>) => {
+    value: (d1: SfDatetime, d2: SfDatetime) => {
       if (d1 == null || d2 == null) {
         return null;
       }
@@ -798,7 +816,7 @@ export default {
     },
   },
   $$LTE_DATETIME$$: {
-    value: (d1: string, d2: string) => {
+    value: (d1: SfDatetime, d2: SfDatetime) => {
       if (d1 == null || d2 == null) {
         return null;
       }
@@ -828,7 +846,7 @@ export default {
     },
   },
   $$GT_DATETIME$$: {
-    value: (d1: string, d2: string) => {
+    value: (d1: SfDatetime, d2: SfDatetime) => {
       if (d1 == null || d2 == null) {
         return null;
       }
@@ -858,7 +876,7 @@ export default {
     },
   },
   $$GTE_DATETIME$$: {
-    value: (d1: string, d2: string) => {
+    value: (d1: SfDatetime, d2: SfDatetime) => {
       if (d1 == null || d2 == null) {
         return null;
       }
@@ -888,7 +906,7 @@ export default {
     },
   },
   $$EQ_DATETIME$$: {
-    value: (d1: string, d2: string) => {
+    value: (d1: SfDatetime, d2: SfDatetime) => {
       if (d1 == null || d2 == null) {
         return null;
       }
@@ -918,7 +936,7 @@ export default {
     },
   },
   $$NEQ_DATETIME$$: {
-    value: (d1: string, d2: string) => {
+    value: (d1: SfDatetime, d2: SfDatetime) => {
       if (d1 == null || d2 == null) {
         return null;
       }
@@ -948,7 +966,7 @@ export default {
     },
   },
   $$ADD_TIME$$: {
-    value: (d: Maybe<string>, n: Maybe<number>) => {
+    value: (d: SfTime, n: SfNumber) => {
       if (d == null || n == null) {
         return null;
       }
@@ -956,7 +974,8 @@ export default {
       if (!dt.isValid()) {
         return null;
       }
-      return dt.add(n, "millisecond").format(SALESFORCE_TIME_FORMAT);
+      const nn = BigNumber(n).toNumber();
+      return dt.add(nn, "millisecond").format(SALESFORCE_TIME_FORMAT);
     },
     type: {
       type: "function",
@@ -974,7 +993,7 @@ export default {
     },
   },
   $$SUBTRACT_TIME$$: {
-    value: (d: Maybe<string>, n: Maybe<number>) => {
+    value: (d: SfTime, n: SfNumber) => {
       if (d == null || n == null) {
         return null;
       }
@@ -982,7 +1001,8 @@ export default {
       if (!dt.isValid()) {
         return null;
       }
-      return dt.add(-n, "millisecond").format(SALESFORCE_TIME_FORMAT);
+      const nn = BigNumber(n).toNumber();
+      return dt.add(-nn, "millisecond").format(SALESFORCE_TIME_FORMAT);
     },
     type: {
       type: "function",
@@ -1000,7 +1020,7 @@ export default {
     },
   },
   $$DIFF_TIME$$: {
-    value: (d1: Maybe<string>, d2: Maybe<string>) => {
+    value: (d1: SfTime, d2: SfTime) => {
       if (d1 == null || d2 == null) {
         return null;
       }
@@ -1030,7 +1050,7 @@ export default {
     },
   },
   $$LT_TIME$$: {
-    value: (d1: Maybe<string>, d2: Maybe<string>) => {
+    value: (d1: SfTime, d2: SfTime) => {
       if (d1 == null || d2 == null) {
         return null;
       }
@@ -1060,7 +1080,7 @@ export default {
     },
   },
   $$LTE_TIME$$: {
-    value: (d1: string, d2: string) => {
+    value: (d1: SfTime, d2: SfTime) => {
       if (d1 == null || d2 == null) {
         return null;
       }
@@ -1090,7 +1110,7 @@ export default {
     },
   },
   $$GT_TIME$$: {
-    value: (d1: string, d2: string) => {
+    value: (d1: SfTime, d2: SfTime) => {
       if (d1 == null || d2 == null) {
         return null;
       }
@@ -1120,7 +1140,7 @@ export default {
     },
   },
   $$GTE_TIME$$: {
-    value: (d1: string, d2: string) => {
+    value: (d1: SfTime, d2: SfTime) => {
       if (d1 == null || d2 == null) {
         return null;
       }
@@ -1150,7 +1170,7 @@ export default {
     },
   },
   $$EQ_TIME$$: {
-    value: (d1: string, d2: string) => {
+    value: (d1: SfTime, d2: SfTime) => {
       if (d1 == null || d2 == null) {
         return null;
       }
@@ -1180,7 +1200,7 @@ export default {
     },
   },
   $$NEQ_TIME$$: {
-    value: (d1: string, d2: string) => {
+    value: (d1: SfTime, d2: SfTime) => {
       if (d1 == null || d2 == null) {
         return null;
       }
@@ -1209,4 +1229,6 @@ export default {
       returns: { type: "boolean" },
     },
   },
-};
+} satisfies FunctionDefDictionary;
+
+export default operatorBuiltins;

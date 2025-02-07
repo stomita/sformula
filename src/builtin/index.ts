@@ -1,4 +1,8 @@
-import type { Context, ExpressionTypeDictionary } from "../types";
+import type {
+  Context,
+  ExpressionTypeDictionary,
+  FunctionDefDictionary,
+} from "../types";
 import stringBuiltins from "./string";
 import datetimeBuiltins from "./datetime";
 import logicBuiltins from "./logic";
@@ -11,7 +15,7 @@ const builtins = {
   ...logicBuiltins,
   ...numberBuiltins,
   ...operatorBuiltins,
-};
+} satisfies FunctionDefDictionary;
 
 export type BuiltinFunctionName = keyof typeof builtins;
 

@@ -1,3 +1,4 @@
+import { BigNumber } from "bignumber.js";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import utc from "dayjs/plugin/utc";
@@ -15,7 +16,8 @@ import {
   parseDatetimeOrTime,
   parseTime,
 } from "./common";
-import type { Maybe } from "../types";
+import type { FunctionDefDictionary } from "../types";
+import type { SfString, SfNumber, SfDate, SfTime } from "./types";
 
 /**
  *
@@ -26,9 +28,9 @@ dayjs.extend(utc);
 /**
  *
  */
-export default {
+const datetimeBuiltins = {
   ADDMONTHS: {
-    value: (d: Maybe<string>, n: Maybe<number>) => {
+    value: (d: SfDate, n: SfNumber) => {
       if (d == null || n == null) {
         return null;
       }
@@ -36,16 +38,17 @@ export default {
       if (!dt.isValid()) {
         return null;
       }
+      const nn = BigNumber(n).integerValue(BigNumber.ROUND_DOWN).toNumber();
       // it should return the last day of the month if the given day is the last day of the month,
       // so add 1 day before adding months and then subtract 1 day after
       if (dt.daysInMonth() === dt.date()) {
         return dt
           .add(1, "day")
-          .add(n, "month")
+          .add(nn, "month")
           .add(-1, "day")
           .format(ISO8601_DATE_FORMAT);
       }
-      return dt.add(n, "month").format(ISO8601_DATE_FORMAT);
+      return dt.add(nn, "month").format(ISO8601_DATE_FORMAT);
     },
     type: {
       type: "function",
@@ -63,17 +66,23 @@ export default {
     },
   },
   DATE: {
-    value: (y: Maybe<number>, m: Maybe<number>, d: Maybe<number>) => {
-      if (y == null || m == null || d == null || y > 9999) {
+    value: (y: SfNumber, m: SfNumber, d: SfNumber) => {
+      if (y == null || m == null || d == null) {
         return null;
       }
-      [y, m, d] = [y, m, d].map(Math.floor);
-      const dd = dayjs(new Date(`${y},${m},${d}`));
-      return dd.isValid() &&
-        dd.year() === y &&
-        dd.month() === m - 1 &&
-        dd.date() === d
-        ? dd.format(ISO8601_DATE_FORMAT)
+      const yy = BigNumber(y).integerValue(BigNumber.ROUND_DOWN).toNumber();
+      if (yy > 9999) {
+        return null;
+      }
+      const mm = BigNumber(m).integerValue(BigNumber.ROUND_DOWN).toNumber();
+      const dd = BigNumber(d).integerValue(BigNumber.ROUND_DOWN).toNumber();
+
+      const dt = dayjs(new Date(`${yy},${mm},${dd}`));
+      return dt.isValid() &&
+        dt.year() === yy &&
+        dt.month() === mm - 1 &&
+        dt.date() === dd
+        ? dt.format(ISO8601_DATE_FORMAT)
         : null;
     },
     type: {
@@ -96,7 +105,7 @@ export default {
     },
   },
   DATETIMEVALUE: {
-    value: (s: Maybe<string>) => {
+    value: (s: SfString) => {
       if (s == null || s === "") {
         return null;
       }
@@ -118,7 +127,7 @@ export default {
     },
   },
   DATEVALUE: {
-    value: (s: Maybe<string>) => {
+    value: (s: SfString) => {
       if (s == null || s === "") {
         return null;
       }
@@ -141,7 +150,7 @@ export default {
     },
   },
   TIMEVALUE: {
-    value: (s: Maybe<string>) => {
+    value: (s: SfString) => {
       if (s == null || s === "") {
         return null;
       }
@@ -164,7 +173,7 @@ export default {
     },
   },
   YEAR: {
-    value: (s: Maybe<string>) => {
+    value: (s: SfDate) => {
       if (s == null || s === "") {
         return null;
       }
@@ -183,7 +192,7 @@ export default {
     },
   },
   MONTH: {
-    value: (s: Maybe<string>) => {
+    value: (s: SfDate) => {
       if (s == null || s === "") {
         return null;
       }
@@ -202,7 +211,7 @@ export default {
     },
   },
   DAY: {
-    value: (s: Maybe<string>) => {
+    value: (s: SfDate) => {
       if (s == null || s === "") {
         return null;
       }
@@ -221,7 +230,7 @@ export default {
     },
   },
   WEEKDAY: {
-    value: (s: Maybe<string>) => {
+    value: (s: SfDate) => {
       if (s == null || s === "") {
         return null;
       }
@@ -242,7 +251,7 @@ export default {
     },
   },
   HOUR: {
-    value: (s: Maybe<string>) => {
+    value: (s: SfTime) => {
       if (s == null || s === "") {
         return null;
       }
@@ -261,7 +270,7 @@ export default {
     },
   },
   MINUTE: {
-    value: (s: Maybe<string>) => {
+    value: (s: SfTime) => {
       if (s == null || s === "") {
         return null;
       }
@@ -280,7 +289,7 @@ export default {
     },
   },
   SECOND: {
-    value: (s: Maybe<string>) => {
+    value: (s: SfTime) => {
       if (s == null || s === "") {
         return null;
       }
@@ -299,7 +308,7 @@ export default {
     },
   },
   MILLISECOND: {
-    value: (s: Maybe<string>) => {
+    value: (s: SfTime) => {
       if (s == null || s === "") {
         return null;
       }
@@ -347,4 +356,6 @@ export default {
       returns: { type: "time" },
     },
   },
-};
+} satisfies FunctionDefDictionary;
+
+export default datetimeBuiltins;

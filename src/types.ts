@@ -30,6 +30,9 @@ export type PrimitiveExpressionType =
       type: "time";
     }
   | {
+      type: "html";
+    }
+  | {
       type: "any";
     };
 
@@ -57,18 +60,29 @@ export type FunctionArgType = {
   optional: boolean;
 };
 
+export type FunctionType = {
+  type: "function";
+  arguments: FunctionArgType[] | ((p: number) => FunctionArgType[]);
+  returns: ExpressionType;
+};
+
+export type FunctionDef = {
+  value: (...args: any[]) => any;
+  type: FunctionType;
+};
+
+export type FunctionDefDictionary = {
+  [key: string]: FunctionDef;
+};
+
 export type ExpressionType =
   | PrimitiveExpressionType
   | AdditionalPrimitiveExpressionType
+  | FunctionType
   | {
       type: "object";
       sobject?: string;
       properties: ExpressionTypeDictionary;
-    }
-  | {
-      type: "function";
-      arguments: FunctionArgType[] | ((p: number) => FunctionArgType[]);
-      returns: ExpressionType;
     }
   | {
       type: "class";

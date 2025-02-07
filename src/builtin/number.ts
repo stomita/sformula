@@ -1,12 +1,17 @@
-import type { Maybe } from "../types";
+import { BigNumber } from "bignumber.js";
+import type { SfNumber } from "./types";
+import type { FunctionDefDictionary } from "../types";
 
 /**
  *
  */
-export default {
+const numberBuiltins = {
   ABS: {
-    value: (v: Maybe<number>) => {
-      return v == null ? null : v >= 0 ? v : -v;
+    value: (v: SfNumber) => {
+      if (v == null) {
+        return null;
+      }
+      return BigNumber(v).abs();
     },
     type: {
       type: "function",
@@ -20,11 +25,11 @@ export default {
     },
   },
   CEILING: {
-    value: (v: Maybe<number>) => {
+    value: (v: SfNumber) => {
       if (v == null) {
         return null;
       }
-      return v >= 0 ? Math.ceil(v) : -Math.ceil(-v);
+      return BigNumber(v).integerValue(BigNumber.ROUND_UP); // v >= 0 ? Math.ceil(v) : -Math.ceil(-v)
     },
     type: {
       type: "function",
@@ -38,11 +43,11 @@ export default {
     },
   },
   FLOOR: {
-    value: (v: Maybe<number>) => {
+    value: (v: SfNumber) => {
       if (v == null) {
         return null;
       }
-      return v >= 0 ? Math.floor(v) : -Math.floor(-v);
+      return BigNumber(v).integerValue(BigNumber.ROUND_DOWN); // v >= 0 ? Math.floor(v) : -Math.floor(-v)
     },
     type: {
       type: "function",
@@ -56,12 +61,23 @@ export default {
     },
   },
   ROUND: {
-    value: (v: Maybe<number>, d: Maybe<number>) => {
+    value: (v: SfNumber, d: SfNumber) => {
       if (v == null || d == null) {
         return null;
       }
-      const factor = 10 ** Math.floor(d);
-      return Math.round(v * factor) / factor;
+      const places = BigNumber(d)
+        .integerValue(BigNumber.ROUND_FLOOR)
+        .toNumber();
+      if (places >= 0) {
+        return BigNumber(v).decimalPlaces(places, BigNumber.ROUND_HALF_UP);
+      } else {
+        // For negative places, shift decimal point left, round, then shift back
+        // e.g. ROUND(1234.5678, -2) => 12.345678 => 12 => 1200
+        return BigNumber(v)
+          .shiftedBy(places)
+          .integerValue(BigNumber.ROUND_HALF_UP)
+          .shiftedBy(-places);
+      }
     },
     type: {
       type: "function",
@@ -79,11 +95,11 @@ export default {
     },
   },
   MCEILING: {
-    value: (v: Maybe<number>) => {
+    value: (v: SfNumber) => {
       if (v == null) {
         return null;
       }
-      return Math.ceil(v);
+      return BigNumber(v).integerValue(BigNumber.ROUND_CEIL); // Math.ceil(v);
     },
     type: {
       type: "function",
@@ -97,11 +113,11 @@ export default {
     },
   },
   MFLOOR: {
-    value: (v: Maybe<number>) => {
+    value: (v: SfNumber) => {
       if (v == null) {
         return null;
       }
-      return Math.floor(v);
+      return BigNumber(v).integerValue(BigNumber.ROUND_FLOOR); // Math.floor(v);
     },
     type: {
       type: "function",
@@ -115,11 +131,11 @@ export default {
     },
   },
   EXP: {
-    value: (n: Maybe<number>) => {
+    value: (n: SfNumber) => {
       if (n == null) {
         return null;
       }
-      return Math.pow(Math.E, n);
+      return BigNumber(Math.E).pow(n);
     },
     type: {
       type: "function",
@@ -133,11 +149,15 @@ export default {
     },
   },
   LN: {
-    value: (n: Maybe<number>) => {
-      if (n == null || n <= 0) {
+    value: (n: SfNumber) => {
+      if (n == null) {
         return null;
       }
-      return Math.log(n);
+      const nn = BigNumber(n).toNumber();
+      if (nn <= 0) {
+        return null;
+      }
+      return Math.log(nn);
     },
     type: {
       type: "function",
@@ -151,11 +171,15 @@ export default {
     },
   },
   LOG: {
-    value: (n: Maybe<number>) => {
-      if (n == null || n <= 0) {
+    value: (n: SfNumber) => {
+      if (n == null) {
         return null;
       }
-      return Math.log10(n);
+      const nn = BigNumber(n).toNumber();
+      if (nn <= 0) {
+        return null;
+      }
+      return Math.log10(nn);
     },
     type: {
       type: "function",
@@ -169,11 +193,15 @@ export default {
     },
   },
   SQRT: {
-    value: (n: Maybe<number>) => {
-      if (n == null || n < 0) {
+    value: (n: SfNumber) => {
+      if (n == null) {
         return null;
       }
-      return Math.sqrt(n);
+      const nn = BigNumber(n).toNumber();
+      if (nn < 0) {
+        return null;
+      }
+      return Math.sqrt(nn);
     },
     type: {
       type: "function",
@@ -187,14 +215,14 @@ export default {
     },
   },
   MAX: {
-    value: (...nums: Array<Maybe<number>>) => {
-      let max = null;
+    value: (...nums: Array<SfNumber>) => {
+      let max: SfNumber = null;
       for (const n of nums) {
         if (n == null) {
           return null;
         }
-        if (max == null || max < n) {
-          max = n;
+        if (max == null || max.isLessThan(n)) {
+          max = BigNumber(n);
         }
       }
       return max;
@@ -209,14 +237,14 @@ export default {
     },
   },
   MIN: {
-    value: (...nums: Array<Maybe<number>>) => {
-      let min = null;
+    value: (...nums: Array<SfNumber>) => {
+      let min: SfNumber = null;
       for (const n of nums) {
         if (n == null) {
           return null;
         }
-        if (min == null || min > n) {
-          min = n;
+        if (min == null || min.isGreaterThan(n)) {
+          min = BigNumber(n);
         }
       }
       return min;
@@ -231,14 +259,14 @@ export default {
     },
   },
   MOD: {
-    value: (n: Maybe<number>, d: Maybe<number>) => {
+    value: (n: SfNumber, d: SfNumber) => {
       if (n == null || d == null) {
         return null;
       }
-      if (d === 0) {
+      if (BigNumber(d).isZero()) {
         return n;
       }
-      return n % d;
+      return BigNumber(n).mod(d);
     },
     type: {
       type: "function",
@@ -255,4 +283,6 @@ export default {
       returns: { type: "number" },
     },
   },
-};
+} satisfies FunctionDefDictionary;
+
+export default numberBuiltins;

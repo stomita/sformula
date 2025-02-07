@@ -1,11 +1,12 @@
-import type { Maybe } from "../types";
+import type { FunctionDefDictionary } from "../types";
+import type { SfBoolean, SfAnyData, SfString } from "./types";
 
 /**
  *
  */
-export default {
+export const logicBuiltins = {
   AND: {
-    value: (...conds: Array<boolean | null | undefined>) => {
+    value: (...conds: SfBoolean[]) => {
       let ret: boolean | null = true;
       for (const c of conds) {
         if (c === false) {
@@ -27,7 +28,7 @@ export default {
     },
   },
   OR: {
-    value: (...conds: Array<boolean | null | undefined>) => {
+    value: (...conds: SfBoolean[]) => {
       let ret: boolean | null = false;
       for (const c of conds) {
         if (c === true) {
@@ -49,7 +50,7 @@ export default {
     },
   },
   NOT: {
-    value: (v: boolean | null | undefined) => {
+    value: (v: SfBoolean) => {
       if (v == null) {
         return null;
       }
@@ -67,7 +68,7 @@ export default {
     },
   },
   CASE: {
-    value: (...args: Array<any>) => {
+    value: (...args: SfAnyData[]) => {
       const value = args[0] == null ? "" : args[0];
       for (let i = 1; i < args.length - 1; i += 2) {
         const match = args[i] == null ? "" : args[i];
@@ -111,7 +112,7 @@ export default {
     },
   },
   IF: {
-    value: (test: boolean, cons: any, alt: any) => {
+    value: (test: SfBoolean, cons: SfAnyData, alt: SfAnyData) => {
       return test ? cons : alt;
     },
     type: {
@@ -134,7 +135,7 @@ export default {
     },
   },
   ISNULL: {
-    value: (value: any) => {
+    value: (value: SfAnyData) => {
       return value == null;
     },
     type: {
@@ -149,7 +150,7 @@ export default {
     },
   },
   ISBLANK: {
-    value: (value: any) => {
+    value: (value: SfAnyData) => {
       return value == null || value === "";
     },
     type: {
@@ -164,10 +165,11 @@ export default {
     },
   },
   ISNUMBER: {
-    value: (value: Maybe<string>) => {
+    value: (value: SfString) => {
       if (!value) {
         return null;
       }
+      // Strings representing binary, octal, or hexadecimal numbers are not treated as numbers.
       if (/^-?0[box]/i.test(value)) {
         return false;
       }
@@ -186,7 +188,7 @@ export default {
     },
   },
   NULLVALUE: {
-    value: (value: any, alt: any) => {
+    value: (value: SfAnyData, alt: SfAnyData) => {
       return value == null ? alt : value;
     },
     type: {
@@ -205,7 +207,7 @@ export default {
     },
   },
   BLANKVALUE: {
-    value: (value: any, alt: any) => {
+    value: (value: SfAnyData, alt: SfAnyData) => {
       return value == null || value === "" ? alt : value;
     },
     type: {
@@ -223,4 +225,6 @@ export default {
       returns: { type: "template", ref: "T" },
     },
   },
-};
+} satisfies FunctionDefDictionary;
+
+export default logicBuiltins;
