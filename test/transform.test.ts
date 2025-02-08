@@ -1,7 +1,7 @@
 import assert from "assert";
 import { Expression } from "estree";
 import { replace } from "estraverse";
-import { parseSync, compileSync } from "..";
+import { parseSync, compileSync } from "../src";
 
 test("should compile transformed ast directly", () => {
   const formula = "Text1__c & ' ' & Text2__c";

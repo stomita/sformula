@@ -1,7 +1,7 @@
 import assert from "assert";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
-import { parse, FormulaReturnType } from "..";
+import { parse, FormulaReturnType } from "../src";
 import { loadFormulaDefs } from "./utils/formulaDef";
 import {
   describe as describeSObject,
