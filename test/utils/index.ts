@@ -11,7 +11,7 @@ export function escapeXml(str: string): string {
 
 export async function catchError(
   execCb: () => Promise<void>,
-  callback: (e?: Error) => void
+  callback: (e?: unknown) => void
 ): Promise<void> {
   try {
     await execCb();

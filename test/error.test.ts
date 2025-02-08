@@ -19,6 +19,7 @@ test("should raise parse error", () => {
     });
     assert.fail("should not reach here");
   } catch (e) {
+    assert(typeof e === "object" && e != null && "name" in e);
     assert(e.name === "SyntaxError");
     assert(e instanceof SyntaxError);
     assert(e.found === "!");
@@ -38,6 +39,7 @@ test("should raise invalid type error", () => {
     });
     assert.fail("should not reach here");
   } catch (e) {
+    assert(typeof e === "object" && e != null && "name" in e);
     assert(e.name === "InvalidTypeError");
     assert(e instanceof InvalidTypeError);
     assert.deepStrictEqual(e.expected, ["number"]);
@@ -55,6 +57,7 @@ test("should raise invalid argument length error", () => {
     });
     assert.fail("should not reach here");
   } catch (e) {
+    assert(typeof e === "object" && e != null && "name" in e);
     assert(e.name === "InvalidArgLengthError");
     assert(e instanceof InvalidArgLengthError);
     assert(e.location?.start.line === 1);
@@ -73,6 +76,7 @@ test("should raise invalid operator error", () => {
     });
     assert.fail("should not reach here");
   } catch (e) {
+    assert(typeof e === "object" && e != null && "name" in e);
     assert(e.name === "InvalidOperatorError");
     assert(e instanceof InvalidOperatorError);
     assert(e.location?.start.line === 1);
@@ -88,6 +92,7 @@ test("should raise type not found error", () => {
     });
     assert.fail("should not reach here");
   } catch (e) {
+    assert(typeof e === "object" && e != null && "name" in e);
     assert(e.name === "TypeNotFoundError");
     assert(e instanceof TypeNotFoundError);
     assert(e.identifier === "Field__c");

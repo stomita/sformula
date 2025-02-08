@@ -14,7 +14,7 @@ export const parseFormula = (
       setBracketIdentifierHolder(options.bracketIdentifierHolder);
     }
     return parse(text);
-  } catch (e) {
+  } catch (e: any) {
     throw new SyntaxError(e.message, e.expected, e.found, e.location);
   } finally {
     resetBracketIdentifierHolder();
