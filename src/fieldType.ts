@@ -13,7 +13,9 @@ async function describeFieldType(
     so = await describer.describe(describer.sobject);
   } catch (e) {
     console.error(`failed to describe sobject: ${describer.sobject}`);
-    console.error(e.message);
+    if (typeof e === "object" && e != null && "message" in e) {
+      console.error(e.message);
+    }
     return null;
   }
   const fieldDef = so.fields.find(
