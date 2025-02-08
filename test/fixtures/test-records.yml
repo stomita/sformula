@@ -1,295 +1,191 @@
 - {}
--
-  Checkbox01__c: true
+- Checkbox01__c: true
   Number01__c: 0.65
   Percent01__c: 45
--
-  Percent01__c: 145
--
-  Number01__c: 1
-- 
+- Percent01__c: 145
+- Number01__c: 1
+- Number02__c: 2
+- Number01__c: 1
   Number02__c: 2
--
-  Number01__c: 1
-  Number02__c: 2
--
-  Number01__c: 1
+- Number01__c: 1
   Number02__c: 0
--
-  Number01__c: 0
+- Number01__c: 0
   Number02__c: 4
--
-  Text01__c: abc
--
-  Text01__c: abc
+- Text01__c: abc
+- Text01__c: abc
   Text02__c: def
--
-  Text02__c: def
--
-  Date01__c: '2017-12-29'
--
-  Datetime01__c: '2018-01-01T14:00:00Z'
--
-  Datetime01__c: '2018-01-01T14:00:00+09:00'
--
-  Datetime01__c: '2018-01-02T09:28:04Z'
--
-  Datetime01__c: '2017-09-30T23:34:59Z'
--
-  Datetime01__c: '2018-01-02T00:00:00Z'
-  Datetime02__c: '2017-12-29T12:00:00Z'
--
-  Datetime01__c: '2018-01-02T00:00:00Z'
-  Datetime02__c: '2017-12-30T00:00:00Z'
--
-  Date01__c: '2018-01-02'
-  Date02__c: '2017-12-31'
--
-  Date01__c: '2018-01-02'
--
-  Number01__c: 0
--
+- Text02__c: def
+- Date01__c: "2017-12-29"
+- Datetime01__c: "2018-01-01T14:00:00Z"
+- Datetime01__c: "2018-01-01T14:00:00+09:00"
+- Datetime01__c: "2018-01-02T09:28:04Z"
+- Datetime01__c: "2017-09-30T23:34:59Z"
+- Datetime01__c: "2018-01-02T00:00:00Z"
+  Datetime02__c: "2017-12-29T12:00:00Z"
+- Datetime01__c: "2018-01-02T00:00:00Z"
+  Datetime02__c: "2017-12-30T00:00:00Z"
+- Date01__c: "2018-01-02"
+  Date02__c: "2017-12-31"
+- Date01__c: "2018-01-02"
+- Number01__c: 0
+- Number02__c: 1
+- Number01__c: 0
   Number02__c: 1
--
-  Number01__c: 0
+- Number01__c: 13
   Number02__c: 1
--
-  Number01__c: 13
-  Number02__c: 1
--
-  Number01__c: 4
+- Number01__c: 4
   Number02__c: 31
--
-  Number01__c: 12
+- Number01__c: 12
   Number02__c: -8
--
-  Number01__c: 4
+- Number01__c: 4
   Number02__c: 3
--
-  Number01__c: 5
+- Number01__c: 5
   Number02__c: 3
--
-  Number01__c: -4
+- Number01__c: -4
   Number02__c: 3
--
-  Number01__c: -5
+- Number01__c: -5
   Number02__c: 3
--
-  Number01__c: 5
+- Number01__c: 5
   Number02__c: 3.45
--
-  Number01__c: 10
+- Number01__c: 10
   Number02__c: -1.54
--
-  Number02__c: 3.14159265
--
-  Currency01__c: 1215
+- Number02__c: 3.14159265
+- Currency01__c: 1215
   Number02__c: 1.08
--
-  Currency02__c: -0.25
+- Currency02__c: -0.25
   Number02__c: -0.15
   Percent02__c: -45.5
--
-  Percent01__c: 89.4
+- Percent01__c: 89.4
   Number01__c: 250
--
-  Percent02__c: 0.12
--
-  Percent02__c: 1.2
--
-  Percent02__c: 12
--
-  Percent02__c: 120
--
-  Percent02__c: 1200
--
-  Number01__c: 0
+- Percent02__c: 0.12
+- Percent02__c: 1.2
+- Percent02__c: 12
+- Percent02__c: 120
+- Percent02__c: 1200
+- Number01__c: 0
   Number02__c: 1250.8359
   Percent02__c: 89.6
   Currency02__c: 149800.55
--
-  Number02__c: -2319.182
+- Number02__c: -2319.182
   Percent02__c: -90.5
   Currency02__c: -2800.50
--
-  Number01__c: 0
+- Number01__c: 0
   Number02__c: 152.498
   Percent02__c: 48.67
   Currency02__c: 98000.01
--
-  Number01__c: 2
+- Number01__c: 2
   Number02__c: -1.0981
   Percent02__c: -130.41
   Currency02__c: -501.12
--
-  Number01__c: 2
+- Number01__c: 2
   Number02__c: 152.498
   Percent02__c: 48.67
   Currency02__c: 98000.01
--
-  Number01__c: 0
+- Number01__c: 0
   Number02__c: -1.0981
   Percent02__c: -130.41
   Currency02__c: -501.12
--
-  Text01__c: ''
--
-  Text01__c: null
--
-  Text02__c: ''
--
+- Text01__c: ""
+- Text01__c: null
+- Text02__c: ""
+- Text02__c: null
+- Text01__c: ""
   Text02__c: null
--
-  Text01__c: ''
+- Text01__c: ""
+  Text02__c: ""
+- Text01__c: null
   Text02__c: null
--
-  Text01__c: ''
-  Text02__c: ''
--
-  Text01__c: null
-  Text02__c: null
--
-  Text01__c: '2018'
-  Text02__c: '12'
--
-  Text01__c: '2000'
-  Text02__c: '13'
--
-  Text01__c: '-1.05'
--
-  Text01__c: '.05'
--
-  Text01__c: '3e-3'
--
-  Checkbox01__c: false
--
-  Checkbox01__c: false
+- Text01__c: "2018"
+  Text02__c: "12"
+- Text01__c: "2000"
+  Text02__c: "13"
+- Text01__c: "-1.05"
+- Text01__c: ".05"
+- Text01__c: "3e-3"
+- Checkbox01__c: false
+- Checkbox01__c: false
   Checkbox02__c: true
--
-  Date01__c: '2018-01-01'
--
-  Date01__c: '2018-01-01'
-  Date02__c: '2017-12-31'
--
-  Date01__c: '2018-01-01'
+- Date01__c: "2018-01-01"
+- Date01__c: "2018-01-01"
+  Date02__c: "2017-12-31"
+- Date01__c: "2018-01-01"
   Number01__c: 1
--
-  Date01__c: '2018-01-01'
-  Date02__c: '2017-12-31'
+- Date01__c: "2018-01-01"
+  Date02__c: "2017-12-31"
   Parent__r: {}
--
-  Date01__c: '2018-01-01'
+- Date01__c: "2018-01-01"
   Parent__r:
-    Date01__c: '2018-01-01'
-    Date02__c: '2017-12-31'
+    Date01__c: "2018-01-01"
+    Date02__c: "2017-12-31"
     Parent__r:
-      Date02__c: '2017-12-29'
--
-  Text01__c: 'A'
--
-  Text01__c: 'B'
--
-  Text01__c: 'C'
--
-  Text01__c: 'D'
--
-  Text01__c: 'Z'
--
-  Picklist01__c: '2'
-  Picklist02__c: '1'
--
-  Picklist01__c: '1'
-  Picklist02__c: '0'
--
-  Picklist01__c: null
+      Date02__c: "2017-12-29"
+- Text01__c: "A"
+- Text01__c: "B"
+- Text01__c: "C"
+- Text01__c: "D"
+- Text01__c: "Z"
+- Picklist01__c: "2"
+  Picklist02__c: "1"
+- Picklist01__c: "1"
+  Picklist02__c: "0"
+- Picklist01__c: null
   Picklist02__c: null
--
-  MultiPicklist01__c: 'M;XL'
-  MultiPicklist02__c: 'A'
--
-  MultiPicklist01__c: 'S;M'
-  MultiPicklist02__c: 'A;B;D'
--
-  MultiPicklist01__c: null
+- MultiPicklist01__c: "M;XL"
+  MultiPicklist02__c: "A"
+- MultiPicklist01__c: "S;M"
+  MultiPicklist02__c: "A;B;D"
+- MultiPicklist01__c: null
   MultiPicklist02__c: null
--
-  Text01__c: 'abcABCde'
-  Text02__c: 'bcA'
--
-  Text01__c: 'abcABCde'
-  Text02__c: 'BCA'
--
-  Text01__c: 'abcABCde'
-  Text02__c: 'aB'
--
-  Text01__c: 'abcABCde'
-  Text02__c: 'ab'
--
-  Text01__c: 'abcABCde'
-  Text02__c: ''
--
-  Text01__c: 'abcABCde'
+- Text01__c: "abcABCde"
+  Text02__c: "bcA"
+- Text01__c: "abcABCde"
+  Text02__c: "BCA"
+- Text01__c: "abcABCde"
+  Text02__c: "aB"
+- Text01__c: "abcABCde"
+  Text02__c: "ab"
+- Text01__c: "abcABCde"
+  Text02__c: ""
+- Text01__c: "abcABCde"
   Number01__c: 4
--
-  Text01__c: 'abcABCde'
+- Text01__c: "abcABCde"
   Number01__c: -3
--
-  Text01__c: 'abcABCde'
+- Text01__c: "abcABCde"
   Number01__c: 0
--
-  Text01__c: 'abcABCde'
+- Text01__c: "abcABCde"
   Number01__c: 15
--
-  Text01__c: 'abcABCde'
+- Text01__c: "abcABCde"
   Number01__c: 2.81
--
-  Text01__c: 'abcあいう０１２ＡＢＣ'
-  Text02__c: 'A'
--
-  Text01__c: 'abcあいう０１２ＡＢＣ'
-  Text02__c: 'Ａ'
--
-  Text01__c: 'abcABCde 01201 444-888'
--
-  Textarea01__c: |-
+- Text01__c: "abcあいう０１２ＡＢＣ"
+  Text02__c: "A"
+- Text01__c: "abcあいう０１２ＡＢＣ"
+  Text02__c: "Ａ"
+- Text01__c: "abcABCde 01201 444-888"
+- Textarea01__c: |-
     Lorem ipsum dolor sit amet, consectetur adipiscing elit.
     Morbi bibendum, justo porta euismod tristique, ipsum dui scelerisque metus,
     non eleifend odio orci nec massa.
--
-  Text01__c: '123.45'
--
-  Text01__c: '1,000,000'
--
-  Text01__c: '-123.45'
--
-  Text01__c: '0x123'
--
-  Text01__c: '0123'
--
-  Text01__c: '3.5e-4'
--
-  Text01__c: '18:36:19.124'
--
-  Text01__c: '28:66:99.009'
-  Time01__c: '20:04:46.012Z'
-  Time02__c: '01:08:16.345Z'
--
-  Time01__c: '11:11:11.111Z'
-  Time02__c: '11:11:11.111Z'
--
-  Time01__c: '09:14:56.012Z'
-  Time02__c: '03:24:10.345Z'
--
-  Text01__c: '12:34:56.789'
-  Text02__c: '12:34:56.789'
--
-  Text01__c: '0053h000001aRXZ'
-  Text02__c: '0053h000001aRXZAA2'
--
-  Text01__c: '00D3h000002sxWVEAY'
-  Text02__c: '00D3h000002sxWVEAY'
--
-  Text01__c: ABC
+- Text01__c: "123.45"
+- Text01__c: "1,000,000"
+- Text01__c: "-123.45"
+- Text01__c: "0x123"
+- Text01__c: "0123"
+- Text01__c: "3.5e-4"
+- Text01__c: "18:36:19.124"
+- Text01__c: "28:66:99.009"
+  Time01__c: "20:04:46.012Z"
+  Time02__c: "01:08:16.345Z"
+- Time01__c: "11:11:11.111Z"
+  Time02__c: "11:11:11.111Z"
+- Time01__c: "09:14:56.012Z"
+  Time02__c: "03:24:10.345Z"
+- Text01__c: "12:34:56.789"
+  Text02__c: "12:34:56.789"
+- Text01__c: "0053h000001aRXZ"
+  Text02__c: "0053h000001aRXZAA2"
+- Text01__c: "00D3h000002sxWVEAY"
+  Text02__c: "00D3h000002sxWVEAY"
+- Text01__c: ABC
   Text02__c: abc
   Email01__c: abc@def.com
   Email02__c: hello@example.net
@@ -297,35 +193,28 @@
   Phone02__c: "0312345678"
   Url01__c: "https://www.google.com/"
   Url02__c: "www.apple.com/ja"
--
-  Url01__c: "https://www.google.com/"
+- Url01__c: "https://www.google.com/"
   Url02__c: "/path/to/servlet"
   Text01__c: "The quick brown fox jumps over the lazy dog"
   Text02__c: "lazy dog"
   Number01__c: 16
   Number02__c: 16
--
-  Url01__c: "https://www.google.com/"
+- Url01__c: "https://www.google.com/"
   Url02__c: "/path/to/servlet"
   Text01__c: "Self"
   Text02__c: "_self"
   Number01__c: 120
--
-  Url01__c: "https://www.google.com/"
+- Url01__c: "https://www.google.com/"
   Url02__c: "/path/to/servlet"
   Text01__c: "With <tagged> text"
-  Text02__c: "With \"double quoted\" text"
+  Text02__c: 'With "double quoted" text'
   Number01__c: 4.23
   Number02__c: -12.8
--
-  Date01__c: '2019-11-30'
+- Date01__c: "2019-11-30"
   Number01__c: 5
--
-  Date01__c: '2019-12-31'
+- Date01__c: "2019-12-31"
   Number01__c: 5
--
-  Date01__c: '2019-04-30'
+- Date01__c: "2019-04-30"
   Number01__c: 1
--
-  Date01__c: '2019-05-30'
+- Date01__c: "2019-05-30"
   Number01__c: 1

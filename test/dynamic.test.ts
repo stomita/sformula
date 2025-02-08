@@ -25,11 +25,13 @@ function zeropad(n: number) {
 }
 
 function toReturnType(type: string): FormulaReturnType {
-  return (type === "Checkbox"
-    ? "boolean"
-    : type === "Text"
-    ? "string"
-    : type.toLowerCase()) as FormulaReturnType;
+  return (
+    type === "Checkbox"
+      ? "boolean"
+      : type === "Text"
+        ? "string"
+        : type.toLowerCase()
+  ) as FormulaReturnType;
 }
 
 const ISO8601_DATETIME_FORMAT = "YYYY-MM-DD[T]HH:mm:ss.SSSZZZ";
