@@ -3,6 +3,14 @@
   precision: 18
   scale: 0
 - type: Number
+  formula: 0.1 + 0.2
+  precision: 18
+  scale: 2
+- type: Number
+  formula: 0.3 - 0.1
+  precision: 18
+  scale: 2
+- type: Number
   formula: 6 / 3 * 2
   precision: 18
   scale: 0
@@ -139,6 +147,10 @@
   formula: Time01__c < Time02__c + 5 * 60 * 60 * 1000
 - type: Checkbox
   formula: Time01__c > Time02__c - 10 * 60 * 60 * 1000
+- type: Number
+  formula: -Number01__c
+  precision: 18
+  scale: 2
 - type: Number
   formula: +Number02__c
   precision: 18
