@@ -153,7 +153,7 @@ function traverseUnaryExpression(
   }
   switch (argumentType.type) {
     case "number":
-      if (operator !== "-" && operator === "+") {
+      if (operator !== "-" && operator !== "+") {
         throw new InvalidOperatorError(
           expression.argument,
           argumentTypeId,

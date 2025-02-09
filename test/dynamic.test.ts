@@ -37,6 +37,10 @@ beforeAll(async () => {
 /**
  *
  */
+const targetFormulaNo = process.env.TEST_FORMULA_NO
+  ? parseInt(process.env.TEST_FORMULA_NO, 10)
+  : null;
+
 for (const [i, formulaDef] of formulaDefs.entries()) {
   const {
     type,
@@ -46,10 +50,13 @@ for (const [i, formulaDef] of formulaDefs.entries()) {
     blankAsZero,
     fluctuation = 0,
   } = formulaDef;
-  /**
-   *
-   */
-  test(`formula#${zeropad(i + 1)}: ${formula}${
+
+  const formulaNo = i + 1;
+  if (targetFormulaNo && formulaNo !== targetFormulaNo) {
+    continue;
+  }
+
+  test(`formula#${zeropad(formulaNo)}: ${formula}${
     blankAsZero ? " (blank as zero) " : ""
   }`, async () => {
     if (expectedRecords?.length !== testRecords?.length) {

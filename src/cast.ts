@@ -1,8 +1,8 @@
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
-import { shiftDecimalPoint } from "./builtin/common";
 import { ISO8601_DATE_FORMAT } from "./builtin/constants";
 import { Maybe } from "./types";
+import BigNumber from "bignumber.js";
 
 /**
  *
@@ -31,9 +31,8 @@ export function isCastableType(srcType: string, dstType: string) {
 /**
  *
  */
-export function applyScale(n: number, scale: number) {
-  const power = 10 ** scale;
-  return Math.round(n * power) / power;
+export function applyScale(n: number | BigNumber, scale: number) {
+  return BigNumber(n).decimalPlaces(scale, BigNumber.ROUND_HALF_UP);
 }
 
 /**
@@ -55,17 +54,22 @@ export function castValue(
     const dt = dayjs(value);
     return dt.isValid() ? dt.utc().format(ISO8601_DATE_FORMAT) : null;
   }
+  // Convert to/from percent value (e.g. 45.5% <-> 0.455)
   if (dstType === "percent" && srcType !== "percent") {
-    value = shiftDecimalPoint(value, -2);
+    value = BigNumber(value).shiftedBy(2); // 0.455 -> 45.5
   }
   if (dstType !== "percent" && srcType === "percent") {
-    value = shiftDecimalPoint(value, 2);
+    value = BigNumber(value).shiftedBy(-2); // 45.5 -> 0.455
   }
   if (
     typeof scale === "number" &&
     (dstType === "number" || dstType === "currency" || dstType === "percent")
   ) {
     value = applyScale(value, scale);
+  }
+  // Convert BigNumber to number before returning
+  if (BigNumber.isBigNumber(value)) {
+    value = value.toNumber();
   }
   // trim the space from the output
   if (dstType === "string" && srcType === "string") {

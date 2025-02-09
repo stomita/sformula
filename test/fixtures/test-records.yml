@@ -218,3 +218,19 @@
   Number01__c: 1
 - Date01__c: "2019-05-30"
   Number01__c: 1
+- Date01__c: "2019-05-30"
+  Number01__c: 1
+- Date01__c: "2020-01-14"
+  Number01__c: 1.21
+- Date01__c: "2019-12-30"
+  Number01__c: 1.65
+- Date01__c: "2019-10-31"
+  Number01__c: -2.8
+  Number02__c: -987.654321
+  Percent01__c: 0.85
+  Percent02__c: 45.45
+- Date01__c: "2019-11-01"
+  Number01__c: -1.45
+  Number02__c: 12.3456789
+  Percent01__c: 24
+  Percent02__c: -0.345
