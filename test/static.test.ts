@@ -1,6 +1,6 @@
 import assert from "assert";
 import dayjs from "dayjs";
-import { parseSync, parse, InvalidTypeError } from "..";
+import { parseSync, parse, InvalidTypeError } from "../src";
 import { DescribeSObjectResult } from "../src/types";
 import { catchError } from "./utils";
 import { describe } from "./utils/schema";

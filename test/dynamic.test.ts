@@ -1,91 +1,15 @@
 import assert from "assert";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import { parse, FormulaReturnType } from "..";
+import { parse } from "../src";
 import { loadFormulaDefs } from "./utils/formulaDef";
-import {
-  describe as describeSObject,
-  createFormulaSchema,
-  resetFormulaSchema,
-} from "./utils/schema";
-import {
-  loadTestRecords,
-  truncateAllTestRecords,
-  insertTestRecords,
-  getExpectedRecords,
-  Record,
-} from "./utils/testRecords";
+import { describe as describeSObject } from "./utils/schema";
+import { Record, setupFormulaObjectAndRecords } from "./utils/testRecords";
+import { FORMULA_TEST_OBJECT } from "./utils/constant";
+import { between, calcFluctuatedValue, toReturnType, zeropad } from "./utils";
 
-//
-dayjs.extend(utc);
-//
-
-function zeropad(n: number) {
-  return (n < 10 ? "00" : n < 100 ? "0" : "") + String(n);
-}
-
-function toReturnType(type: string): FormulaReturnType {
-  return (
-    type === "Checkbox"
-      ? "boolean"
-      : type === "Text"
-        ? "string"
-        : type.toLowerCase()
-  ) as FormulaReturnType;
-}
-
-const ISO8601_DATETIME_FORMAT = "YYYY-MM-DD[T]HH:mm:ss.SSSZZZ";
-
-const SALESFORCE_TIME_OUTPUT_FORMAT = "HH:mm:ss.SSS[Z]";
-
-function calcFluctuatedValue(
-  value: string | number | null,
-  fluctuation: number,
-  returnType: FormulaReturnType
-) {
-  if (
-    (returnType === "number" ||
-      returnType === "currency" ||
-      returnType === "percent") &&
-    typeof value === "number"
-  ) {
-    return [value - fluctuation, value + fluctuation] as [number, number];
-  }
-  if (returnType === "datetime" && typeof value === "string") {
-    const dt = dayjs(value);
-    return [
-      dt.add(-fluctuation, "millisecond").utc().format(ISO8601_DATETIME_FORMAT),
-      dt.add(fluctuation, "millisecond").utc().format(ISO8601_DATETIME_FORMAT),
-    ] as [string, string];
-  }
-  if (returnType === "time" && typeof value === "string") {
-    const dt = dayjs.utc(value, SALESFORCE_TIME_OUTPUT_FORMAT, true);
-    return [
-      dt
-        .add(-fluctuation, "millisecond")
-        .utc()
-        .format(SALESFORCE_TIME_OUTPUT_FORMAT),
-      dt
-        .add(fluctuation, "millisecond")
-        .utc()
-        .format(SALESFORCE_TIME_OUTPUT_FORMAT),
-    ] as [string, string];
-  }
-  return [value, value] as [typeof value, typeof value];
-}
-
-function between(value: any, lower: any, upper: any) {
-  return (
-    (value == null && lower == null && upper === null) ||
-    (value >= lower && value <= upper)
-  );
-}
-
-const FORMULA_TEST_OBJECT = "FormulaTest__c";
-
+const formulaSObject = `${FORMULA_TEST_OBJECT}__c`;
 const formulaDefs = loadFormulaDefs();
 
-const describer = { sobject: FORMULA_TEST_OBJECT, describe: describeSObject };
+const describer = { sobject: formulaSObject, describe: describeSObject };
 
 /**
  *
@@ -102,19 +26,12 @@ let expectedRecords: Record[];
  *
  */
 beforeAll(async () => {
-  if (
-    !process.env.SKIP_LOADING_TEST_RECORDS &&
-    !process.env.SKIP_REBUILD_FORMULA_SCHEMA
-  ) {
-    await resetFormulaSchema(FORMULA_TEST_OBJECT);
-    await createFormulaSchema(FORMULA_TEST_OBJECT, formulaDefs);
-  }
-  testRecords = loadTestRecords();
-  if (!process.env.SKIP_LOADING_TEST_RECORDS) {
-    await truncateAllTestRecords(FORMULA_TEST_OBJECT);
-    await insertTestRecords(FORMULA_TEST_OBJECT, testRecords);
-  }
-  expectedRecords = await getExpectedRecords(FORMULA_TEST_OBJECT, testRecords);
+  const ret = await setupFormulaObjectAndRecords(formulaSObject, formulaDefs, {
+    skipLoadingTestRecords: !!process.env.SKIP_LOADING_TEST_RECORDS,
+    skipRebuildFormulaSchdema: !!process.env.SKIP_REBUILD_FORMULA_SCHEMA,
+  });
+  testRecords = ret.testRecords;
+  expectedRecords = ret.expectedRecords;
 });
 
 /**

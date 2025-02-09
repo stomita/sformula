@@ -6,7 +6,7 @@ import {
   InvalidTypeError,
   InvalidArgLengthError,
   InvalidOperatorError,
-} from "..";
+} from "../src";
 
 test("should raise parse error", () => {
   const formula = "Text__c !";
