@@ -3,6 +3,8 @@ import fs from "fs-extra";
 import yaml from "js-yaml";
 import { zeropad } from ".";
 import { getConnection } from "./connection";
+import { createFormulaSchema, resetFormulaSchema } from "./schema";
+import type { FormulaDef } from "./formulaDef";
 
 export type Record = {
   Key__c: string;
@@ -118,4 +120,30 @@ export async function getExpectedRecords(
   const expectedRecs = testRecords.map((rec) => keyMap[rec.Key__c]);
   console.log("got expected record values from server");
   return expectedRecs;
+}
+
+type FormulaObjectSetupOptions = {
+  skipLoadingTestRecords?: boolean;
+  skipRebuildFormulaSchdema?: boolean;
+};
+
+export async function setupFormulaObjectAndRecords(
+  sobject: string,
+  formulaDefs: FormulaDef[],
+  {
+    skipLoadingTestRecords,
+    skipRebuildFormulaSchdema,
+  }: FormulaObjectSetupOptions = {}
+) {
+  if (!skipLoadingTestRecords && !skipRebuildFormulaSchdema) {
+    await resetFormulaSchema(sobject);
+    await createFormulaSchema(sobject, formulaDefs);
+  }
+  const testRecords = loadTestRecords();
+  if (!skipLoadingTestRecords) {
+    await truncateAllTestRecords(sobject);
+    await insertTestRecords(sobject, testRecords);
+  }
+  const expectedRecords = await getExpectedRecords(sobject, testRecords);
+  return { testRecords, expectedRecords };
 }
