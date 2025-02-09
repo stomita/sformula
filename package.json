@@ -23,6 +23,7 @@
     "prettier": "prettier src test --write",
     "typecheck": "tsc --noEmit",
     "test": "jest",
+    "test:snapshot:precompile": "tsx test/utils/precompile.ts",
     "test:skipRebuild": "SKIP_REBUILD_FORMULA_SCHEMA=true jest",
     "test:skipPrepare": "SKIP_LOADING_TEST_RECORDS=true jest"
   },
@@ -78,6 +79,7 @@
     "prettier": "^3.4.2",
     "rimraf": "^3.0.2",
     "salesforce-metadata-xml-builder": "^0.4.0",
+    "tsx": "^4.19.2",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.23.0",
     "webpack": "^5.97.1",
