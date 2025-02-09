@@ -60,10 +60,14 @@ async function describeFieldType(
       return fieldDef.name === field
         ? { type: "id" }
         : fieldDef.relationshipName === field &&
-          fieldDef.referenceTo &&
-          fieldDef.referenceTo.length === 1
-        ? { type: "object", sobject: fieldDef.referenceTo[0], properties: {} }
-        : { type: "object", sobject: "Name", properties: {} };
+            fieldDef.referenceTo &&
+            fieldDef.referenceTo.length === 1
+          ? {
+              type: "object",
+              sobject: fieldDef.referenceTo[0],
+              properties: {},
+            }
+          : { type: "object", sobject: "Name", properties: {} };
     default:
       return null;
   }

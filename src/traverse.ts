@@ -859,7 +859,7 @@ function traverseCallExpression(
   }
   const returnType =
     calleeType.returns.type === "template"
-      ? templateTypes.get(calleeType.returns.ref) ?? { type: "any" }
+      ? (templateTypes.get(calleeType.returns.ref) ?? { type: "any" })
       : calleeType.returns;
   return {
     expression: injectCallExpression(
@@ -931,10 +931,10 @@ function traverseLiteral(expression: Literal): TraverseResult {
     typeof expression.value === "number"
       ? { type: "number" }
       : typeof expression.value === "string"
-      ? { type: "string" }
-      : typeof expression.value === "boolean"
-      ? { type: "boolean" }
-      : { type: "any" };
+        ? { type: "string" }
+        : typeof expression.value === "boolean"
+          ? { type: "boolean" }
+          : { type: "any" };
   return { expression, returnType };
 }
 

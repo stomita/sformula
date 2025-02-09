@@ -20,6 +20,7 @@
     "build:typedef": "tsc --project ./src/tsconfig.json --declaration --emitDeclarationOnly --outDir types --rootDir src",
     "build:bundle": "webpack",
     "lint": "eslint src test",
+    "prettier": "prettier src test --write",
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "test:skipRebuild": "SKIP_REBUILD_FORMULA_SCHEMA=true jest",
