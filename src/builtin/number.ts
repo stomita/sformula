@@ -65,9 +65,7 @@ const numberBuiltins = {
       if (v == null || d == null) {
         return null;
       }
-      const places = BigNumber(d)
-        .integerValue(BigNumber.ROUND_FLOOR)
-        .toNumber();
+      const places = BigNumber(d).integerValue(BigNumber.ROUND_DOWN).toNumber();
       if (places >= 0) {
         return BigNumber(v).decimalPlaces(places, BigNumber.ROUND_HALF_UP);
       } else {

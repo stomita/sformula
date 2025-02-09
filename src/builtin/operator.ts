@@ -440,7 +440,7 @@ const operatorBuiltins = {
       if (!dt.isValid()) {
         return null;
       }
-      const nn = BigNumber(n).toNumber();
+      const nn = BigNumber(n).integerValue(BigNumber.ROUND_DOWN).toNumber();
       const ms = dayjs.duration(nn, "day").asMilliseconds();
       return dt.add(ms, "millisecond").format(ISO8601_DATE_FORMAT);
     },
@@ -468,9 +468,8 @@ const operatorBuiltins = {
       if (!dt.isValid()) {
         return null;
       }
-      const ms = dayjs
-        .duration(BigNumber(n).toNumber(), "day")
-        .asMilliseconds();
+      const nn = BigNumber(n).integerValue(BigNumber.ROUND_DOWN).toNumber();
+      const ms = dayjs.duration(nn, "day").asMilliseconds();
       return dt.add(-ms, "millisecond").format(ISO8601_DATE_FORMAT);
     },
     type: {
