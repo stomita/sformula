@@ -538,3 +538,5 @@
   formula: IMAGE(Url01__c, Text01__c, Number01__c, Number02__c)
 - type: Text
   formula: HYPERLINK(Url02__c, IMAGE(Url01__c, Text01__c), Text02__c)
+- type: Text
+  formula: CASE(MOD(Number01__c, 2), 0, Text01__c, 1, Text02__c, NULL)
