@@ -1,5 +1,5 @@
 import type { FunctionDefDictionary } from "../types";
-import type { SfBoolean, SfAnyData, SfString } from "./types";
+import { type SfBoolean, type SfAnyData, type SfString, isEquivalent } from "./types";
 
 /**
  *
@@ -69,11 +69,11 @@ export const logicBuiltins = {
   },
   CASE: {
     value: (...args: SfAnyData[]) => {
-      const value = args[0] == null ? "" : args[0];
+      const value = args[0];
       for (let i = 1; i < args.length - 1; i += 2) {
-        const match = args[i] == null ? "" : args[i];
+        const match = args[i];
         const ret = args[i + 1];
-        if (match === value) {
+        if (isEquivalent(match, value)) {
           return ret;
         }
       }
